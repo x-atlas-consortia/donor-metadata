@@ -47,8 +47,16 @@ The ideal curation solution has features including:
 # Architecture
 ## Elements
 - Python
-- Flask/WTF for forms-based app
-- neo4j driver
+  - Blueprint
+  - Flask
+  - WTF for forms-based app 
+  - neo4j driver
+- Valueset source (Google Sheets)
 - Docker 
 
 _Diagram pending_ 
+
+# Development
+## Initial tasks
+* Install all packages in *requirements.txt*.
+* 

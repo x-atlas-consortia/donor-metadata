@@ -1,0 +1,16 @@
+#APPCONTEXT should be either the string "HuBMAP" or "SenNet".
+APPCONTEXT="HuBMAP"
+
+# Information to connect to the appropriate neo4j provenance instance.
+SERVER='bolt://localhost:4500'
+USERNAME='neo4j'
+PASSWORD=
+
+# Maximum duration for the execution of timeboxed queries to prevent service timeout, in seconds
+# The AWS API gateway timeout is 29 seconds.
+TIMEOUT=28
+# Maximum number of rows returned from a query to prevent large payloads
+ROWLIMIT=1000
+# Maximum size of payload, in bytes
+# 9437184 bytes = 9 MB, less than the 10 MB payload limit for the AWS API gateway.
+PAYLOADLIMIT=9437184

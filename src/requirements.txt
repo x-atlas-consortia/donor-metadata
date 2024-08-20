@@ -1,0 +1,12 @@
+Flask==3.0.3
+# Flask depends on Werkzeug.
+Werkzeug==3.0.3
+# Flask forms
+WTForms==3.1.2
+
+neo4j==5.23.1
+
+# For working with the Google Sheet metadata valueset file.
+pandas==2.2.2
+gdown==5.2.0
+openpyxl==3.1.5
