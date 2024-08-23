@@ -5,16 +5,22 @@ Class for working with information from the Google Sheet of donor clinical metad
 import pandas as pd
 # For downloading from Google Sheets
 import gdown
+import logging
+
+logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S',
+                    level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class ValueSetManager():
 
-    def __init__(self, url:str, download_full_path: str, logger):
+    def __init__(self, url:str, download_full_path: str):
 
         try:
+            logging.info('Loading valuesets...')
             gdown.download(url, output=download_full_path, fuzzy=True)
             # The spreadsheet has multiple tabs, so sheet_name=None
             self.dfValueset = pd.read_excel(download_full_path,sheet_name=None)
-            print(self.dfValueset)
         except FileNotFoundError as e:
             logger.exception('Failed to load the valuesets Google Sheets document.')
             raise e
