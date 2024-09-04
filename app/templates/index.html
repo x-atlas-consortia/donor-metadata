@@ -1,0 +1,84 @@
+<!-- Data entry page for curation-->
+{% extends 'base.html' %}
+
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+<form method=post>
+    <div class="container text-left">
+        <div class="row align-items-start">
+            <div class="col">
+                <h1>Minimal Clinical Metadata</h1>
+                <h4><i>This metadata is required for the purposes of building DOIs for datasets associated with the donor.</i></h4>
+                <div class="row text-bg-warning p-3">
+                    <div class="col">
+                        {{ render_field(form.context) }}
+                    </div>
+                    <div class="col">
+                        {{ render_field(form.source_name) }}
+                    </div>
+                </div>
+                <div class="row align-items-start text-bg-warning p-3">
+                    <div class="col">
+                        {{ render_field(form.donorid) }}
+                    </div>
+                </div>
+                <div class="row align-items-start text-bg-warning p-3">
+                    <div class="col">
+                        {{ render_field(form.agevalue) }}
+                    </div>
+                    <div class="col">
+                        {{ render_field(form.ageunit) }}
+                    </div>
+                </div>
+                <div class="row align-items-start text-bg-warning p-3">
+                    <div class="col">
+                        {{ render_field(form.race) }}
+                    </div>
+                    <div class="col">
+                        {{ render_field(form.ethnicity) }}
+                    </div>
+                </div>
+                <div class="row align-items-start text-bg-warning p-3">
+                    <div class="col">
+                        {{ render_field(form.sex) }}
+                    </div>
+                </div>
+                <br>
+                <div class="row align-items-start">
+                    <h1>Organ Donation Metadata</h1>
+                    <dl>
+                        {{ render_field(form.cause) }}
+                        {{ render_field(form.mechanism) }}
+                        {{ render_field(form.event) }}
+                    </dl>
+                </div>
+            </div>
+            <div class="col">
+                <h1>Measurements</h1>
+                <div class="row">
+                    <div class="col">
+                        {{ render_field(form.heightvalue) }}
+                    </div>
+                    <div class="col">
+                        {{ render_field(form.heightunit) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{ render_field(form.weightvalue) }}
+                    </div>
+                    <div class="col">
+                        {{ render_field(form.weightunit) }}
+                    </div>
+                </div>
+            </div>
+        <div class="row align-items-start">
+            <div class="col">
+                <br>
+                <p><input type=submit value=update>
+            </div>
+        </div>
+    </div>
+
+</form>
+{% endblock %}
