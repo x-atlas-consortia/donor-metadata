@@ -86,9 +86,8 @@ class EditForm(Form):
                                                   validate_donorid])
 
     # Source_name is not encoded as a valueset, so hard-code the selection.
-    source_name = SelectField('Source name',
-                              choices=[('0', 'living_donor_data'), ('1', 'organ_donor_data'),
-                                       ('PROMPT', 'Select an option')])
+    # source_name = SelectField('Source name',
+                              # choices=[('0', 'living_donor_data'), ('1', 'organ_donor_data')])
 
     # Age requires both a value and a selection of unit.
 

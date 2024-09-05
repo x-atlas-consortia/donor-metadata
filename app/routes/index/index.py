@@ -19,7 +19,7 @@ def index():
     # 2. 'PROMPT' for optional fields
     # 3. default unit for unit fields
 
-    form.source_name.data = 'PROMPT'
+    # form.source_name.data = 'PROMPT'
     form.race.data = 'C0439673'  # Unknown
     form.sex.data = 'C0421467 '  # Unknown
     form.ethnicity.data = 'PROMPT'
