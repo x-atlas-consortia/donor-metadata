@@ -4,9 +4,7 @@ entity-api.
 """
 import os
 
-from wtforms import (Form, StringField, SelectField, DecimalField, validators, ValidationError,
-                     FieldList, FormField, TextAreaField, SelectMultipleField)
-from flask_wtf import FlaskForm
+from wtforms import (Form, StringField, SelectField, DecimalField, validators, ValidationError,TextAreaField)
 
 from .appconfig import AppConfig
 from .valuesetmanager import ValueSetManager
@@ -53,9 +51,11 @@ def validate_age(form, field):
 
 # ----------------------
 # MAIN FORM
+
+
 class EditForm(Form):
 
-    # POPULATE FORM FIELDS WITH SELECTION OPTIONS.
+    # POPULATE FORM FIELDS. In particular, populate SelectFields with lists obtained from the valueset manager.
 
     # Read the app.cfg file outside the Flask application context.
     fpath = os.path.dirname(os.getcwd())
@@ -79,13 +79,16 @@ class EditForm(Form):
     # Donor ID. This should be validated for format (i.e., contains expected delimiters) and
     # that the first two characters of the ID match the application context (e.g., HM and hubmapconsortium.org).
     donorid = StringField('Donor ID', validators=[validators.DataRequired(),
-                                                  validators.regexp('\D\D\d\d\d\.\D\D\D\.\d\d\d',
-                                                                    message='ID format: CCnnn.XXX.nnn, with '
-                                                                            'CC either HM or SN; n integer;'
-                                                                            'X non-numeric'),validate_donorid])
+                                                  validators.regexp('[^0-9]{2}[0-9]{3}\.[^0-9]{3}\.[0-9]{3}',
+                                                                    message='ID format: CCnnn.XXX.nnn: '
+                                                                            'CC either HM or SN; n integer; '
+                                                                            'X non-numeric'),
+                                                  validate_donorid])
 
     # Source_name is not encoded as a valueset, so hard-code the selection.
-    source_name = SelectField('Source name', choices=[('0', 'living_donor_data'), ('1', 'organ_donor_data'),('PROMPT','Select an option')])
+    source_name = SelectField('Source name',
+                              choices=[('0', 'living_donor_data'), ('1', 'organ_donor_data'),
+                                       ('PROMPT', 'Select an option')])
 
     # Age requires both a value and a selection of unit.
 
@@ -121,13 +124,13 @@ class EditForm(Form):
     # Measurements
     # Create SelectFields for each measurment group.
     heightvalue = DecimalField('Height (value)')
-    heightunit = SelectField('units', choices=[('0','cm'),('1','in')])
+    heightunit = SelectField('units', choices=[('0', 'cm'), ('1', 'in')])
     weightvalue = DecimalField('Weight (value)')
     weightunit = SelectField('units', choices=[('0', 'kg'), ('1', 'lb')])
     bmi = DecimalField('Body Mass Index (kg/m^2)')
     waistvalue = DecimalField('Waist circumference')
-    waistunit = SelectField('units', choices=[('0','cm'),('1','in')])
-    kdpi = DecimalField('Kidney donor profile index (%)')
+    waistunit = SelectField('units', choices=[('0', 'cm'), ('1', 'in')])
+    kdpi = DecimalField('KDPI (%)')
     hba1c = DecimalField('HbA1c (%)')
     amylase = DecimalField('Amylase (IU)')
     lipase = DecimalField('Lipase (IU)')
@@ -135,41 +138,43 @@ class EditForm(Form):
     agefirstbirth = DecimalField('Age at first birth (years)')
     gestationalage = DecimalField('Gestational age (weeks)')
     cancerrisk = DecimalField('Cancer Risk (%)')
-    pathologynote=TextAreaField('Pathology Note')
-    apoephenotype=TextAreaField('APOE phenotype')
+    pathologynote = TextAreaField('Pathology Note')
+    apoephenotype = TextAreaField('APOE phenotype')
 
     # The Fitzpatrick Skin Type, blood type, and blood Rh factor are categorical measurements.
-    fitz = valuesetmanager.getValuesetTuple(tab='Measurements',group_term="Fitzpatrick Classification Scale",
-                                                  addprompt=True)
+    fitz = valuesetmanager.getValuesetTuple(tab='Measurements', group_term="Fitzpatrick Classification Scale",
+                                            addprompt=True)
     fitzpatrick = SelectField('Fitzpatrick Classification Scale', choices=fitz)
 
     bloodtypes = valuesetmanager.getValuesetTuple(tab='Blood Type', group_term="ABO blood group system",
-                                            addprompt=True)
+                                                  addprompt=True)
     bloodtype = SelectField('ABO Blood Type', choices=bloodtypes)
 
     bloodrhs = valuesetmanager.getValuesetTuple(tab='Blood Type', group_term="Rh Blood Group",
-                                                  addprompt=True)
+                                                addprompt=True)
     bloodrh = SelectField('Rh Blood Group', choices=bloodrhs)
 
     # Social History fields are categorical; however, the Social History tab uses the same grouping concept,
     # so grouping will need to be manual. The other option of adding distinct grouping concepts would require
     # that we regenerate all donor metadata currently in provenance.
 
-    list_smoking_concepts = ['C0337664','C0337672', 'C0337671']
+    list_smoking_concepts = ['C0337664', 'C0337672', 'C0337671']
     smokings = valuesetmanager.getValuesetTuple(tab='Social History', list_concepts=list_smoking_concepts,
-                                               addprompt=True)
+                                                addprompt=True)
     smoking = SelectField('Smoking history', choices=smokings)
 
     tobaccos = valuesetmanager.getValuesetTuple(tab='Social History', list_concepts=['C3853727'], addprompt=True)
     tobacco = SelectField('Tobacco history', choices=tobaccos)
 
     list_alcohol_concepts = ['C0001948', 'C0457801']
-    alcohols = valuesetmanager.getValuesetTuple(tab='Social History', list_concepts=list_alcohol_concepts, addprompt=True)
+    alcohols = valuesetmanager.getValuesetTuple(tab='Social History', list_concepts=list_alcohol_concepts,
+                                                addprompt=True)
     alcohol = SelectField('Alcohol history', choices=alcohols)
 
-    list_drug_concepts = ['C4518790','C0524662','C0242566','C1456624','C3266350','C0281875','C0013146','C0239076']
+    list_drug_concepts = ['C4518790', 'C0524662', 'C0242566', 'C1456624', 'C3266350', 'C0281875',
+                          'C0013146', 'C0239076']
     drugs = valuesetmanager.getValuesetTuple(tab='Social History', list_concepts=list_drug_concepts,
-                                                addprompt=True)
+                                             addprompt=True)
     drug = SelectField('Other drug history', choices=drugs)
 
     # Medical History
@@ -187,6 +192,3 @@ class EditForm(Form):
     medhx_7 = SelectField('Condition', choices=medhx)
     medhx_8 = SelectField('Condition', choices=medhx)
     medhx_9 = SelectField('Condition', choices=medhx)
-    medhx_10 = SelectField('Condition', choices=medhx)
-
-

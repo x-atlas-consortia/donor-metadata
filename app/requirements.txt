@@ -3,7 +3,6 @@ Flask==3.0.3
 Werkzeug==3.0.3
 # Flask forms
 WTForms==3.1.2
-Flask-WTF==1.2.1
 
 neo4j==5.23.1
 

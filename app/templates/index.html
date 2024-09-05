@@ -20,6 +20,10 @@
                     <div class="col">
                         {{ render_field(form.donorid) }}
                     </div>
+                    <div class="col">
+                        <br>
+                        <p>&#8678;   <i>(CCnnn.XXX.nnn)</i></p>
+                    </div>
                 </div>
                 <div class="row text-bg-warning">
                     <div class="col">
@@ -158,7 +162,6 @@
                     </div>
                 </div>
                 <h1>Medical History</h1>
-                <h4><i>Optional</i></h4>
                 <div>
                     {{ render_field(form.medhx_0) }}
                 </div>
@@ -189,13 +192,10 @@
                 <div>
                     {{ render_field(form.medhx_9) }}
                 </div>
-                <div>
-                    {{ render_field(form.medhx_10) }}
-                </div>
             </div>
         </div>
         <div class="d-grid gap-2 col-6 mx-auto">
-            <button type="submit" class="btn btn-primary btn-lg">Update</button>
+            <button type="submit" class="btn btn-primary btn-lg">Create/Update</button>
         </div>
     </div>
 

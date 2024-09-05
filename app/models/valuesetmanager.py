@@ -17,7 +17,7 @@ class ValueSetManager():
     def __init__(self, url:str, download_full_path: str):
 
         try:
-            logging.info('Loading valuesets...')
+            logging.info('Downloading latest version of valueset file...')
             gdown.download(url, output=download_full_path, fuzzy=True)
             # The spreadsheet has multiple tabs, so sheet_name=None
             self.Sheets = pd.read_excel(download_full_path,sheet_name=None)
@@ -48,6 +48,7 @@ class ValueSetManager():
                            grouping_concept_preferred_term
         :param list_concepts: optional list of concepts used for "manual" grouping--i.e., not relying on the
                            value of grouping_concept_preferred_term
+        NOTE: if group_term takes precedence over list_concepts.
         :param addprompt: flag to indicate whether to add a prompt entry--i.e., "Select an option"
         :return: a list of tuples with values (concept_id, col)
         """

@@ -7,6 +7,7 @@ from models.editform import EditForm
 index_blueprint = Blueprint('index', __name__, url_prefix='/')
 
 
+
 @index_blueprint.route('', methods=['GET', 'POST'])
 def index():
 
@@ -46,7 +47,6 @@ def index():
     form.medhx_7.data = 'PROMPT'
     form.medhx_8.data = 'PROMPT'
     form.medhx_9.data = 'PROMPT'
-    form.medhx_10.data = 'PROMPT'
 
     if request.method == 'POST' and form.validate():
         # Translate fields into the encoded donor metadata schema.
