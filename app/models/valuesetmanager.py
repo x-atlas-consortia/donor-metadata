@@ -25,7 +25,7 @@ class ValueSetManager():
             logger.exception('Failed to load the valuesets Google Sheets document.')
             raise e
 
-    def getValuesetTuple(self, tab:str, col:str='preferred_term', addprompt:bool=False):
+    def getValuesetTuple(self, tab:str, col:str='preferred_term', group_term:str='', list_concepts:list=[], addprompt:bool=False):
 
         """
         In general, a tab in the ValuesetManager's Google sheet is formatted with columns:
@@ -43,10 +43,24 @@ class ValueSetManager():
         grouping_sab
 
         :param tab: Identifies a tab in the Google Sheets document.
-        :return:
+        :param col: column containing concept labels
+        :param group_term: term identifying a subset of rows in the tab with the same value for
+                           grouping_concept_preferred_term
+        :param list_concepts: optional list of concepts used for "manual" grouping--i.e., not relying on the
+                           value of grouping_concept_preferred_term
+        :param addprompt: flag to indicate whether to add a prompt entry--i.e., "Select an option"
+        :return: a list of tuples with values (concept_id, col)
         """
         dfTab = self.Sheets[tab]
+        # Optional filters for subset
+        if group_term != '':
+            dfTab = dfTab.loc[dfTab['grouping_concept_preferred_term']==group_term]
+        elif len(list_concepts) > 0:
+            dfTab = dfTab.loc[dfTab['concept_id'].isin(list_concepts)]
 
+        dfTab = dfTab.sort_values(by=['preferred_term'])
+
+        # Convert to tuple.
         sTuple = dfTab[['concept_id', col]].apply(tuple, axis=1)
 
         if addprompt:

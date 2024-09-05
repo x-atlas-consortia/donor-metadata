@@ -8,8 +8,8 @@
         <div class="row align-items-start">
             <div class="col">
                 <h1>Minimal Clinical Metadata</h1>
-                <h4><i>This metadata is required for the purposes of building DOIs for datasets associated with the donor.</i></h4>
-                <div class="row text-bg-warning p-3">
+                <h4><i>Required</i></h4>
+                <div class="row text-bg-warning">
                     <div class="col">
                         {{ render_field(form.context) }}
                     </div>
@@ -17,12 +17,12 @@
                         {{ render_field(form.source_name) }}
                     </div>
                 </div>
-                <div class="row align-items-start text-bg-warning p-3">
+                <div class="row text-bg-warning">
                     <div class="col">
                         {{ render_field(form.donorid) }}
                     </div>
                 </div>
-                <div class="row align-items-start text-bg-warning p-3">
+                <div class="row text-bg-warning">
                     <div class="col">
                         {{ render_field(form.agevalue) }}
                     </div>
@@ -30,7 +30,7 @@
                         {{ render_field(form.ageunit) }}
                     </div>
                 </div>
-                <div class="row align-items-start text-bg-warning p-3">
+                <div class="row text-bg-warning">
                     <div class="col">
                         {{ render_field(form.race) }}
                     </div>
@@ -38,14 +38,15 @@
                         {{ render_field(form.ethnicity) }}
                     </div>
                 </div>
-                <div class="row align-items-start text-bg-warning p-3">
+                <div class="row text-bg-warning">
                     <div class="col">
                         {{ render_field(form.sex) }}
                     </div>
                 </div>
                 <br>
-                <div class="row align-items-start">
-                    <h1>Organ Donation Metadata</h1>
+                <div class="row">
+                    <h1>Organ Donation</h1>
+                    <h4><i>Optional</i></h4>
                     <dl>
                         {{ render_field(form.cause) }}
                         {{ render_field(form.mechanism) }}
@@ -55,6 +56,7 @@
             </div>
             <div class="col">
                 <h1>Measurements</h1>
+                <h4><i>Optional; values will be converted to SI units</i></h4>
                 <div class="row">
                     <div class="col">
                         {{ render_field(form.heightvalue) }}
@@ -71,14 +73,133 @@
                         {{ render_field(form.weightunit) }}
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col">
+                         {{ render_field(form.bmi) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{ render_field(form.bloodtype) }}
+                    </div>
+                    <div class="col">
+                        {{ render_field(form.bloodrh) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{ render_field(form.waistvalue) }}
+                    </div>
+                    <div class="col">
+                        {{ render_field(form.waistunit) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{ render_field(form.agemenarche) }}
+                    </div>
+                    <div class="col">
+                        {{ render_field(form.agefirstbirth) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{ render_field(form.gestationalage) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{ render_field(form.kdpi) }}
+                    </div>
+                    <div class="col">
+                        {{ render_field(form.cancerrisk) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{ render_field(form.hba1c) }}
+                    </div>
+                    <div class="col">
+                        {{ render_field(form.amylase) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{ render_field(form.lipase) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{ render_field(form.pathologynote) }}
+                    </div>
+                    <div class="col">
+                        {{ render_field(form.apoephenotype) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{ render_field(form.fitzpatrick) }}
+                    </div>
+                </div>
             </div>
-        <div class="row align-items-start">
             <div class="col">
-                <br>
-                <p><input type=submit value=update>
+                <h1>Social History</h1>
+                <h4><i>Optional</i></h4>
+                <div class="row">
+                    <div class="col">
+                        {{ render_field(form.smoking) }}
+                    </div>
+                    <div class="col">
+                        {{ render_field(form.tobacco) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{ render_field(form.alcohol) }}
+                    </div>
+                    <div class="col">
+                        {{ render_field(form.drug) }}
+                    </div>
+                </div>
+                <h1>Medical History</h1>
+                <h4><i>Optional</i></h4>
+                <div>
+                    {{ render_field(form.medhx_0) }}
+                </div>
+                <div>
+                    {{ render_field(form.medhx_1) }}
+                </div>
+                <div>
+                    {{ render_field(form.medhx_2) }}
+                </div>
+                <div>
+                    {{ render_field(form.medhx_3) }}
+                </div>
+                <div>
+                    {{ render_field(form.medhx_4) }}
+                </div>
+                <div>
+                    {{ render_field(form.medhx_5) }}
+                </div>
+                <div>
+                    {{ render_field(form.medhx_6) }}
+                </div>
+                <div>
+                    {{ render_field(form.medhx_7) }}
+                </div>
+                <div>
+                    {{ render_field(form.medhx_8) }}
+                </div>
+                <div>
+                    {{ render_field(form.medhx_9) }}
+                </div>
+                <div>
+                    {{ render_field(form.medhx_10) }}
+                </div>
             </div>
         </div>
+    <div>
+        <p><input type=submit value=update>
     </div>
-
 </form>
 {% endblock %}
