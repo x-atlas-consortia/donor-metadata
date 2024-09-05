@@ -7,8 +7,7 @@
     <div class="container text-left">
         <div class="row align-items-start">
             <div class="col">
-                <h1>Minimal Clinical Metadata</h1>
-                <h4><i>Required</i></h4>
+                <h1>Minimal Metadata</h1>
                 <div class="row text-bg-warning">
                     <div class="col">
                         {{ render_field(form.context) }}
@@ -46,7 +45,6 @@
                 <br>
                 <div class="row">
                     <h1>Organ Donation</h1>
-                    <h4><i>Optional</i></h4>
                     <dl>
                         {{ render_field(form.cause) }}
                         {{ render_field(form.mechanism) }}
@@ -56,7 +54,6 @@
             </div>
             <div class="col">
                 <h1>Measurements</h1>
-                <h4><i>Optional; values will be converted to SI units</i></h4>
                 <div class="row">
                     <div class="col">
                         {{ render_field(form.heightvalue) }}
@@ -144,7 +141,6 @@
             </div>
             <div class="col">
                 <h1>Social History</h1>
-                <h4><i>Optional</i></h4>
                 <div class="row">
                     <div class="col">
                         {{ render_field(form.smoking) }}
@@ -198,8 +194,10 @@
                 </div>
             </div>
         </div>
-    <div>
-        <p><input type=submit value=update>
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <button type="submit" class="btn btn-primary btn-lg">Update</button>
+        </div>
     </div>
+
 </form>
 {% endblock %}

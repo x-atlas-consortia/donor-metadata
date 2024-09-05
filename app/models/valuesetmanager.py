@@ -65,7 +65,7 @@ class ValueSetManager():
 
         if addprompt:
             sPrompt = pd.Series([('PROMPT','Select an option')])
-            sTuple = pd.concat([sTuple,sPrompt])
+            sTuple = pd.concat([sPrompt,sTuple])
 
         return sTuple
 
