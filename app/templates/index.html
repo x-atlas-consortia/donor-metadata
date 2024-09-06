@@ -1,208 +1,23 @@
-<!-- Data entry page for curation-->
+<!--donor search page-->
 {% extends 'base.html' %}
 
 {% block content %}
 {% from "_formhelpers.html" import render_field %}
 <form method=post>
     <div class="container text-left">
-        <div class="row align-items-start">
-            <div class="col">
-                <h1>Minimal Metadata</h1>
-                <div class="row text-bg-warning">
-                    <div class="col">
-                        {{ render_field(form.context) }}
-                    </div>
-                </div>
-                <div class="row text-bg-warning">
-                    <div class="col">
-                        {{ render_field(form.donorid) }}
-                    </div>
-                    <div class="col">
-                        <br>
-                        <p>&#8678;   <i>(CCnnn.XXX.nnn)</i></p>
-                    </div>
-                </div>
-                <div class="row text-bg-warning">
-                    <div class="col">
-                        {{ render_field(form.agevalue) }}
-                    </div>
-                    <div class="col">
-                        {{ render_field(form.ageunit) }}
-                    </div>
-                </div>
-                <div class="row text-bg-warning">
-                    <div class="col">
-                        {{ render_field(form.race) }}
-                    </div>
-                    <div class="col">
-                        {{ render_field(form.ethnicity) }}
-                    </div>
-                </div>
-                <div class="row text-bg-warning">
-                    <div class="col">
-                        {{ render_field(form.sex) }}
-                    </div>
-                </div>
-                <div class="row text-bg-warning">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" style="margin-left: 0px;" type="checkbox" role="switch" id="flexSwitchCheckChecked" data-bs-toggle="collapse" data-bs-target="#collapseOrganDonor" aria-expanded="false" aria-controls="collapseOrganDonor">
-                        <label class="form-check-label" for="flexSwitchCheckChecked">Organ donor</label>
-                    </div>
-                </div>
-                <br>
-                <div class="collapse" id="collapseOrganDonor">
-                    <div class="row">
-                        <h1>Organ Donation</h1>
-                        <dl>
-                            {{ render_field(form.cause) }}
-                            {{ render_field(form.mechanism) }}
-                            {{ render_field(form.event) }}
-                        </dl>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <h1>Measurements</h1>
-                <div class="row">
-                    <div class="col">
-                        {{ render_field(form.heightvalue) }}
-                    </div>
-                    <div class="col">
-                        {{ render_field(form.heightunit) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        {{ render_field(form.weightvalue) }}
-                    </div>
-                    <div class="col">
-                        {{ render_field(form.weightunit) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                         {{ render_field(form.bmi) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        {{ render_field(form.bloodtype) }}
-                    </div>
-                    <div class="col">
-                        {{ render_field(form.bloodrh) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        {{ render_field(form.waistvalue) }}
-                    </div>
-                    <div class="col">
-                        {{ render_field(form.waistunit) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        {{ render_field(form.agemenarche) }}
-                    </div>
-                    <div class="col">
-                        {{ render_field(form.agefirstbirth) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        {{ render_field(form.gestationalage) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        {{ render_field(form.kdpi) }}
-                    </div>
-                    <div class="col">
-                        {{ render_field(form.cancerrisk) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        {{ render_field(form.hba1c) }}
-                    </div>
-                    <div class="col">
-                        {{ render_field(form.amylase) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        {{ render_field(form.lipase) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        {{ render_field(form.pathologynote) }}
-                    </div>
-                    <div class="col">
-                        {{ render_field(form.apoephenotype) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        {{ render_field(form.fitzpatrick) }}
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <h1>Social History</h1>
-                <div class="row">
-                    <div class="col">
-                        {{ render_field(form.smoking) }}
-                    </div>
-                    <div class="col">
-                        {{ render_field(form.tobacco) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        {{ render_field(form.alcohol) }}
-                    </div>
-                    <div class="col">
-                        {{ render_field(form.drug) }}
-                    </div>
-                </div>
-                <h1>Medical History</h1>
-                <div>
-                    {{ render_field(form.medhx_0) }}
-                </div>
-                <div>
-                    {{ render_field(form.medhx_1) }}
-                </div>
-                <div>
-                    {{ render_field(form.medhx_2) }}
-                </div>
-                <div>
-                    {{ render_field(form.medhx_3) }}
-                </div>
-                <div>
-                    {{ render_field(form.medhx_4) }}
-                </div>
-                <div>
-                    {{ render_field(form.medhx_5) }}
-                </div>
-                <div>
-                    {{ render_field(form.medhx_6) }}
-                </div>
-                <div>
-                    {{ render_field(form.medhx_7) }}
-                </div>
-                <div>
-                    {{ render_field(form.medhx_8) }}
-                </div>
-                <div>
-                    {{ render_field(form.medhx_9) }}
-                </div>
-            </div>
+        <div class>
+            {{ render_field(form.context) }}
         </div>
-        <div class="d-grid gap-2 col-6 mx-auto">
-            <button type="submit" class="btn btn-primary btn-lg">Update</button>
+        <div>
+            {{ render_field(form.donorid) }}
+        </div>
+        <div>
+            &#8679; ID format is <i>(CCCnnn.XXXX.nnn)</i>, with <i>CCC</i> in (HBM,SNT); <i>n</i> integer; <i>X</i> non-numeric
+        </div>
+        <br>
+        <div>
+            <button type="submit" class="btn btn-primary btn-lg">Search</button>
         </div>
     </div>
-
 </form>
 {% endblock %}

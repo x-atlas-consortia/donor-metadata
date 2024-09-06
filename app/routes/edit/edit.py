@@ -1,15 +1,29 @@
 # Context login form
-from flask import Blueprint, request, render_template, jsonify
+from flask import Blueprint, request, render_template, jsonify, abort
+import requests
 
 # The form used to build request bodies for PUT and POST endpoints of the entity-api
 from models.editform import EditForm
 
-index_blueprint = Blueprint('index', __name__, url_prefix='/')
+edit_blueprint = Blueprint('edit', __name__, url_prefix='/edit/<donor>')
 
+def setInputDisabled(inputField, disabled: bool = True):
+    """
+    Disables the given input
+    :param inputField: the WTForms input to disable
+    :param disabled: if true set the disabled attribute of the input
+    :return: nothing
+    """
 
+    if inputField.render_kw is None:
+        inputField.render_kw = {}
+    if disabled:
+        inputField.render_kw["disabled"] = "disabled"
+    else:
+        inputField.render_kw.pop("disabled")
 
-@index_blueprint.route('', methods=['GET', 'POST'])
-def index():
+@edit_blueprint.route('', methods=['GET', 'POST'])
+def edit(donor):
 
     # Get the application context using a form.
     form = EditForm(request.form)
@@ -19,7 +33,20 @@ def index():
     # 2. 'PROMPT' for optional fields
     # 3. default unit for unit fields
 
-    # form.source_name.data = 'PROMPT'
+    form.donorid.data = donor
+    setInputDisabled(form.donorid, disabled=True)
+
+    contextid = donor[0:3]
+    if contextid == "HBM":
+        context = 'hubmapconsortium'
+    elif contextid == "SNT":
+        context = 'sennetconsortium'
+    else:
+        abort(400, f'Invalid donor id format: {donor}')
+
+    form.context.data = context
+    setInputDisabled(form.context, disabled=True)
+
     form.race.data = 'C0439673'  # Unknown
     form.sex.data = 'C0421467 '  # Unknown
     form.ethnicity.data = 'PROMPT'
@@ -50,11 +77,8 @@ def index():
 
     if request.method == 'POST' and form.validate():
         # Translate fields into the encoded donor metadata schema.
-        context = form.context.choices[0][1]
-        donorid = form.donorid.data
-        dictret = {'id': donorid}
-        return jsonify(dictret)
+        return "OK"
 
         # Execute appropriate endpoint of entity-api.
 
-    return render_template('index.html', form=form)
+    return render_template('edit.html', form=form)

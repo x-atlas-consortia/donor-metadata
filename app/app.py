@@ -6,7 +6,8 @@ from pathlib import Path
 from flask import Flask
 
 # route blueprints
-from routes.index.index import index_blueprint
+from routes.edit.edit import edit_blueprint
+from routes.search.search import search_blueprint
 
 # Configure consistent logging. This is done at the beginning of each module instead of with a superclass of
 # logger to avoid the need to overload function calls to logger.
@@ -33,7 +34,8 @@ class DonorUI:
         logger.info(f"package_base_dir: {package_base_dir}")
 
         # Register route Blueprints.
-        self.app.register_blueprint(index_blueprint)
+        self.app.register_blueprint(edit_blueprint)
+        self.app.register_blueprint(search_blueprint)
 
 
 # ###################################################################################################

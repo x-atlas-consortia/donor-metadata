@@ -9,32 +9,9 @@ from wtforms import (Form, StringField, SelectField, DecimalField, validators, V
 from .appconfig import AppConfig
 from .valuesetmanager import ValueSetManager
 
-
-# ---- CUSTOM VALIDATORS
-def validate_donorid(form, field):
-    """
-    Checks whether the first three characters of the id correspond to the selected context.
-    :param form: the EditForm
-    :param field: the donorid field
-    :return: Nothing or raises ValidationError
-
-    """
-    idcontext = field.data.split('.')[0][0:2].upper()
-
-    # Compare against the selected value of context.
-    if idcontext == 'HM':
-        if form.context.data != 'CONTEXT_HUBMAP':
-            raise ValidationError('HuBMAP IDs must begin with HM.')
-    elif idcontext == 'SN':
-        if form.context.data != 'CONTEXT_SENNET':
-            raise ValidationError('SenNet IDs must begin with SN.')
-    else:
-        raise ValidationError(f'Unknown ID prefix {idcontext}')
-
-
 def validate_age(form, field):
     """
-    Checks that age is at least 1 month.
+    Custom validator. Checks that age is at least 1 month.
 
     :param form: the Edit form
     :param field: the age field
@@ -44,7 +21,7 @@ def validate_age(form, field):
     ageunit = form.ageunit.data
     age = field.data
 
-    if age == 0:
+    if age <= 0:
         raise ValidationError('The minimum age is 1 month.')
     if age > 89 and ageunit == 'C0001779':  # UMLS CUI for age in years
         raise ValidationError('All ages over 89 years must be set to 90 years.')
@@ -62,6 +39,8 @@ class EditForm(Form):
     fpath = os.path.join(fpath, 'app/instance/app.cfg')
     cfg = AppConfig()
 
+    token = cfg.getfield(key='GLOBUS_TOKEN').replace("'", "")
+
     # Instantiate the ValuesetManager that reads resources for form controls from a
     # Google Sheet.
     # Get URL to Google sheet, with single quote literals stripped.
@@ -73,24 +52,16 @@ class EditForm(Form):
 
     # Application context for entity-api URLs (HuBMAP or SenNet).
     # This field will be used to build the appropriate endpoint URL.
-    contexts = cfg.getfieldlist(prefix='CONTEXT_')
-    context = SelectField('Consortium', choices=contexts)
+    #contexts = cfg.getfieldlist(prefix='CONTEXT_')
+    #context = SelectField('Consortium', choices=contexts)
 
-    # Donor ID. This should be validated for format (i.e., contains expected delimiters) and
-    # that the first two characters of the ID match the application context (e.g., HM and hubmapconsortium.org).
-    donorid = StringField('Donor ID', validators=[validators.DataRequired(),
-                                                  validators.regexp('[^0-9]{2}[0-9]{3}\.[^0-9]{3}\.[0-9]{3}',
-                                                                    message='ID format: CCnnn.XXX.nnn: '
-                                                                            'CC either HM or SN; n integer; '
-                                                                            'X non-numeric'),
-                                                  validate_donorid])
+    # This field will be populated by the edit route.
+    context = StringField('Consortium')
 
-    # Source_name is not encoded as a valueset, so hard-code the selection.
-    # source_name = SelectField('Source name',
-                              # choices=[('0', 'living_donor_data'), ('1', 'organ_donor_data')])
+    # Donor ID. This field will be populated by the edit route.
+    donorid = StringField('Donor ID')
 
     # Age requires both a value and a selection of unit.
-
     ageunits = valuesetmanager.getValuesetTuple(tab='Age', col=''
                                                                'units')
     ageunit = SelectField('units', choices=ageunits)
@@ -122,23 +93,23 @@ class EditForm(Form):
 
     # Measurements
     # Create SelectFields for each measurment group.
-    heightvalue = DecimalField('Height (value)')
+    heightvalue = DecimalField('Height (value)', validators=[validators.Optional()])
     heightunit = SelectField('units', choices=[('0', 'cm'), ('1', 'in')])
-    weightvalue = DecimalField('Weight (value)')
+    weightvalue = DecimalField('Weight (value)', validators=[validators.Optional()])
     weightunit = SelectField('units', choices=[('0', 'kg'), ('1', 'lb')])
-    bmi = DecimalField('Body Mass Index (kg/m^2)')
-    waistvalue = DecimalField('Waist circumference')
+    bmi = DecimalField('Body Mass Index (kg/m^2)', validators=[validators.Optional()])
+    waistvalue = DecimalField('Waist circumference', validators=[validators.Optional()])
     waistunit = SelectField('units', choices=[('0', 'cm'), ('1', 'in')])
-    kdpi = DecimalField('KDPI (%)')
-    hba1c = DecimalField('HbA1c (%)')
-    amylase = DecimalField('Amylase (IU)')
-    lipase = DecimalField('Lipase (IU)')
-    agemenarche = DecimalField('Age at menarche (years)')
-    agefirstbirth = DecimalField('Age at first birth (years)')
-    gestationalage = DecimalField('Gestational age (weeks)')
-    cancerrisk = DecimalField('Cancer Risk (%)')
-    pathologynote = TextAreaField('Pathology Note')
-    apoephenotype = TextAreaField('APOE phenotype')
+    kdpi = DecimalField('KDPI (%)', validators=[validators.Optional()])
+    hba1c = DecimalField('HbA1c (%)', validators=[validators.Optional()])
+    amylase = DecimalField('Amylase (IU)', validators=[validators.Optional()])
+    lipase = DecimalField('Lipase (IU)', validators=[validators.Optional()])
+    agemenarche = DecimalField('Age at menarche (years)', validators=[validators.Optional()])
+    agefirstbirth = DecimalField('Age at first birth (years)', validators=[validators.Optional()])
+    gestationalage = DecimalField('Gestational age (weeks)', validators=[validators.Optional()])
+    cancerrisk = DecimalField('Cancer Risk (%)', validators=[validators.Optional()])
+    pathologynote = TextAreaField('Pathology Note', validators=[validators.Optional()])
+    apoephenotype = TextAreaField('APOE phenotype', validators=[validators.Optional()])
 
     # The Fitzpatrick Skin Type, blood type, and blood Rh factor are categorical measurements.
     fitz = valuesetmanager.getValuesetTuple(tab='Measurements', group_term="Fitzpatrick Classification Scale",
