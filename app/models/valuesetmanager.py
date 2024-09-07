@@ -70,4 +70,13 @@ class ValueSetManager():
 
         return sTuple
 
-
+    def getcolumnvalues(self, tab:str, col:str) -> list:
+        """
+        Returns values in the specified column of a tab of the valueset sheet.
+        :param tab: Identifies a tab in the Google Sheets document.
+        :param col: column name
+        :return: list of values
+        """
+        dfTab = self.Sheets[tab]
+        print('column values',dfTab[col].drop_duplicates().to_list())
+        return dfTab[col].drop_duplicates().to_list()

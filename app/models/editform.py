@@ -4,10 +4,15 @@ entity-api.
 """
 import os
 
-from wtforms import (Form, StringField, SelectField, DecimalField, validators, ValidationError,TextAreaField)
+from wtforms import (Form, StringField, SelectField, DecimalField, validators, ValidationError,
+                     TextAreaField)
 
+# Helper classes
+# Represents the app.cfg file
 from .appconfig import AppConfig
+# Represents the Google Sheets of donor clinical metadata valuesets
 from .valuesetmanager import ValueSetManager
+
 
 def validate_age(form, field):
     """
@@ -52,20 +57,17 @@ class EditForm(Form):
 
     # Application context for entity-api URLs (HuBMAP or SenNet).
     # This field will be used to build the appropriate endpoint URL.
-    #contexts = cfg.getfieldlist(prefix='CONTEXT_')
-    #context = SelectField('Consortium', choices=contexts)
+    # This field will be populated by the edit route, based on information passed to it by the search form.
+    consortium = StringField('Consortium')
 
-    # This field will be populated by the edit route.
-    context = StringField('Consortium')
-
-    # Donor ID. This field will be populated by the edit route.
+    # Donor ID. This field will be populated by the edit route, based on information passed to it by the search form.
     donorid = StringField('Donor ID')
 
     # Age requires both a value and a selection of unit.
-    ageunits = valuesetmanager.getValuesetTuple(tab='Age', col=''
-                                                               'units')
+    ageunits = valuesetmanager.getValuesetTuple(tab='Age', col='units')
     ageunit = SelectField('units', choices=ageunits)
-    agevalue = DecimalField('Age (value)', validators=[validators.DataRequired(), validate_age])
+    agevalue = DecimalField('Age (value)',
+                            validators=[validators.DataRequired(), validators.NumberRange(min=0)])
 
     # Race
     races = valuesetmanager.getValuesetTuple(tab='Race')
