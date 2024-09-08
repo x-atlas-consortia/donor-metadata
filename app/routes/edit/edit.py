@@ -72,7 +72,7 @@ def setdefaults(form, donorid: str):
     # Get current metadata for donor. The auth token is obtained from the app.cfg file.
     currentdonordata = DonorData(donorid=donorid, consortium=consortium, token=form.token)
 
-    print(currentdonordata.metadata)
+    #print(currentdonordata.metadata)
 
     # Age
     # The Age valueset has its own tab.
@@ -180,6 +180,24 @@ def setdefaults(form, donorid: str):
     if len(bmilist) > 0:
         form.bmi.data = float(bmilist[0])
 
+    # ABO Blood Type
+    # The ABO Blood type is categorical. Its valueset is a subset of rows on the "Blood Type" tab.
+    bloodtype_grouping_concept = 'C0000778'
+    bloodtypelist = currentdonordata.getmetadatavalues(grouping_concept=bloodtype_grouping_concept, key='concept_id')
+    if len(bloodtypelist) > 0:
+        form.bloodtype.data = bloodtypelist[0]
+    else:
+        form.bloodtype.data = 'PROMPT'
+
+    # Rh Blood Group
+    # The RH Blood Group is categorical. Its valueset is a subset of rows on the "Blood Type" tab.
+    bloodrh_grouping_concept = 'C0035406'
+    bloodrhlist = currentdonordata.getmetadatavalues(grouping_concept=bloodrh_grouping_concept, key='concept_id')
+    if len(bloodrhlist) > 0:
+        form.bloodrh.data = bloodrhlist[0]
+    else:
+        form.bloodrh.data = 'PROMPT'
+
     # Waist Circumference
     # The Waist Circumference valueset has only one concept, on the "Measurements" tab.
     waist_concept = 'C0455829'
@@ -216,12 +234,60 @@ def setdefaults(form, donorid: str):
     if len(gestationalagelist) > 0:
         form.gestationalage.data = float(gestationalagelist[0])
 
+    # KDPI
+    # The KDPI has no default value.
+    kdpi_concept = 'C4330523'
+    kdpilist = currentdonordata.getmetadatavalues(grouping_concept=kdpi_concept, key='data_value')
+    if len(kdpilist) > 0:
+        form.kdpi.data = float(kdpilist[0])
+
+    # Cancer risk
+    # The Cancer risk has no default value.
+    cancer_concept = 'C0596244'
+    cancerlist = currentdonordata.getmetadatavalues(grouping_concept=cancer_concept, key='data_value')
+    if len(cancerlist) > 0:
+        form.cancerrisk.data = float(cancerlist[0])
+
+    # Hba1c
+    # The Hba1c has no default value.
+    hba1c_concept = 'C2707530'
+    hba1clist = currentdonordata.getmetadatavalues(grouping_concept=hba1c_concept, key='data_value')
+    if len(hba1clist) > 0:
+        form.hba1c.data = float(hba1clist[0])
+
+    # Amylase
+    # The Amylase has no default value.
+    amylase_concept = 'C0201883'
+    amlyaselist = currentdonordata.getmetadatavalues(grouping_concept=amylase_concept, key='data_value')
+    if len(amlyaselist) > 0:
+        form.amylase.data = float(amlyaselist[0])
+
+    # Lipase
+    # The Lipase has no default value.
+    lipase_concept = 'C0373670'
+    lipaselist = currentdonordata.getmetadatavalues(grouping_concept=lipase_concept, key='data_value')
+    if len(lipaselist) > 0:
+        form.lipase.data = float(lipaselist[0])
+
+    # Pathology note
+    # The Pathology note has no default value.
+    path_concept = 'C0807321'
+    pathlist = currentdonordata.getmetadatavalues(grouping_concept=path_concept, key='data_value')
+    if len(pathlist) > 0:
+        form.pathologynote.data = float(pathlist[0])
+
+    # APOE phenotype
+    # The APOE phenotype has no default value.
+    apoe_concept = 'C0428504'
+    apoelist = currentdonordata.getmetadatavalues(grouping_concept=apoe_concept, key='data_value')
+    if len(apoelist) > 0:
+        form.apoephenotype.data = float(apoelist[0])
+
     # Fitzpatrick Skin Type
     # The Fitzpatrick scale is categorical. For the original set of donors that had Fitzpatrick scores,
     # the grouping concept was the same as the valueset concept, so it is necessary to build a group of
     # concepts manually. If these donors are re-ingested with the corrected valuesets, the logic
     # can revert to using a common grouping_concept.
-
     fitz_concepts = ['C2700185', 'C2700186', 'C2700187', 'C2700188', 'C2700189', 'C2700190']
     fitzlist = currentdonordata.getmetadatavalues(list_concept=fitz_concepts, key='concept_id')
     if len(fitzlist) > 0:
@@ -229,32 +295,70 @@ def setdefaults(form, donorid: str):
     else:
         form.fitzpatrick.data = 'PROMPT'
 
-    # ABO Blood Type
-    # The ABO Blood type is categorical. Its valueset is a subset of rows on the "Blood Type" tab.
-    bloodtype_grouping_concept = 'C0000778'
-    bloodtypelist = currentdonordata.getmetadatavalues(grouping_concept=bloodtype_grouping_concept, key='concept_id')
-    print('bloodtypelist',bloodtypelist)
-    if len(bloodtypelist) > 0:
-        form.bloodtype.data = bloodtypelist[0]
+    # Smoking
+    # Smoking is categorical. Its valueset is a subset of rows on the "Social History" tab. The
+    # valueset concepts do not share a grouping concept.
+    smoking_concepts = ['C0337664', 'C0337672', 'C0337671']
+    smokinglist = currentdonordata.getmetadatavalues(list_concept=smoking_concepts, key='concept_id')
+    if len(smokinglist) > 0:
+        form.smoking.data = smokinglist[0]
     else:
-        form.bloodtype.data = 'PROMPT'
+        form.smoking.data = 'PROMPT'
 
-    form.bloodrh.data = 'PROMPT'
-    form.smoking.data = 'PROMPT'
-    form.tobacco.data = 'PROMPT'
-    form.alcohol.data = 'PROMPT'
-    form.drug.data = 'PROMPT'
+    # Tobacco
+    # Tobacco is categorical. Its v
+    # alueset is a subset of rows on the "Social History" tab. The
+    # valueset concepts do not share a grouping concept.
+    tobacco_concepts = ['C3853727']
+    tobaccolist = currentdonordata.getmetadatavalues(list_concept=tobacco_concepts, key='concept_id')
+    if len(tobaccolist) > 0:
+        form.tobacco.data = tobaccolist[0]
+    else:
+        form.tobacco.data = 'PROMPT'
 
-    form.medhx_0.data = 'PROMPT'
-    form.medhx_1.data = 'PROMPT'
-    form.medhx_2.data = 'PROMPT'
-    form.medhx_3.data = 'PROMPT'
-    form.medhx_4.data = 'PROMPT'
-    form.medhx_5.data = 'PROMPT'
-    form.medhx_6.data = 'PROMPT'
-    form.medhx_7.data = 'PROMPT'
-    form.medhx_8.data = 'PROMPT'
-    form.medhx_9.data = 'PROMPT'
+    # Alcohol
+    # Alcohol is categorical. Its valueset is a subset of rows on the "Social History" tab. The
+    # valueset concepts do not share a grouping concept.
+    alcohol_concepts = ['C0001948','C0457801']
+    alcohollist = currentdonordata.getmetadatavalues(list_concept=alcohol_concepts, key='concept_id')
+    if len(alcohollist) > 0:
+        form.alcohol.data = alcohollist[0]
+    else:
+        form.alcohol.data = 'PROMPT'
+
+    # Drug
+    # Drug is categorical. Its valueset is a subset of rows on the "Social History" tab. The
+    # valueset concepts do not share a grouping concept.
+    drug_concepts = ['C4518790', 'C0524662', 'C0242566', 'C1456624', 'C3266350',
+                     'C0281875', 'C0013146', 'C0239076']
+    druglist = currentdonordata.getmetadatavalues(list_concept=drug_concepts, key='concept_id')
+    if len(druglist) > 0:
+        form.drug.data = druglist[0]
+    else:
+        form.drug.data = 'PROMPT'
+
+    # Medical History
+    # The Medical History valueset has its own tab. There is no default value.
+    # Display information for up to 10 conditions.
+    formmedhxdata = [form.medhx_0, form.medhx_1,
+                     form.medhx_2, form.medhx_3,
+                     form.medhx_4, form.medhx_5,
+                     form.medhx_6, form.medhx_7,
+                     form.medhx_8, form.medhx_9]
+    medhx_grouping_concept = 'C0262926'
+    medhxlist = currentdonordata.getmetadatavalues(grouping_concept=medhx_grouping_concept, key='concept_id')
+
+    if len(medhxlist) > 10:
+        msg = f'Donor {donorid} has more than 10 Medical History Conditions. Edit manually.'
+        abort(400, msg)
+
+    for medhx in medhxlist:
+        idx = medhxlist.index(medhx)
+        formmedhxdata[idx].data = medhx
+
+    # Set defaults for any medhx list that was not set by donor data.
+    for m in range(len(medhxlist),10):
+        formmedhxdata[m].data = 'PROMPT'
 
 
 @edit_blueprint.route('', methods=['GET', 'POST'])
