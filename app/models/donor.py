@@ -85,19 +85,25 @@ class DonorData:
 
         # Extract the relevant metadata dicts from the list, and then the relevant value from each dict.
         listret = []
-        for m in metadata:
-            if grouping_concept is not None:
+
+        if grouping_concept is not None:
+            for m in metadata:
                 group = m.get('grouping_concept')
                 if group == grouping_concept:
                     val = m.get(key)
                     if val is not None:
                         listret.append(val)
-            else:
+        elif list_concept is not None:
+            for m in metadata:
                 m_concept = m.get('concept_id')
                 if m_concept in list_concept:
                     val = m.get(key)
                     if val is not None:
                         listret.append(val)
+        else:
+            abort(500, "Invalid call to donordata.getmetadatavalues: "
+                       "both grouping_concept and list_concept are null")
+
 
         return listret
 

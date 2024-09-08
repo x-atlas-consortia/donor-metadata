@@ -119,7 +119,6 @@ class EditForm(Form):
 
     bloodtypes = valuesetmanager.getvaluesettuple(tab='Blood Type', group_term="ABO blood group system",
                                                   addprompt=True)
-    print('blood types',bloodtypes)
     bloodtype = SelectField('ABO Blood Type', choices=bloodtypes)
 
     bloodrhs = valuesetmanager.getvaluesettuple(tab='Blood Type', group_term="Rh Blood Group",

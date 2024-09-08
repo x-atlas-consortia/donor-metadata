@@ -72,7 +72,7 @@ def setdefaults(form, donorid: str):
     # Get current metadata for donor. The auth token is obtained from the app.cfg file.
     currentdonordata = DonorData(donorid=donorid, consortium=consortium, token=form.token)
 
-    #print(currentdonordata.metadata)
+    print(currentdonordata.metadata)
 
     # Age
     # The Age valueset has its own tab.
@@ -230,15 +230,14 @@ def setdefaults(form, donorid: str):
         form.fitzpatrick.data = 'PROMPT'
 
     # ABO Blood Type
-    # The ABO Blood type is categorical. Its valueset is a subset of rows on the "Blood Types" tab.
-    bloodtype_concept = 'C0000778'
-    bloodtypelist = currentdonordata.getmetadatavalues(grouping_concept=bloodtype_concept, key='concept_id')
+    # The ABO Blood type is categorical. Its valueset is a subset of rows on the "Blood Type" tab.
+    bloodtype_grouping_concept = 'C0000778'
+    bloodtypelist = currentdonordata.getmetadatavalues(grouping_concept=bloodtype_grouping_concept, key='concept_id')
     print('bloodtypelist',bloodtypelist)
     if len(bloodtypelist) > 0:
-        form.bloodtypes.data = bloodtypelist[0]
+        form.bloodtype.data = bloodtypelist[0]
     else:
-        form.bloodtypes.data = 'PROMPT'
-    print('form.bloodtypes.data',form.bloodtypes.data)
+        form.bloodtype.data = 'PROMPT'
 
     form.bloodrh.data = 'PROMPT'
     form.smoking.data = 'PROMPT'
