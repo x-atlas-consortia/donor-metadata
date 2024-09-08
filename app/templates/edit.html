@@ -39,22 +39,14 @@
                         {{ render_field(form.sex) }}
                     </div>
                 </div>
-                <div class="row text-bg-warning">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" style="margin-left: 0px;" type="checkbox" role="switch" id="flexSwitchCheckChecked" data-bs-toggle="collapse" data-bs-target="#collapseOrganDonor" aria-expanded="false" aria-controls="collapseOrganDonor">
-                        <label class="form-check-label" for="flexSwitchCheckChecked">Organ donor</label>
-                    </div>
-                </div>
                 <br>
-                <div class="collapse" id="collapseOrganDonor">
-                    <div class="row">
-                        <h1>Organ Donation</h1>
-                        <dl>
-                            {{ render_field(form.cause) }}
-                            {{ render_field(form.mechanism) }}
-                            {{ render_field(form.event) }}
-                        </dl>
-                    </div>
+                <div class="row">
+                    <h1>Organ Donation</h1>
+                    <dl>
+                        {{ render_field(form.cause) }}
+                        {{ render_field(form.mechanism) }}
+                        {{ render_field(form.event) }}
+                    </dl>
                 </div>
             </div>
             <div class="col">

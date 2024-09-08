@@ -9,22 +9,24 @@ from models.editform import EditForm
 
 edit_blueprint = Blueprint('edit', __name__, url_prefix='/edit/<donorid>')
 
-def setinputdisabled(inputField, disabled: bool = True):
+
+def setinputdisabled(inputfield, disabled: bool = True):
     """
     Disables the given field.
-    :param inputField: the WTForms input to disable
+    :param inputfield: the WTForms input to disable
     :param disabled: if true set the disabled attribute of the input
     :return: nothing
     """
 
-    if inputField.render_kw is None:
-        inputField.render_kw = {}
+    if inputfield.render_kw is None:
+        inputfield.render_kw = {}
     if disabled:
-        inputField.render_kw['disabled'] = 'disabled'
+        inputfield.render_kw['disabled'] = 'disabled'
     else:
-        inputField.render_kw.pop('disabled')
+        inputfield.render_kw.pop('disabled')
 
-def getconsortiumfromdonorid(donorid: str) ->str:
+
+def getconsortiumfromdonorid(donorid: str) -> str:
     """
     Tranlates the donorid into a consortium
     :param donorid: ID for a donor
@@ -42,6 +44,7 @@ def getconsortiumfromdonorid(donorid: str) ->str:
         abort(400, msg)
 
     return consortium
+
 
 def setdefaults(form, donorid: str):
     """
@@ -67,61 +70,182 @@ def setdefaults(form, donorid: str):
     # 3. default unit for unit fields
 
     # Get current metadata for donor. The auth token is obtained from the app.cfg file.
-    CurrentDonorData = DonorData(donorid=donorid, consortium=consortium, token=form.token)
+    currentdonordata = DonorData(donorid=donorid, consortium=consortium, token=form.token)
 
-    print(CurrentDonorData.metadata)
-    # age
+    #print(currentdonordata.metadata)
+
+    # Age
+    # The Age valueset has its own tab.
     age_grouping_concept = form.valuesetmanager.getcolumnvalues(tab='Age', col='grouping_concept')[0]
-    agelist = CurrentDonorData.getmetadatavalues(grouping_concept=age_grouping_concept, key='data_value')
+    agelist = currentdonordata.getmetadatavalues(grouping_concept=age_grouping_concept, key='data_value')
     if len(agelist) > 0:
         form.agevalue.data = float(agelist[0])
 
-    # age units
-    ageunitlist = CurrentDonorData.getmetadatavalues(grouping_concept=age_grouping_concept, key='units')
+    # Age Units
+    # The default age unit is years.
+    ageunitlist = currentdonordata.getmetadatavalues(grouping_concept=age_grouping_concept, key='units')
     if len(ageunitlist) > 0:
         form.ageunits.data = ageunitlist[0]
     else:
         form.ageunits.data = 'C0001779'  # years
 
-    # race
+    # Race
+    # The Race valueset has its own tab. The default value is Unknown.
     race_grouping_concept = form.valuesetmanager.getcolumnvalues(tab='Race', col='grouping_concept')[0]
-    racelist = CurrentDonorData.getmetadatavalues(grouping_concept=race_grouping_concept, key='concept_id')
+    racelist = currentdonordata.getmetadatavalues(grouping_concept=race_grouping_concept, key='concept_id')
     if len(racelist) > 0:
         form.race.data = racelist[0]
     else:
         form.race.data = 'C0439673'  # Unknown
 
-    # ethnicity
+    # Ethnicity
+    # The Ethnicity valueset has its own tab. There is no default value.
     eth_grouping_concept = form.valuesetmanager.getcolumnvalues(tab='Ethnicity', col='grouping_concept')[0]
-    ethlist = CurrentDonorData.getmetadatavalues(grouping_concept=eth_grouping_concept, key='concept_id')
+    ethlist = currentdonordata.getmetadatavalues(grouping_concept=eth_grouping_concept, key='concept_id')
     if len(ethlist) > 0:
         form.ethnicity.data = ethlist[0]
     else:
-        form.race.data = 'PROMPT'
-    # sex
+        form.ethnicity.data = 'PROMPT'
+
+    # Sex
+    # The Sex valueset has its own tab. The default value is Unknown.
     sex_grouping_concept = form.valuesetmanager.getcolumnvalues(tab='Sex', col='grouping_concept')[0]
-    sexlist = CurrentDonorData.getmetadatavalues(grouping_concept=sex_grouping_concept, key='concept_id')
+    sexlist = currentdonordata.getmetadatavalues(grouping_concept=sex_grouping_concept, key='concept_id')
     if len(sexlist) > 0:
         form.sex.data = sexlist[0]
     else:
-        form.race.data = 'C0421467'  # Unknown
+        form.sex.data = 'C0421467'  # Unknown
 
-    # Organ donor switch
-    # if CurrentDonorData.metadata_type == 'organ_donor_data':
+    # Cause of Death
+    # The Cause of Death valuest has its own tab. There is no default value.
+    cod_grouping_concept = form.valuesetmanager.getcolumnvalues(tab='Cause of Death', col='grouping_concept')[0]
+    codlist = currentdonordata.getmetadatavalues(grouping_concept=cod_grouping_concept, key='concept_id')
+    if len(codlist) > 0:
+        form.cause.data = codlist[0]
+    else:
+        form.cause.data = 'PROMPT'
 
-    form.cause.data = 'PROMPT'
-    form.mechanism.data = 'PROMPT'
-    form.event.data = 'PROMPT'
-    form.heightunit.data = '0'  # cm
-    form.weightunit.data = '0'  # kg
-    form.waistunit.data = '0'  # cm
-    form.fitzpatrick.data = 'PROMPT'
-    form.bloodtype.data = 'PROMPT'
+    # Mechanism of Injury
+    # The Mechanism of Injury valueset has its own tab. There is no default value.
+    mech_grouping_concept = form.valuesetmanager.getcolumnvalues(tab='Mechanism of Injury', col='grouping_concept')[0]
+    mechlist = currentdonordata.getmetadatavalues(grouping_concept=mech_grouping_concept, key='concept_id')
+    if len(mechlist) > 0:
+        form.mechanism.data = mechlist[0]
+    else:
+        form.mechanism.data = 'PROMPT'
+
+    # Death Event
+    # The Death Event valueset has its own tab. There is no default value.
+    event_grouping_concept = form.valuesetmanager.getcolumnvalues(tab='Death Event', col='grouping_concept')[0]
+    eventlist = currentdonordata.getmetadatavalues(grouping_concept=event_grouping_concept, key='concept_id')
+    if len(eventlist) > 0:
+        form.event.data = eventlist[0]
+    else:
+        form.event.data = 'PROMPT'
+
+    # Height
+    # The Height valueset has only one concept, on the "Measurements" tab.
+    height_concept = 'C0005890'
+    heightvaluelist = currentdonordata.getmetadatavalues(grouping_concept=height_concept, key='data_value')
+    if len(heightvaluelist) > 0:
+        form.heightvalue.data = float(heightvaluelist[0])
+
+    # Height unit
+    # The Height unit is currently linked to the Height valueset, and has a default of cm.
+    heightunitlist = currentdonordata.getmetadatavalues(grouping_concept=height_concept, key='units')
+    if len(heightunitlist) > 0:
+        form.heightunit.data = heightunitlist[0]
+    else:
+        form.heightunit.data = '0'  # cm
+
+    # Weight
+    # The Weight valueset has only one concept, on the "Measurements" tab.
+    weight_concept = 'C0005910'
+    weightvaluelist = currentdonordata.getmetadatavalues(grouping_concept=weight_concept, key='data_value')
+    if len(weightvaluelist) > 0:
+        form.weightvalue.data = float(weightvaluelist[0])
+
+    # Weight unit
+    # The Weight unit is currently linked to the Height valueset, and has a default of kg.
+    weightunitlist = currentdonordata.getmetadatavalues(grouping_concept=weight_concept, key='units')
+    if len(weightunitlist) > 0:
+        form.weightunit.data = heightunitlist[0]
+    else:
+        form.heightunit.data = '0'  # kg
+
+    # Body Mass Index
+    # The BMI has no default value.
+    bmi_concept = 'C1305855'
+    bmilist = currentdonordata.getmetadatavalues(grouping_concept=bmi_concept, key='data_value')
+    if len(bmilist) > 0:
+        form.bmi.data = float(bmilist[0])
+
+    # Waist Circumference
+    # The Waist Circumference valueset has only one concept, on the "Measurements" tab.
+    waist_concept = 'C0455829'
+    waistvaluelist = currentdonordata.getmetadatavalues(grouping_concept=waist_concept, key='data_value')
+    if len(waistvaluelist) > 0:
+        form.waistvalue.data = float(waistvaluelist[0])
+
+    # Waist Circumference unit
+    # The Waist Circumference unit is currently linked to the Height valueset, and has a default of cm.
+    waistunitlist = currentdonordata.getmetadatavalues(grouping_concept=waist_concept, key='units')
+    if len(waistunitlist) > 0:
+        form.waistunit.data = waistunitlist[0]
+    else:
+        form.waistunit.data = '0'  # cm
+
+    # Age at menarche
+    # The age at menarche has no default value.
+    agemenarche_concept = 'C1314691'
+    agemenarchelist = currentdonordata.getmetadatavalues(grouping_concept=agemenarche_concept, key='data_value')
+    if len(agemenarchelist) > 0:
+        form.agemenarche.data = float(agemenarchelist[0])
+
+    # Age at first birth
+    # The age at first birth has no default value.
+    agefirstbirth_concept = 'C1510831'
+    agefirstbirthlist = currentdonordata.getmetadatavalues(grouping_concept=agefirstbirth_concept, key='data_value')
+    if len(agefirstbirthlist) > 0:
+        form.agefirstbirth.data = float(agefirstbirthlist[0])
+
+    # Gestational age
+    # The gestational age has no default value.
+    gestationalage_concept = 'C0017504'
+    gestationalagelist = currentdonordata.getmetadatavalues(grouping_concept=gestationalage_concept, key='data_value')
+    if len(gestationalagelist) > 0:
+        form.gestationalage.data = float(gestationalagelist[0])
+
+    # Fitzpatrick Skin Type
+    # The Fitzpatrick scale is categorical. For the original set of donors that had Fitzpatrick scores,
+    # the grouping concept was the same as the valueset concept, so it is necessary to build a group of
+    # concepts manually. If these donors are re-ingested with the corrected valuesets, the logic
+    # can revert to using a common grouping_concept.
+
+    fitz_concepts = ['C2700185', 'C2700186', 'C2700187', 'C2700188', 'C2700189', 'C2700190']
+    fitzlist = currentdonordata.getmetadatavalues(list_concept=fitz_concepts, key='concept_id')
+    if len(fitzlist) > 0:
+        form.fitzpatrick.data = fitzlist[0]
+    else:
+        form.fitzpatrick.data = 'PROMPT'
+
+    # ABO Blood Type
+    # The ABO Blood type is categorical. Its valueset is a subset of rows on the "Blood Types" tab.
+    bloodtype_concept = 'C0000778'
+    bloodtypelist = currentdonordata.getmetadatavalues(grouping_concept=bloodtype_concept, key='concept_id')
+    print('bloodtypelist',bloodtypelist)
+    if len(bloodtypelist) > 0:
+        form.bloodtypes.data = bloodtypelist[0]
+    else:
+        form.bloodtypes.data = 'PROMPT'
+    print('form.bloodtypes.data',form.bloodtypes.data)
+
     form.bloodrh.data = 'PROMPT'
     form.smoking.data = 'PROMPT'
     form.tobacco.data = 'PROMPT'
     form.alcohol.data = 'PROMPT'
     form.drug.data = 'PROMPT'
+
     form.medhx_0.data = 'PROMPT'
     form.medhx_1.data = 'PROMPT'
     form.medhx_2.data = 'PROMPT'
@@ -132,7 +256,6 @@ def setdefaults(form, donorid: str):
     form.medhx_7.data = 'PROMPT'
     form.medhx_8.data = 'PROMPT'
     form.medhx_9.data = 'PROMPT'
-
 
 
 @edit_blueprint.route('', methods=['GET', 'POST'])

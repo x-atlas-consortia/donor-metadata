@@ -1,8 +1,7 @@
 """
 Donor search form
 """
-from flask import Blueprint, request, render_template, jsonify, abort, url_for, redirect
-import requests
+from flask import Blueprint, request, render_template, redirect
 
 # The form used to execute a GET request against the entity-api of a consortium
 from models.searchform import SearchForm
@@ -10,6 +9,7 @@ from models.searchform import SearchForm
 from models.donor import DonorData
 
 search_blueprint = Blueprint('search', __name__, url_prefix='/')
+
 
 @search_blueprint.route('', methods=['GET', 'POST'])
 def search():
