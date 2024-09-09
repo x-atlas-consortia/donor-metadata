@@ -80,6 +80,11 @@ class EditForm(Form):
     # Sex
     sexes = valuesetmanager.getvaluesettuple(tab='Sex', group_term='Sex')
     sex = SelectField('Sex', choices=sexes)
+
+    # Source name
+    sources = [('0','living_donor_data'),('1','organ_donor_data'),('PROMPT','Select an option')]
+    source = SelectField('Source name', choices=sources)
+
     # Cause of Death
     causes = valuesetmanager.getvaluesettuple(tab='Cause of Death', group_term='Cause of Death', addprompt=True)
     cause = SelectField('Cause of Death', choices=causes)

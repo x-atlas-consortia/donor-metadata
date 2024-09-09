@@ -96,6 +96,7 @@ class DonorData:
         elif list_concept is not None:
             for m in metadata:
                 m_concept = m.get('concept_id')
+                m_term = m.get('data_value')
                 if m_concept in list_concept:
                     val = m.get(key)
                     if val is not None:

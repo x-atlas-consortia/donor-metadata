@@ -72,7 +72,7 @@ def setdefaults(form, donorid: str):
     # Get current metadata for donor. The auth token is obtained from the app.cfg file.
     currentdonordata = DonorData(donorid=donorid, consortium=consortium, token=form.token)
 
-    #print(currentdonordata.metadata)
+    print(currentdonordata.metadata)
 
     # Age
     # The Age valueset has its own tab.
@@ -115,6 +115,15 @@ def setdefaults(form, donorid: str):
         form.sex.data = sexlist[0]
     else:
         form.sex.data = 'C0421467'  # Unknown
+
+    # Source name
+    # Source name is not encoded in a valuset.
+    if currentdonordata.metadata_type == 'living_donor_data':
+        form.source.data = '0'
+    elif currentdonordata.metadata_type == 'organ_donor_data':
+        form.source.data = '1'
+    else:
+        form.source.data = 'PROMPT'
 
     # Cause of Death
     # The Cause of Death valuest has its own tab. There is no default value.
@@ -274,14 +283,14 @@ def setdefaults(form, donorid: str):
     path_concept = 'C0807321'
     pathlist = currentdonordata.getmetadatavalues(grouping_concept=path_concept, key='data_value')
     if len(pathlist) > 0:
-        form.pathologynote.data = float(pathlist[0])
+        form.pathologynote.data = pathlist[0]
 
     # APOE phenotype
     # The APOE phenotype has no default value.
     apoe_concept = 'C0428504'
     apoelist = currentdonordata.getmetadatavalues(grouping_concept=apoe_concept, key='data_value')
     if len(apoelist) > 0:
-        form.apoephenotype.data = float(apoelist[0])
+        form.apoephenotype.data = apoelist[0]
 
     # Fitzpatrick Skin Type
     # The Fitzpatrick scale is categorical. For the original set of donors that had Fitzpatrick scores,
@@ -319,7 +328,7 @@ def setdefaults(form, donorid: str):
     # Alcohol
     # Alcohol is categorical. Its valueset is a subset of rows on the "Social History" tab. The
     # valueset concepts do not share a grouping concept.
-    alcohol_concepts = ['C0001948','C0457801']
+    alcohol_concepts = ['C0001948', 'C0457801']
     alcohollist = currentdonordata.getmetadatavalues(list_concept=alcohol_concepts, key='concept_id')
     if len(alcohollist) > 0:
         form.alcohol.data = alcohollist[0]
@@ -345,8 +354,10 @@ def setdefaults(form, donorid: str):
                      form.medhx_4, form.medhx_5,
                      form.medhx_6, form.medhx_7,
                      form.medhx_8, form.medhx_9]
-    medhx_grouping_concept = 'C0262926'
-    medhxlist = currentdonordata.getmetadatavalues(grouping_concept=medhx_grouping_concept, key='concept_id')
+    # Future development note: Some existing records incorrectly use concept_id for grouping_concept_id. After
+    # these donors are corrected, change medhxlist to use group_concept.
+    medhx_concepts = form.valuesetmanager.getcolumnvalues(tab='Medical History', col='concept_id')
+    medhxlist = currentdonordata.getmetadatavalues(list_concept=medhx_concepts, key='concept_id')
 
     if len(medhxlist) > 10:
         msg = f'Donor {donorid} has more than 10 Medical History Conditions. Edit manually.'
@@ -357,7 +368,7 @@ def setdefaults(form, donorid: str):
         formmedhxdata[idx].data = medhx
 
     # Set defaults for any medhx list that was not set by donor data.
-    for m in range(len(medhxlist),10):
+    for m in range(len(medhxlist), 10):
         formmedhxdata[m].data = 'PROMPT'
 
 
@@ -371,6 +382,7 @@ def edit(donorid):
     if request.method == 'POST' and form.validate():
         # Translate fields into the encoded donor metadata schema.
         return "OK"
+
 
         # Execute appropriate endpoint of entity-api.
 
