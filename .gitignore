@@ -22,5 +22,7 @@ BUILD
 /tests/*/*.json
 /tests/*/*.out
 /tests/*/*.key
+/tests/*/*.csv
+/tests/*/*.xlsx
 
 /valueset/*.csv

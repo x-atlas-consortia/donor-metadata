@@ -67,12 +67,10 @@ class ValueSetManager:
         dftab = self.Sheets[tab]
 
         # Apply filters for subset.
-        if group_term != '':
+        if group_term is not None:
             dftab = dftab.loc[dftab['grouping_concept_preferred_term'] == group_term]
         elif len(list_concepts) > 0:
-            print(list_concepts)
             dftab = dftab.loc[dftab['concept_id'].isin(list_concepts)]
-            print(dftab)
 
         # Sort and filter to relevant columns.
         dftab = dftab.sort_values(by=['preferred_term'])[['concept_id', col]]
