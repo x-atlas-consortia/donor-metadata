@@ -41,14 +41,14 @@ class DonorData:
         else:
             abort(response.status_code, response.json().get('error'))
 
-    def __init__(self, donorid: str, consortium: str, token: str):
+    def __init__(self, donorid: str, consortium: str, token: str, isforupdate: bool=False):
         """
 
         :param donorid: ID of a donor in a context.
         :param consortium: hubmapconsortium or sennetconsortium
+        :param isforupdate: Is this for update?
         """
 
-        self.metadata = self.__getdonormetadata(donorid=donorid, consortium=consortium, token=token)
         self.donorid = donorid
         self.consortium = consortium
         self.token = token
@@ -57,17 +57,21 @@ class DonorData:
         # organ_donor_data
         # living_donor_data
 
-        metadata = self.metadata.get('organ_donor_data')
-        if metadata is not None:
-            self.metadata_type = 'organ_donor_data'
+        if isforupdate:
+            self.metadata = {}
         else:
-            metadata = self.metadata.get('living_donor_data')
+            self.metadata = self.__getdonormetadata(donorid=donorid, consortium=consortium, token=token)
+            metadata = self.metadata.get('organ_donor_data')
             if metadata is not None:
-                self.metadata_type = 'living_donor_data'
+                self.metadata_type = 'organ_donor_data'
             else:
-                msg = ("Invalid donor metadata. The highest-level key should be "
-                       "either 'organ_donor_data' or 'living_donor_data'.")
-                abort(400, msg)
+                metadata = self.metadata.get('living_donor_data')
+                if metadata is not None:
+                    self.metadata_type = 'living_donor_data'
+                else:
+                    msg = ("Invalid donor metadata. The highest-level key should be either "
+                           "'organ_donor_data' or 'living_donor_data'.")
+                    abort(400, msg)
 
     def getmetadatavalues(self, key: str, grouping_concept=None, list_concept=None) -> list:
         """
@@ -85,6 +89,7 @@ class DonorData:
 
         # Extract the relevant metadata dicts from the list, and then the relevant value from each dict.
         listret = []
+
 
         if grouping_concept is not None:
             for m in metadata:
@@ -104,7 +109,6 @@ class DonorData:
         else:
             abort(500, "Invalid call to donordata.getmetadatavalues: "
                        "both grouping_concept and list_concept are null")
-
 
         return listret
 

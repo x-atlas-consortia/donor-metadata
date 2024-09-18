@@ -3,6 +3,8 @@ Class for working with information from the Google Sheet of donor clinical metad
 """
 
 import pandas as pd
+import numpy as np
+
 # For downloading from Google Sheets
 import gdown
 import logging
@@ -96,3 +98,29 @@ class ValueSetManager:
         """
         dftab = self.Sheets[tab]
         return dftab[col].drop_duplicates().to_list()
+
+
+    def getvaluesetrow(self, tab: str, concept_id: str) -> dict:
+        """
+        Translates a requested row from the valueset manager into a dict per the donor metadata schema, in which
+        all values are strings.
+        :param tab: corresponds to tab in the source valueset Google sheet
+        :param concept_id: concept for the requested valueset member
+        :return: dict
+        """
+
+        # Filter to row with concept.
+
+        dftab = self.Sheets[tab]
+        dfmember = dftab.loc[dftab['concept_id'] == concept_id]
+        # Reset index to 0.
+        dfmember = dfmember.reset_index(drop=True)
+        dictreturn = {}
+        for col in dfmember:
+            if pd.isna(dfmember.loc[0,col]):
+                dictreturn[col]=''
+            else:
+                dictreturn[col] = str(dfmember.loc[0,col])
+
+        return dictreturn
+
