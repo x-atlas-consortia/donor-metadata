@@ -1,6 +1,18 @@
-# Context login form
+"""
+Donor metadata curation page
+Second page in the curation workflow.
+Works with editform.py.
+
+Does the following:
+1. Obtains any existing metadata for the donor from provenance.
+2. Sets input forms with defaults that match the existing metadata.
+3. Tranlsates form data into the donor metadata schema.
+4. Routes the existing and changed metadata to the update page.
+"""
+
 from flask import Blueprint, request, render_template, jsonify, abort
-from wtforms import Field, DecimalField, SelectField
+from wtforms import DecimalField, SelectField, Field
+
 
 # Represents the metadata for a donor in a consortium database
 from models.donor import DonorData
@@ -117,7 +129,10 @@ def setdefaults(form, donorid: str):
 
     # Source name
     # The source name is not encoded in a valuset.
-    if form.currentdonordata.metadata_type == 'living_donor_data':
+    if form.currentdonordata.metadata is None:
+        # No existing metadata.
+        form.source.data = 'PROMPT'
+    elif form.currentdonordata.metadata_type == 'living_donor_data':
         form.source.data = '0'
     elif form.currentdonordata.metadata_type == 'organ_donor_data':
         form.source.data = '1'
@@ -296,6 +311,20 @@ def setdefaults(form, donorid: str):
     lipaselist = form.currentdonordata.getmetadatavalues(grouping_concept=lipase_concept, key='data_value')
     if len(lipaselist) > 0:
         form.lipase.data = float(lipaselist[0])
+
+    # eGFR
+    # The eGFR has no default value.
+    egfr_concept = 'C3274401'
+    egfrlist = form.currentdonordata.getmetadatavalues(grouping_concept=egfr_concept, key='data_value')
+    if len(egfrlist) > 0:
+        form.egfr.data = float(egfrlist[0])
+
+    # Serum creatinine
+    # No default value.
+    secr_concept = 'C0600061'
+    secrlist = form.currentdonordata.getmetadatavalues(grouping_concept=secr_concept, key='data_value')
+    if len(secrlist) > 0:
+        form.secr.data = float(secrlist[0])
 
     # Pathology note
     # The Pathology note has no default value.
@@ -553,6 +582,18 @@ def buildnewdonordata(form) -> DonorData:
     if lipase is not None:
         donor.metadata[donor_data_key].append(lipase)
 
+    # eGFR
+    egfr = translate_field_value_to_metadata(form, formfield=form.lipase, tab='Measurements',
+                                               concept_id='C3274401')
+    if egfr is not None:
+        donor.metadata[donor_data_key].append(egfr)
+
+    # Creatinine
+    secr = translate_field_value_to_metadata(form, formfield=form.lipase, tab='Measurements',
+                                             concept_id='C0600061')
+    if secr is not None:
+        donor.metadata[donor_data_key].append(secr)
+
     # age at menarche
     agemenarche = translate_field_value_to_metadata(form, formfield=form.agemenarche, tab='Measurements',
                                                      concept_id='C1314691')
@@ -645,6 +686,11 @@ def edit(donorid):
     if request.method == 'POST' and form.validate():
         # Translate revised donor metadata fields into the encoded donor metadata schema.
         form.newdonordata = buildnewdonordata(form)
-        return jsonify(form.newdonordata.metadata)
+
+        return(jsonify(form.newdonordata.metadata))
+        # Pass existing and changed metadata to the review/update form.
+        #return render_template('update.html', form=form)
+
+
 
     return render_template('edit.html', form=form)

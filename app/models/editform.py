@@ -3,6 +3,7 @@ Form used to build the request body of the POST (create) or PUT (update) endpoin
 entity-api.
 """
 import os
+from flask import flash, session
 
 from wtforms import (Form, StringField, SelectField, DecimalField, validators, ValidationError,
                      TextAreaField)
@@ -121,12 +122,14 @@ class EditForm(Form):
     weightvalue = DecimalField('Weight (value)', validators=[validators.Optional()])
     weightunit = SelectField('units', choices=[('0', 'kg'), ('1', 'lb')], validators=[validators.Optional()])
     bmi = DecimalField('Body Mass Index (kg/m^2)', validators=[validators.Optional()])
-    waistvalue = DecimalField('Waist circumference (value)', validators=[validators.Optional()])
+    waistvalue = DecimalField('Waist circumference', validators=[validators.Optional()])
     waistunit = SelectField('units', choices=[('0', 'cm'), ('1', 'in')], validators=[validators.Optional()])
     kdpi = DecimalField('KDPI (%)', validators=[validators.Optional()])
     hba1c = DecimalField('HbA1c (%)', validators=[validators.Optional()])
     amylase = DecimalField('Amylase (IU)', validators=[validators.Optional()])
     lipase = DecimalField('Lipase (IU)', validators=[validators.Optional()])
+    egfr = DecimalField('eGFR (mL/min/1.73m^2)', validators=[validators.Optional()])
+    secr = DecimalField('Creatinine (mg/dL)', validators=[validators.Optional()])
     agemenarche = DecimalField('Age at menarche (years)', validators=[validators.Optional()])
     agefirstbirth = DecimalField('Age at first birth (years)', validators=[validators.Optional()])
     gestationalage = DecimalField('Gestational age (weeks)', validators=[validators.Optional()])
@@ -137,7 +140,7 @@ class EditForm(Form):
     # The Fitzpatrick Skin Type, blood type, and blood Rh factor are categorical measurements.
     fitz = valuesetmanager.getvaluesettuple(tab='Measurements', group_term="Fitzpatrick Classification Scale",
                                             addprompt=True)
-    fitzpatrick = SelectField('Fitzpatrick Classification Scale', choices=fitz,
+    fitzpatrick = SelectField('Fitzpatrick Scale', choices=fitz,
                               validators=[validate_selectfield_default, validators.Optional()])
 
     bloodtypes = valuesetmanager.getvaluesettuple(tab='Blood Type', group_term="ABO blood group system",

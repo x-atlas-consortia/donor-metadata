@@ -1,5 +1,10 @@
 """
-Donor search form
+Donor search page
+This is the initial page in the curation workflow.
+Works with searchform.py.
+
+Allows the user to specify the consortium and donor.
+
 """
 from flask import Blueprint, request, render_template, redirect
 

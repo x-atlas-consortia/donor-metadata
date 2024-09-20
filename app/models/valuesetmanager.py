@@ -68,11 +68,17 @@ class ValueSetManager:
         # Obtain relevant valueset.
         dftab = self.Sheets[tab]
 
+        # Trim extraneous white space from concept column.
+        dftab.loc[:,'concept_id'] = dftab['concept_id'].str.strip()
+
         # Apply filters for subset.
         if group_term is not None:
             dftab = dftab.loc[dftab['grouping_concept_preferred_term'] == group_term]
         elif len(list_concepts) > 0:
             dftab = dftab.loc[dftab['concept_id'].isin(list_concepts)]
+
+        # Trim extraneous white space from concept.
+        dftab.loc[:,'concept_id'] = dftab['concept_id'].str.strip()
 
         # Sort and filter to relevant columns.
         dftab = dftab.sort_values(by=['preferred_term'])[['concept_id', col]]
@@ -112,6 +118,9 @@ class ValueSetManager:
         # Filter to row with concept.
 
         dftab = self.Sheets[tab]
+        # Trim extraneous white space from concept column.
+        dftab.loc[:, 'concept_id'] = dftab['concept_id'].str.strip()
+
         dfmember = dftab.loc[dftab['concept_id'] == concept_id]
         # Reset index to 0.
         dfmember = dfmember.reset_index(drop=True)

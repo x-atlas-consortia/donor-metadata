@@ -1,7 +1,9 @@
-<!-- Data entry page for curation-->
+<!-- Review differences between existing metadata and changed metadata-->
 {% extends 'base.html' %}
 
 {% block content %}
+{% from "_formhelpers.html" import render_field %}
+
 <br>
 <div class="container">
     <button onclick="history.back()">Go Back</button>

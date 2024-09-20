@@ -7,15 +7,29 @@
     <div class="container text-left">
         <div class="row align-items-start">
             <div class="col">
-                <h1>Minimal Metadata</h1>
+                <h3 text-bg-warning>Minimal Metadata</h3>
                 <div class="row text-bg-warning">
                     <div class="col">
-                        {{ render_field(form.consortium) }}
+                        <strong>{{ form.consortium.label }}</strong>
+                    </div>
+                    <div class="col">
+                        {{ form.consortium}}
                     </div>
                 </div>
                 <div class="row text-bg-warning">
                     <div class="col">
-                        {{ render_field(form.donorid) }}
+                        <strong> {{ form.donorid.label }}</strong>
+                    </div>
+                    <div class="col">
+                        {{ form.donorid }}
+                    </div>
+                </div>
+                 <div class="row text-bg-warning">
+                    <div class="col">
+                        {{ render_field(form.source) }}
+                    </div>
+                     <div class="col">
+                        {{ render_field(form.sex) }}
                     </div>
                 </div>
                 <div class="row text-bg-warning">
@@ -34,29 +48,16 @@
                         {{ render_field(form.ethnicity) }}
                     </div>
                 </div>
-                <div class="row text-bg-warning">
-                    <div class="col">
-                        {{ render_field(form.sex) }}
-                    </div>
-                </div>
-                <div class="row text-bg-warning">
-                    <div class="col">
-                        {{ render_field(form.source) }}
-                    </div>
-                </div>
-                <br>
                 <div class="row">
-                    <h1>Organ Donation</h1>
+                    <h3>Organ Donation</h3>
                     <dl>
                         {{ render_field(form.cause) }}
                         {{ render_field(form.mechanism) }}
                         {{ render_field(form.event) }}
                     </dl>
                 </div>
-            </div>
-            <div class="col">
-                <h1>Measurements</h1>
-                <div class="row">
+                <div class = "row">
+                    <h3> Vitals</h3>
                     <div class="col">
                         {{ render_field(form.heightvalue) }}
                     </div>
@@ -77,6 +78,9 @@
                          {{ render_field(form.bmi) }}
                     </div>
                 </div>
+            </div>
+            <div class="col">
+                <h3>Measurements</h3>
                 <div class="row">
                     <div class="col">
                         {{ render_field(form.bloodtype) }}
@@ -129,6 +133,14 @@
                 </div>
                 <div class="row">
                     <div class="col">
+                        {{ render_field(form.egfr) }}
+                    </div>
+                    <div class="col">
+                        {{ render_field(form.secr) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
                         {{ render_field(form.pathologynote) }}
                     </div>
                     <div class="col">
@@ -142,7 +154,7 @@
                 </div>
             </div>
             <div class="col">
-                <h1>Social History</h1>
+                <h3>Social History</h3>
                 <div class="row">
                     <div class="col">
                         {{ render_field(form.smoking) }}
@@ -159,7 +171,7 @@
                         {{ render_field(form.drug) }}
                     </div>
                 </div>
-                <h1>Medical History</h1>
+                <h3>Medical History</h3>
                 <div>
                     {{ render_field(form.medhx_0) }}
                 </div>
@@ -193,7 +205,7 @@
             </div>
         </div>
         <div class="d-grid gap-2 col-6 mx-auto">
-            <button type="submit" class="btn btn-primary btn-lg">Update</button>
+            <button type="submit" class="btn btn-primary btn-lg">Review Changes</button>
         </div>
     </div>
 

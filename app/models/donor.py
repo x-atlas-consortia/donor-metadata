@@ -1,9 +1,14 @@
 """
-Represents clinical metadata associated with a donor in a consortium database.
+Represents clinical metadata associated with a donor in a consortium provenance database.
+Uses a consortium's entity-api instance to:
+1. get donor metadata
+2. update donor metdata
+
 """
 
 import requests
-from flask import abort
+import base64
+from flask import abort, request
 
 class DonorData:
 
@@ -61,17 +66,18 @@ class DonorData:
             self.metadata = {}
         else:
             self.metadata = self.__getdonormetadata(donorid=donorid, consortium=consortium, token=token)
-            metadata = self.metadata.get('organ_donor_data')
-            if metadata is not None:
-                self.metadata_type = 'organ_donor_data'
-            else:
-                metadata = self.metadata.get('living_donor_data')
+            if self.metadata is not None:
+                metadata = self.metadata.get('organ_donor_data')
                 if metadata is not None:
-                    self.metadata_type = 'living_donor_data'
+                    self.metadata_type = 'organ_donor_data'
                 else:
-                    msg = ("Invalid donor metadata. The highest-level key should be either "
+                    metadata = self.metadata.get('living_donor_data')
+                    if metadata is not None:
+                        self.metadata_type = 'living_donor_data'
+                    else:
+                        msg = ("Invalid donor metadata. The highest-level key should be either "
                            "'organ_donor_data' or 'living_donor_data'.")
-                    abort(400, msg)
+                        abort(400, msg)
 
     def getmetadatavalues(self, key: str, grouping_concept=None, list_concept=None) -> list:
         """
@@ -84,12 +90,15 @@ class DonorData:
         :return: the value in the metadata dictionary corresponding to key
         """
 
-        metadata = self.metadata.get(self.metadata_type)
-        # Donor metadata is a list of dicts.
+        if self.metadata is None:
+            metadata = {}
+        else:
+            metadata = self.metadata.get(self.metadata_type)
 
+
+        # Donor metadata is a list of dicts.
         # Extract the relevant metadata dicts from the list, and then the relevant value from each dict.
         listret = []
-
 
         if grouping_concept is not None:
             for m in metadata:
