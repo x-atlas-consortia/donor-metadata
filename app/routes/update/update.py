@@ -8,18 +8,16 @@ Does the following:
    donor in provenance.
 """
 
-from flask import Blueprint, request, render_template, redirect
+from flask import Blueprint, request, render_template, redirect, jsonify
 
 update_blueprint = Blueprint('update', __name__, url_prefix='/update')
 
 @update_blueprint.route('', methods=['GET', 'POST'])
-def edit():
+def update(donorid):
 
-
+    print('update')
     if request.method == 'POST':# and form.validate():
-        # Translate revised donor metadata fields into the encoded donor metadata schema.
-        form.newdonordata = buildnewdonordata(form)
-        # Return to the
-        #return render_template('search.html', form=form)
+        return 'ok'
 
-    return render_template('update.html', form=form)
+
+    return render_template('update.html')

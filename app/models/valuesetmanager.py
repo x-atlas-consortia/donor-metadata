@@ -24,6 +24,8 @@ class ValueSetManager:
             gdown.download(url, output=download_full_path, fuzzy=True)
             # The spreadsheet has multiple tabs, so sheet_name=None
             self.Sheets = pd.read_excel(download_full_path, sheet_name=None)
+            # Get UMLS version field.
+            self.umls = self.Sheets['UMLS']['graph_version'][0]
         except FileNotFoundError as e:
             logger.exception('Failed to load the valuesets Google Sheets document.')
             raise e
@@ -116,8 +118,8 @@ class ValueSetManager:
         """
 
         # Filter to row with concept.
-
         dftab = self.Sheets[tab]
+
         # Trim extraneous white space from concept column.
         dftab.loc[:, 'concept_id'] = dftab['concept_id'].str.strip()
 
@@ -130,6 +132,11 @@ class ValueSetManager:
                 dictreturn[col]=''
             else:
                 dictreturn[col] = str(dfmember.loc[0,col])
+
+        # Add the start_datetime, end_datetime, and graph_version fields.
+        dictreturn['start_datetime'] = ''
+        dictreturn['end_datetime'] = ''
+        dictreturn['graph_version'] = self.umls
 
         return dictreturn
 

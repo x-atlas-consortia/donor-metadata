@@ -7,7 +7,6 @@ Uses a consortium's entity-api instance to:
 """
 
 import requests
-import base64
 from flask import abort, request
 
 class DonorData:

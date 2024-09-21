@@ -3,10 +3,40 @@
 
 {% block content %}
 {% from "_formhelpers.html" import render_field %}
-
-<br>
-<div class="container">
-    <button onclick="history.back()">Go Back</button>
+<title>Donor ID: {{ donorid }} </title>
+<div class="container text-left">
+    <div class="row align-items-start">
+        <div class="col">
+            <h3>Current Metadata</h3>
+            <div class="overflow-scroll mt-5 pb-5 bg-light">
+                <pre>
+                    {% if form.currentdonordata.metadata is none %}
+                        no metadata
+                    {% else %}
+                        {{ form.currentdonordata.metadata|tojson_pretty|safe  }}
+                    {% endif %}
+                </pre>
+            </div>
+        </div>
+        <div class="col">
+            <h3>New Metadata</h3>
+            <div class="overflow-scroll mt-5 pb-5 bg-light">
+                <pre>
+                    {% if form.newdonordata.metadata is none %}
+                        no metadata
+                    {% else %}
+                        {{ form.newdonordata.metadata|tojson_pretty|safe  }}
+                    {% endif %}
+                </pre>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="d-grid gap-2 col-6 mx-auto">
+        <button type="submit" class="btn btn-primary btn-lg" value="Update">Update</button>
+        <a href="/" class="btn btn-primary btn-lg">Cancel</a>
+    </div>
 </div>
+
 
 {% endblock %}

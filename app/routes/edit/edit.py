@@ -10,8 +10,9 @@ Does the following:
 4. Routes the existing and changed metadata to the update page.
 """
 
-from flask import Blueprint, request, render_template, jsonify, abort
+from flask import Blueprint, request, render_template, abort,jsonify
 from wtforms import DecimalField, SelectField, Field
+import json
 
 
 # Represents the metadata for a donor in a consortium database
@@ -420,7 +421,7 @@ def setdefaults(form, donorid: str):
         formmedhxdata[m].data = 'PROMPT'
 
 
-def translate_age_to_metadata(form, formfield: DecimalField, formunitfield: SelectField) -> dict:
+def translate_age_to_metadata(form) -> dict:
     """
     Translates the combination of age and age unit fields in the Edit form to a metadata dict.
 
@@ -429,16 +430,14 @@ def translate_age_to_metadata(form, formfield: DecimalField, formunitfield: Sele
     Numeric values in the donor
     metadata object are strings.
     :param form: the edit form
-    :param formfield: field in a form
-    :param formunitfield: optional field for unit.
     :return: dict
     """
 
-    agevalue = formfield.data
+    agevalue = form.agevalue.data
     # Units are not encoded in metadata.
-    unit_concept_id = formunitfield.data
+    unit_concept_id = form.ageunit.data
     dictvalueset = form.valuesetmanager.getvaluesetrow(tab='Age', concept_id=unit_concept_id)
-    dictvalueset['datavalue'] = str(agevalue)
+    dictvalueset['data_value'] = str(agevalue)
     return dictvalueset
 
 def translate_selectfield_to_metadata(form, formfield: SelectField, tab: str) -> dict:
@@ -503,7 +502,7 @@ def buildnewdonordata(form) -> DonorData:
     donor.metadata[donor_data_key] = []
 
     # Age
-    age = translate_age_to_metadata(form, formfield=form.agevalue, formunitfield=form.ageunit)
+    age = translate_age_to_metadata(form)
     if age is not None:
         donor.metadata[donor_data_key].append(age)
 
@@ -675,22 +674,26 @@ def buildnewdonordata(form) -> DonorData:
 
     return donor
 
+
 @edit_blueprint.route('', methods=['GET', 'POST'])
 def edit(donorid):
 
     form = EditForm(request.form)
 
-    # Populate the edit form with current metadata for the donor.
-    setdefaults(form, donorid=donorid)
+    if request.method =='GET':
+        # Populate the edit form with current metadata for the donor.
+        setdefaults(form, donorid=donorid)
 
     if request.method == 'POST' and form.validate():
+
+        # Obtain current donor metadata from provenance.
+        consortium = getconsortiumfromdonorid(donorid=donorid)
+        form.currentdonordata = DonorData(donorid=donorid, consortium=consortium, token=form.token)
+
         # Translate revised donor metadata fields into the encoded donor metadata schema.
         form.newdonordata = buildnewdonordata(form)
 
-        return(jsonify(form.newdonordata.metadata))
-        # Pass existing and changed metadata to the review/update form.
-        #return render_template('update.html', form=form)
+        # Pass existing and changed metadata to the review/update form
+        return render_template('update.html', donorid=donorid, form=form)
 
-
-
-    return render_template('edit.html', form=form)
+    return render_template('edit.html', donorid=donorid, form=form)

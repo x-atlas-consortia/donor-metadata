@@ -3,7 +3,6 @@ Form used to build the request body of the POST (create) or PUT (update) endpoin
 entity-api.
 """
 import os
-from flask import flash, session
 
 from wtforms import (Form, StringField, SelectField, DecimalField, validators, ValidationError,
                      TextAreaField)
