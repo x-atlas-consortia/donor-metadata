@@ -1,5 +1,6 @@
 """
 Form used to search for a donor by ID in the provenance database of a consortium.
+First form in the workflow.
 """
 from flask import session, flash
 

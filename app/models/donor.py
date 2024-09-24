@@ -8,42 +8,11 @@ Uses a consortium's entity-api instance to:
 
 import requests
 from flask import abort, request
+import json
+
+from models.entity import getdonormetadata, is_donor_for_published_datasets
 
 class DonorData:
-
-    def __getdonormetadata(self, consortium: str, donorid: str, token: str) -> dict:
-        """
-        Searches for metadata for donor in a consortium, using the entity-api.
-        :param consortium: consortium identifier used to build the URL for the entity-api endpoint.
-        :param donorid: ID of a donor in the provenance database of a consortium.
-        :param token: Globus group token, obtained from the app.cfg
-        :return: if there is a donor entity with id=donorid, a dict that corresponds to the metadata
-        object.
-        """
-
-        url = f'https://entity.api.{consortium}.org/entities/{donorid}'
-        headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
-        headers['Authorization'] = f'Bearer {token}'
-        response = requests.get(url=url, headers=headers)
-        if response.status_code == 200:
-            rjson = response.json()
-            if consortium == 'hubmapconsortium':
-                donor = rjson.get('metadata')
-            else:
-                donor = rjson.get('metadata')
-            return donor
-
-        elif response.status_code == 404:
-            abort(404, f'No donor with id {donorid} found in provenance for {consortium}')
-        elif response.status_code == 400:
-            err = response.json().get('error')
-            if 'is not a valid id format' in err:
-                # This is a miscoded error message. The error is 404, not 400.
-                abort(404, f'No donor with id {donorid} found in provenance for {consortium}')
-            else:
-                abort(response.status_code, response.json().get('error'))
-        else:
-            abort(response.status_code, response.json().get('error'))
 
     def __init__(self, donorid: str, consortium: str, token: str, isforupdate: bool=False):
         """
@@ -64,7 +33,7 @@ class DonorData:
         if isforupdate:
             self.metadata = {}
         else:
-            self.metadata = self.__getdonormetadata(donorid=donorid, consortium=consortium, token=token)
+            self.metadata = getdonormetadata(donorid=donorid, consortium=consortium, token=token)
             if self.metadata is not None:
                 metadata = self.metadata.get('organ_donor_data')
                 if metadata is not None:
@@ -77,6 +46,10 @@ class DonorData:
                         msg = ("Invalid donor metadata. The highest-level key should be either "
                            "'organ_donor_data' or 'living_donor_data'.")
                         abort(400, msg)
+
+            self.has_published_datasets = is_donor_for_published_datasets(donorid=donorid,
+                                                                          consortium=consortium,
+                                                                          token=token)
 
     def getmetadatavalues(self, key: str, grouping_concept=None, list_concept=None) -> list:
         """
@@ -115,7 +88,7 @@ class DonorData:
                     if val is not None:
                         listret.append(val)
         else:
-            abort(500, "Invalid call to donordata.getmetadatavalues: "
+            abort(500, "Invalid call to DonorData.getmetadatavalues: "
                        "both grouping_concept and list_concept are null")
 
         return listret

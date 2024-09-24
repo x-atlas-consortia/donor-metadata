@@ -1,0 +1,52 @@
+<!-- Review differences between existing metadata and changed metadata-->
+{% extends 'base.html' %}
+
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+<title>Donor ID: {{ donorid }} </title>
+
+<!-- Submitting the form posts back to this page.-->
+<form method=post action="/review">
+    <div class="container text-left">
+        <div class="row align-items-start">
+            <div class="col">
+                <h3>Current Metadata</h3>
+                <div class="overflow-scroll mt-5 pb-5 bg-light"
+                    style="max-width: 500px; max-height: 600px;">
+                    <pre>
+                        {% if form.currentdonordata is none %}
+                            no metadata
+                        {% else %}
+                            {{ form.currentdonordata.metadata|tojson_pretty|safe }}
+                        {% endif %}
+                    </pre>
+                </div>
+            </div>
+            <div class="col">
+                <h3>New Metadata</h3>
+                <div class="overflow-scroll mt-5 pb-5 bg-light"
+                    style="max-width: 500px; max-height: 600px;">
+                    <pre>
+                        {% if form.newdonordata is none %}
+                            no metadata
+                        {% else %}
+                            {{ form.newdonordata.metadata|tojson_pretty|safe }}
+                        {% endif %}
+                    </pre>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div>
+            <input name="newdonor" type="hidden" value={{ form.newdonor }} >
+            <input name="donorid" type="hidden" value="{{ donorid}}">
+        </div>
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <button  type="submit" class="btn btn-primary btn-lg" value="Update">Update</button>
+            <a href="/" class="btn btn-primary btn-lg">Cancel</a>
+        </div>
+    </div>
+
+</form>
+
+{% endblock %}

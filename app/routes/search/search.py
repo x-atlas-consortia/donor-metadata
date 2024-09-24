@@ -6,7 +6,7 @@ Works with searchform.py.
 Allows the user to specify the consortium and donor.
 
 """
-from flask import Blueprint, request, render_template, redirect
+from flask import Blueprint, request, render_template, redirect, session, current_app
 
 # The form used to execute a GET request against the entity-api of a consortium
 from models.searchform import SearchForm
@@ -31,7 +31,11 @@ def search():
         donorid = form.donorid.data
         currentDonorData = DonorData(consortium=consortium, donorid=donorid, token=form.token)
 
-        # Load the edit form for the donor.
+        if 'flashes' in session:
+            session['flashes'].clear()
+
+        # Load the edit form for the donor. Use redirect and pass the donorid via GET. The Edit form populates
+        # itself by reading donor metadata from provenance.
         return redirect(f'/edit/{donorid}')
 
     return render_template('index.html', form=form)

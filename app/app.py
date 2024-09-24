@@ -9,7 +9,7 @@ import json
 # route blueprints
 from routes.edit.edit import edit_blueprint
 from routes.search.search import search_blueprint
-from routes.update.update import update_blueprint
+from routes.review.review import review_blueprint
 
 # Configure consistent logging. This is done at the beginning of each module instead of with a superclass of
 # logger to avoid the need to overload function calls to logger.
@@ -43,7 +43,8 @@ class DonorUI:
         # Register route Blueprints.
         self.app.register_blueprint(edit_blueprint)
         self.app.register_blueprint(search_blueprint)
-        self.app.register_blueprint(update_blueprint)
+        self.app.register_blueprint(review_blueprint)
+
 
         # Register the custom JSON pretty print filter.
         self.app.jinja_env.filters['tojson_pretty'] = to_pretty_json

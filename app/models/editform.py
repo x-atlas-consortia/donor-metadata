@@ -1,11 +1,11 @@
 """
-Form used to build the request body of the POST (create) or PUT (update) endpoints for the HuBMAP and SenNet
-entity-api.
+Form used to build the JSON of new metadata for a donor in provenance.
+Second form in the workflow.
 """
 import os
 
 from wtforms import (Form, StringField, SelectField, DecimalField, validators, ValidationError,
-                     TextAreaField)
+                     TextAreaField, SubmitField)
 
 # Helper classes
 # Represents the app.cfg file
@@ -52,13 +52,12 @@ def validate_selectfield_default(form, field):
 # MAIN FORM
 
 
+
 class EditForm(Form):
 
     # POPULATE FORM FIELDS. In particular, populate SelectFields with lists obtained from the valueset manager.
 
     # Read the app.cfg file outside the Flask application context.
-    fpath = os.path.dirname(os.getcwd())
-    fpath = os.path.join(fpath, 'app/instance/app.cfg')
     cfg = AppConfig()
 
     token = cfg.getfield(key='GLOBUS_TOKEN').replace("'", "")
@@ -205,3 +204,6 @@ class EditForm(Form):
                           validators=[validate_selectfield_default, validators.Optional()])
     medhx_9 = SelectField('Condition', choices=medhx,
                           validators=[validate_selectfield_default, validators.Optional()])
+
+    review = SubmitField()
+
