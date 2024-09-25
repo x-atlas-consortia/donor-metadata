@@ -1,11 +1,9 @@
-[Contexts]
-hubmap=hubmapconsortium
-sennet=sennetconsortium
-
-[Keys]
-KEY=
-globus_token=
-
-[ValuesetManager]
+# Application contexts
+CONTEXT_HUBMAP='hubmapconsortium'
+CONTEXT_SENNET='sennetconsortium'
+ENDPOINT_BASE='https://entity-api.dev'
+# Keys
+KEY='secret key for app'
+GLOBUS_TOKEN='Globus groups token for a context'
 # Google Sheets resource for metadata valuesets
-valuesetmanager=https://docs.google.com/spreadsheets/d/1VhBA3eC78X8w47_ej5f_wq5uvvgO2kY0kfC7utgDqhI/edit?usp=sharing
+VALUESETMANAGER='https://docs.google.com/spreadsheets/d/1VhBA3eC78X8w47_ej5f_wq5uvvgO2kY0kfC7utgDqhI/edit?usp=sharing'
