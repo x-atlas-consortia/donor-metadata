@@ -15,13 +15,13 @@ from wtforms import DecimalField, SelectField, Field
 import base64
 import pickle
 
-
+# Helper classes
 # Represents the metadata for a donor in a consortium database
 from models.donor import DonorData
 # The form used to build request bodies for PUT and POST endpoints of the entity-api
 from models.editform import EditForm
-# Common functions
-from models.entity import getconsortiumfromdonorid
+# entity-api functions
+from models.entity import Entity
 
 
 edit_blueprint = Blueprint('edit', __name__, url_prefix='/edit/<donorid>')
@@ -31,17 +31,17 @@ def edit(donorid):
 
     form = EditForm(request.form)
     # Obtain current donor metadata from provenance.
-    consortium = getconsortiumfromdonorid(donorid=donorid)
-    form.currentdonordata = DonorData(donorid=donorid, consortium=consortium, token=form.token)
+    form.currentdonordata = DonorData(donorid=donorid, isforupdate=False)
 
     if request.method == 'GET':
         # Redirect from the search page.
         # Populate the edit form with current metadata for the donor.
-        setdefaults(form, donorid=donorid)
+        setdefaults(form)
 
     if request.method == 'POST' and form.validate():
         # Translate revised donor metadata fields into the encoded donor metadata schema.
-        form.newdonordata = buildnewdonordata(form)
+
+        form.newdonordata = buildnewdonordata(form, donorid=donorid)
 
         # Prepare a base64-encoded string version of the new metadata dictionary that will be decoded
         # by the review.html for the update post to entity-api.
@@ -69,7 +69,7 @@ def setinputdisabled(inputfield, disabled: bool = True):
     else:
         inputfield.render_kw.pop('disabled')
 
-def setdefaults(form, donorid: str):
+def setdefaults(form):
     """
     Sets default values in form fields.
 
@@ -79,12 +79,11 @@ def setdefaults(form, donorid: str):
     # will be read-only.
 
     # Donor id
-    form.donorid.data = donorid
+    form.donorid.data = form.currentdonordata.donorid
     setinputdisabled(form.donorid, disabled=True)
 
     # Consortium
-    consortium = getconsortiumfromdonorid(donorid=donorid)
-    form.consortium.data = consortium
+    form.consortium.data = form.currentdonordata.consortium
     setinputdisabled(form.consortium, disabled=True)
 
     # Set defaults for SelectFields, using either the current metadata values for the user or:
@@ -498,7 +497,7 @@ def setdefaults(form, donorid: str):
         formmedhxdata[m].data = 'PROMPT'
 
     if form.currentdonordata.has_published_datasets:
-        flash(f'Donor {donorid} is associated with one or more published datasets. '
+        flash(f'Donor {form.currentdonordata.donorid} is associated with one or more published datasets. '
               f'This application cannot update the donor metadata.')
         setinputdisabled(form.review, disabled=True)
 
@@ -570,13 +569,14 @@ def translate_field_value_to_metadata(form, formfield: Field, tab: str, concept_
     return dictvalueset
 
 
-def buildnewdonordata(form) -> DonorData:
+def buildnewdonordata(form, donorid: str) -> DonorData:
 
     """
     Builds a new DonorData object from form data. This includes populating a list of metadata dicts.
+    :param donorid: donor id
     :return: a DonorData object.
     """
-    donor = DonorData(consortium=form.consortium.data, donorid=form.donorid, token=form.token, isforupdate=True)
+    donor = DonorData(donorid=donorid, isforupdate=True)
 
     # organ_donor_data or living_donor_data key.
     donor_data_key = dict(form.source.choices).get(form.source.data)

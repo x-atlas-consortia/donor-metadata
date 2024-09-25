@@ -29,7 +29,7 @@ def search():
         # Obtain the value of consortium selected (not the key).
         consortium = dict(form.consortium.choices).get(form.consortium.data)
         donorid = form.donorid.data
-        currentDonorData = DonorData(consortium=consortium, donorid=donorid, token=form.token)
+        currentDonorData = DonorData(donorid=donorid)
 
         if 'flashes' in session:
             session['flashes'].clear()

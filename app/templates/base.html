@@ -2,21 +2,67 @@
 <!--base class html-->
 <html lang="en">
   <head>
+    <!-- Spinner to animate long processes -->
+    <style type="text/css">
+
+      #spinner {
+        display: none;
+       }
+
+      .loading {
+          border: 2px solid #ccc;
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          border-top-color: #1ecd97;
+          border-left-color: #1ecd97;
+          animation: spin 1s infinite ease-in;
+      }
+
+      @keyframes spin {
+          0% {
+              transform: rotate(0deg);
+          }
+          100% {
+              transform: rotate(360deg);
+          }
+      }
+    </style>
+
+    <script type="text/javascript">
+        function spinner() {
+            document.getElementById("spinner").style.display = "block";
+        }
+    </script>
+    <script type="text/javascript">
+        function spinneroff() {
+          document.getElementByID("spinner").hide();
+        }
+    </script>
+    <script type="text/javascript">
+      window.addEventListener('pageshow', function(event) {
+        // Forces a reload of a page in case of navigating back, which will hide the spinner animation.
+        if (event.persisted || performance.navigation.type === 2) {
+          location.reload();
+        }
+      });
+    </script>
     <title>Human Donor Clinical Metadata Curator</title>
+    <!-- Flask flash message display -->
     {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <ul class=flashes>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
-  {% endif %}
-{% endwith %}
+      {% if messages %}
+        <ul class=flashes>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   </head>
-  <body>
+  <body onpageload="spinneroff()">
     <nav class="navbar bg-dark">
       <a class="navbar-brand" href="#">
         <img src="/static/hubmap.png" alt="HuBMAP" data-height="234" style="max-height: 49.9922px;">

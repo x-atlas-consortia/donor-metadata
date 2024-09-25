@@ -8,10 +8,9 @@ from flask import Blueprint, request, render_template, redirect, jsonify, abort,
 import pickle
 import base64
 
-# Represents the app.cfg file
-from models.appconfig import AppConfig
-# Common functions
-from models.entity import getconsortiumfromdonorid, updatedonormetadata
+# Helper classes
+# entity-api functions
+from models.donor import DonorData
 
 review_blueprint = Blueprint('review', __name__, url_prefix='/review')
 
@@ -35,10 +34,7 @@ def review():
     else:
         abort(400, 'No donorid')
 
-    # Obtain the globus token from the app.cfg file.
-    cfg = AppConfig()
-    token = cfg.getfield(key='GLOBUS_TOKEN').replace("'", "")
-    consortium = getconsortiumfromdonorid(donorid=donorid)
-    if updatedonormetadata(consortium=consortium, donorid=donorid, token=token, dict_metadata=newdonor) == 'ok':
+    donordata = DonorData(donorid = donorid, isforupdate=True)
+    if donordata.updatedonormetadata(dict_metadata=newdonor) == 'ok':
         flash(f'Updated metadata for {donorid}')
         return redirect('/')

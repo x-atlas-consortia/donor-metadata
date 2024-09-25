@@ -31,6 +31,7 @@ def validate_age(form, field):
     if age > 89 and ageunit == 'C0001779':  # UMLS CUI for age in years
         raise ValidationError('All ages over 89 years must be set to 90 years.')
 
+
 def validate_selectfield_default(form, field):
     """
     Custom validator that checks whether the value specified in a SelectField's data property is in
@@ -48,9 +49,19 @@ def validate_selectfield_default(form, field):
         msg = f"Selected concept '{field.data}` not in valueset."
         raise ValidationError(msg)
 
+def validate_required_selectfield(form, field):
+    """
+    Custom validator that verifies that the value specified in a SelectField deemed required (e.g., Source)
+    is other than the prompt.
+
+    """
+    if field.data == 'PROMPT':
+        msg = f"Required field"
+        raise ValidationError(msg)
+
+
 # ----------------------
 # MAIN FORM
-
 
 
 class EditForm(Form):
@@ -60,7 +71,7 @@ class EditForm(Form):
     # Read the app.cfg file outside the Flask application context.
     cfg = AppConfig()
 
-    token = cfg.getfield(key='GLOBUS_TOKEN').replace("'", "")
+    # token = cfg.getfield(key='GLOBUS_TOKEN').replace("'", "")
 
     # Instantiate the ValuesetManager that reads resources for form controls from a
     # Google Sheet.
@@ -98,15 +109,16 @@ class EditForm(Form):
     sex = SelectField('Sex', choices=sexes)
 
     # Source name
-    sources = [('0','living_donor_data'),('1','organ_donor_data'),('PROMPT','Select an option')]
-    source = SelectField('Source name', choices=sources)
+    sources = [('0', 'living_donor_data'), ('1', 'organ_donor_data'), ('PROMPT', 'Select an option')]
+    source = SelectField('Source name', choices=sources, validators=[validate_required_selectfield])
 
     # Cause of Death
     causes = valuesetmanager.getvaluesettuple(tab='Cause of Death', group_term='Cause of Death', addprompt=True)
     cause = SelectField('Cause of Death', choices=causes, validators=[validate_selectfield_default])
 
     # Mechanism of Injury
-    mechanisms = valuesetmanager.getvaluesettuple(tab='Mechanism of Injury', group_term='Mechanism of Injury', addprompt=True)
+    mechanisms = valuesetmanager.getvaluesettuple(tab='Mechanism of Injury', group_term='Mechanism of Injury',
+                                                  addprompt=True)
     mechanism = SelectField('Mechanism of Injury', choices=mechanisms, validators=[validate_selectfield_default])
 
     # Death Event
@@ -206,4 +218,3 @@ class EditForm(Form):
                           validators=[validate_selectfield_default, validators.Optional()])
 
     review = SubmitField()
-

@@ -15,9 +15,17 @@
             &#8679; ID format is <i>(CCCnnn.XXXX.nnn)</i>, with <i>CCC</i> in (HBM,SNT); <i>n</i> integer; <i>X</i> non-numeric
         </div>
         <br>
+        <br>
         <div>
-            <button type="submit" class="btn btn-primary btn-lg" value="Search">Search</button>
+            <button type="submit"  class="btn btn-primary btn-lg"
+                    value="Search" onclick="spinner()">Search</button>
         </div>
+        <br>
+        <br>
+        <!-- Spinner that displays while searching -->
+        <div id="spinner" class="loading">
+        </div>
+        <br>
     </div>
 </form>
 {% endblock %}

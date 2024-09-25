@@ -6,25 +6,24 @@ Uses a consortium's entity-api instance to:
 
 """
 
-import requests
-from flask import abort, request
-import json
+from flask import abort
 
-from models.entity import getdonormetadata, is_donor_for_published_datasets
+# Helper classes
+# Entity-api functions
+from models.entity import Entity
 
 class DonorData:
 
-    def __init__(self, donorid: str, consortium: str, token: str, isforupdate: bool=False):
+    def __init__(self, donorid: str, isforupdate: bool=False):
         """
 
         :param donorid: ID of a donor in a context.
-        :param consortium: hubmapconsortium or sennetconsortium
-        :param isforupdate: Is this for update?
+        :param isforupdate: Is this for an update, or existing metadata?
         """
 
         self.donorid = donorid
-        self.consortium = consortium
-        self.token = token
+        self.entity = Entity(donorid=donorid)
+        self.consortium = self.entity.consortium
 
         # The highest level key of the metadata dictionary is one of the following:
         # organ_donor_data
@@ -33,7 +32,7 @@ class DonorData:
         if isforupdate:
             self.metadata = {}
         else:
-            self.metadata = getdonormetadata(donorid=donorid, consortium=consortium, token=token)
+            self.metadata = self.entity.getdonormetadata()
             if self.metadata is not None:
                 metadata = self.metadata.get('organ_donor_data')
                 if metadata is not None:
@@ -47,9 +46,7 @@ class DonorData:
                            "'organ_donor_data' or 'living_donor_data'.")
                         abort(400, msg)
 
-            self.has_published_datasets = is_donor_for_published_datasets(donorid=donorid,
-                                                                          consortium=consortium,
-                                                                          token=token)
+            self.has_published_datasets = self.entity.has_published_datasets()
 
     def getmetadatavalues(self, key: str, grouping_concept=None, list_concept=None) -> list:
         """
@@ -92,4 +89,10 @@ class DonorData:
                        "both grouping_concept and list_concept are null")
 
         return listret
-
+    def updatedonormetadata(self, dict_metadata: dict):
+        """
+        Pass-through to the Entity object's call.
+        :param dict_metadata: a dictionary of metadata per the entity schema.
+        :return: ok or abort
+        """
+        return self.entity.updatedonormetadata(dict_metadata=dict_metadata)

@@ -40,10 +40,6 @@ class SearchForm(Form):
     fpath = os.path.join(fpath, 'app/instance/app.cfg')
     cfg = AppConfig()
 
-    # Obtain the Globus token from app.cfg. This should correspond to the globus auth token in the application
-    # context.
-    token = cfg.getfield(key='GLOBUS_TOKEN').replace("'", "")
-
     # Application context for entity-api URLs, corresponding to a consortium.
     # This field will be used to build the appropriate endpoint URL.
     consortia = cfg.getfieldlist(prefix='CONTEXT_')
