@@ -22,7 +22,6 @@ def to_pretty_json(value):
     return json.dumps(value, sort_keys=True,
                       indent=4, separators=(',', ': '))
 
-
 class DonorUI:
 
     def __init__(self, config: str, package_base_dir: Path):

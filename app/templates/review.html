@@ -13,11 +13,13 @@
             <div class="overflow-scroll mt-1 pb-5 bg-light"
                  style="max-width: 500px; max-height: 200px;">
                 <pre>
-                    {% if form.deepdiff is none %}
-                        No differences
-                    {% else %}
-                        {{ form.deepdiff|tojson_pretty|safe }}
-                    {% endif %}
+                    <code>
+                        {% if form.deepdiff is none %}
+                            No differences
+                        {% else %}
+                            {{ form.deepdiff|tojson_pretty|safe }}
+                        {% endif %}
+                    </code>
                 </pre>
             </div>
         </div>

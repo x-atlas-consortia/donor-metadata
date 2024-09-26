@@ -64,6 +64,12 @@ class Entity:
 
         if response.status_code == 200:
             rjson = response.json()
+            entity_type = rjson.get('entity_type')
+
+            if entity_type != "Donor":
+                msg = f'ID {self.donorid} is an entity of type {entity_type}. This application works only with donors.'
+                abort(400, msg)
+
             donor = rjson.get('metadata')
             return donor
 
@@ -78,6 +84,8 @@ class Entity:
                 abort(response.status_code, response.json().get('error'))
         else:
             abort(response.status_code, response.json().get('error'))
+
+
 
     def updatedonormetadata(self, dict_metadata: dict):
         """

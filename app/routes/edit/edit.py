@@ -10,7 +10,7 @@ Does the following:
 4. Routes the existing and changed metadata to the review page.
 """
 
-from flask import Blueprint, request, render_template, abort, flash
+from flask import Blueprint, request, render_template, flash
 from wtforms import SelectField, Field
 import base64
 import pickle
@@ -48,13 +48,14 @@ def edit(donorid):
         # by the review.html for the update post to entity-api.
         form.newdonor = base64.b64encode(pickle.dumps(form.newdonordata.metadata)).decode()  # Base64 encoded string
 
-
-        diff = deepdiff.DeepDiff(form.currentdonordata.metadata, form.newdonordata.metadata)
-        if diff == {}:
-            diff = None
-
-        #form.deepdiff=json.dumps(json.loads(diff.to_json()))
-        form.deepdiff = diff
+        # Identify all differences between the current and new donor metadata.
+        if form.currentdonordata.metadata is None:
+            form.deepdiff = {'Change': 'from no metadata to some metadata'}
+        else:
+            diff = deepdiff.DeepDiff(form.currentdonordata.metadata, form.newdonordata.metadata)
+            if diff == {}:
+                diff = None
+            form.deepdiff = json.loads(diff.to_json())
 
         # Pass existing and changed metadata to the review/update form.
         return render_template('review.html', donorid=donorid,
@@ -107,8 +108,6 @@ def setdefaults(form):
     agelist = form.currentdonordata.getmetadatavalues(grouping_concept=age_grouping_concept, key='data_value')
     if len(agelist) > 0:
         form.agevalue.data = float(agelist[0])
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.agevalue, disabled=True)
 
     # Age Units
     # The default age unit is years.
@@ -117,8 +116,6 @@ def setdefaults(form):
         form.ageunit.data = ageunitlist[0]
     else:
         form.ageunit.data = 'C0001779'  # years
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.ageunit, disabled=True)
 
     # Race
     # The Race valueset has its own tab. The default value is Unknown.
@@ -128,8 +125,6 @@ def setdefaults(form):
         form.race.data = racelist[0]
     else:
         form.race.data = 'C0439673'  # Unknown
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.race, disabled=True)
 
     # Ethnicity
     # The Ethnicity valueset has its own tab. There is no default value.
@@ -139,8 +134,6 @@ def setdefaults(form):
         form.ethnicity.data = ethlist[0]
     else:
         form.ethnicity.data = 'PROMPT'
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.ethnicity, disabled=True)
 
     # Sex
     # The Sex valueset has its own tab. The default value is Unknown.
@@ -150,8 +143,6 @@ def setdefaults(form):
         form.sex.data = sexlist[0]
     else:
         form.sex.data = 'C0421467'  # Unknown
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.sex, disabled=True)
 
     # Source name
     # The source name is not encoded in a valuset.
@@ -164,8 +155,6 @@ def setdefaults(form):
         form.source.data = '1'
     else:
         form.source.data = 'PROMPT'
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.source, disabled=True)
 
     # Cause of Death
     # The Cause of Death valueset has its own tab. There is no default value.
@@ -177,8 +166,6 @@ def setdefaults(form):
         form.cause.data = codlist[0]
     else:
         form.cause.data = 'PROMPT'
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.cause, disabled=True)
 
     # Mechanism of Injury
     # The Mechanism of Injury valueset has its own tab. There is no default value.
@@ -194,8 +181,6 @@ def setdefaults(form):
         form.mechanism.data = mechlist[0]
     else:
         form.mechanism.data = 'PROMPT'
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.mechanism, disabled=True)
 
     # Death Event
     # The Death Event valueset has its own tab. There is no default value.
@@ -207,8 +192,6 @@ def setdefaults(form):
         form.event.data = eventlist[0]
     else:
         form.event.data = 'PROMPT'
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.event, disabled=True)
 
     # Height
     # The Height valueset has only one concept, on the "Measurements" tab.
@@ -216,8 +199,6 @@ def setdefaults(form):
     heightvaluelist = form.currentdonordata.getmetadatavalues(grouping_concept=height_concept, key='data_value')
     if len(heightvaluelist) > 0:
         form.heightvalue.data = float(heightvaluelist[0])
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.heightvalue, disabled=True)
 
     # Height unit
     # The Height unit is currently linked to the Height valueset, and has a default of cm.
@@ -229,8 +210,6 @@ def setdefaults(form):
         form.heightunit.data = list(dictchoices.keys())[list(dictchoices.values()).index(heightunitlist[0])]
     else:
         form.heightunit.data = '0'  # cm
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.heightunit, disabled=True)
 
     # Weight
     # The Weight valueset has only one concept, on the "Measurements" tab.
@@ -238,8 +217,6 @@ def setdefaults(form):
     weightvaluelist = form.currentdonordata.getmetadatavalues(grouping_concept=weight_concept, key='data_value')
     if len(weightvaluelist) > 0:
         form.weightvalue.data = float(weightvaluelist[0])
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.weightvalue, disabled=True)
 
     # Weight unit
     # The Weight unit is currently linked to the Height valueset, and has a default of kg.
@@ -250,8 +227,6 @@ def setdefaults(form):
         form.weightunit.data = list(dictchoices.keys())[list(dictchoices.values()).index(weightunitlist[0])]
     else:
         form.weightunit.data = '0'  # kg
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.weightunit, disabled=True)
 
     # Body Mass Index
     # The BMI has no default value.
@@ -259,8 +234,6 @@ def setdefaults(form):
     bmilist = form.currentdonordata.getmetadatavalues(grouping_concept=bmi_concept, key='data_value')
     if len(bmilist) > 0:
         form.bmi.data = float(bmilist[0])
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.bmi, disabled=True)
 
     # ABO Blood Type
     # The ABO Blood type is categorical. Its valueset is a subset of rows on the "Blood Type" tab.
@@ -271,8 +244,6 @@ def setdefaults(form):
         form.bloodtype.data = bloodtypelist[0]
     else:
         form.bloodtype.data = 'PROMPT'
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.bloodtype, disabled=True)
 
     # Rh Blood Group
     # The RH Blood Group is categorical. Its valueset is a subset of rows on the "Blood Type" tab.
@@ -282,8 +253,6 @@ def setdefaults(form):
         form.bloodrh.data = bloodrhlist[0]
     else:
         form.bloodrh.data = 'PROMPT'
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.bloodrh, disabled=True)
 
     # Waist Circumference
     # The Waist Circumference valueset has only one concept, on the "Measurements" tab.
@@ -291,8 +260,6 @@ def setdefaults(form):
     waistvaluelist = form.currentdonordata.getmetadatavalues(grouping_concept=waist_concept, key='data_value')
     if len(waistvaluelist) > 0:
         form.waistvalue.data = float(waistvaluelist[0])
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.waistvalue, disabled=True)
 
     # Waist Circumference unit
     # The Waist Circumference unit is currently linked to the Height valueset, and has a default of cm.
@@ -303,8 +270,6 @@ def setdefaults(form):
         form.waistunit.data = list(dictchoices.keys())[list(dictchoices.values()).index(waistunitlist[0])]
     else:
         form.waistunit.data = '0'  # cm
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.waistunit, disabled=True)
 
     # Age at menarche
     # The age at menarche has no default value.
@@ -312,8 +277,6 @@ def setdefaults(form):
     agemenarchelist = form.currentdonordata.getmetadatavalues(grouping_concept=agemenarche_concept, key='data_value')
     if len(agemenarchelist) > 0:
         form.agemenarche.data = float(agemenarchelist[0])
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.agemenarche, disabled=True)
 
     # Age at first birth
     # The age at first birth has no default value.
@@ -322,8 +285,6 @@ def setdefaults(form):
                                                                 key='data_value')
     if len(agefirstbirthlist) > 0:
         form.agefirstbirth.data = float(agefirstbirthlist[0])
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.agefirstbirth, disabled=True)
 
     # Gestational age
     # The gestational age has no default value.
@@ -332,8 +293,6 @@ def setdefaults(form):
                                                                  key='data_value')
     if len(gestationalagelist) > 0:
         form.gestationalage.data = float(gestationalagelist[0])
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.gestationalage, disabled=True)
 
     # KDPI
     # The KDPI has no default value.
@@ -341,8 +300,6 @@ def setdefaults(form):
     kdpilist = form.currentdonordata.getmetadatavalues(grouping_concept=kdpi_concept, key='data_value')
     if len(kdpilist) > 0:
         form.kdpi.data = float(kdpilist[0])
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.kdpi, disabled=True)
 
     # Cancer risk
     # The Cancer risk has no default value.
@@ -350,8 +307,6 @@ def setdefaults(form):
     cancerlist = form.currentdonordata.getmetadatavalues(grouping_concept=cancer_concept, key='data_value')
     if len(cancerlist) > 0:
         form.cancerrisk.data = float(cancerlist[0])
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.cancerrisk, disabled=True)
 
     # Hba1c
     # The Hba1c has no default value.
@@ -359,8 +314,6 @@ def setdefaults(form):
     hba1clist = form.currentdonordata.getmetadatavalues(grouping_concept=hba1c_concept, key='data_value')
     if len(hba1clist) > 0:
         form.hba1c.data = float(hba1clist[0])
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.hba1c, disabled=True)
 
     # Amylase
     # The Amylase has no default value.
@@ -368,8 +321,6 @@ def setdefaults(form):
     amlyaselist = form.currentdonordata.getmetadatavalues(grouping_concept=amylase_concept, key='data_value')
     if len(amlyaselist) > 0:
         form.amylase.data = float(amlyaselist[0])
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.amylase, disabled=True)
 
     # Lipase
     # The Lipase has no default value.
@@ -377,8 +328,6 @@ def setdefaults(form):
     lipaselist = form.currentdonordata.getmetadatavalues(grouping_concept=lipase_concept, key='data_value')
     if len(lipaselist) > 0:
         form.lipase.data = float(lipaselist[0])
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.lipase, disabled=True)
 
     # eGFR
     # The eGFR has no default value.
@@ -386,8 +335,6 @@ def setdefaults(form):
     egfrlist = form.currentdonordata.getmetadatavalues(grouping_concept=egfr_concept, key='data_value')
     if len(egfrlist) > 0:
         form.egfr.data = float(egfrlist[0])
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.egfr, disabled=True)
 
     # Serum creatinine
     # No default value.
@@ -395,8 +342,6 @@ def setdefaults(form):
     secrlist = form.currentdonordata.getmetadatavalues(grouping_concept=secr_concept, key='data_value')
     if len(secrlist) > 0:
         form.secr.data = float(secrlist[0])
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.secr, disabled=True)
 
     # Pathology note
     # The Pathology note has no default value.
@@ -404,8 +349,6 @@ def setdefaults(form):
     pathlist = form.currentdonordata.getmetadatavalues(grouping_concept=path_concept, key='data_value')
     if len(pathlist) > 0:
         form.pathologynote.data = pathlist[0]
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.pathologynote, disabled=True)
 
     # APOE phenotype
     # The APOE phenotype has no default value.
@@ -413,8 +356,6 @@ def setdefaults(form):
     apoelist = form.currentdonordata.getmetadatavalues(grouping_concept=apoe_concept, key='data_value')
     if len(apoelist) > 0:
         form.apoephenotype.data = apoelist[0]
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.apoephenotype, disabled=True)
 
     # Fitzpatrick Skin Type
     # The Fitzpatrick scale is categorical. For the original set of donors that had Fitzpatrick scores,
@@ -427,8 +368,6 @@ def setdefaults(form):
         form.fitzpatrick.data = fitzlist[0]
     else:
         form.fitzpatrick.data = 'PROMPT'
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.fitzpatrick, disabled=True)
 
     # Smoking
     # Smoking is categorical. Its valueset is a subset of rows on the "Social History" tab. The
@@ -439,8 +378,6 @@ def setdefaults(form):
         form.smoking.data = smokinglist[0]
     else:
         form.smoking.data = 'PROMPT'
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.smoking, disabled=True)
 
     # Tobacco
     # Tobacco is categorical. Its valueset is a subset of rows on the "Social History" tab. The
@@ -451,8 +388,6 @@ def setdefaults(form):
         form.tobacco.data = tobaccolist[0]
     else:
         form.tobacco.data = 'PROMPT'
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.tobacco, disabled=True)
 
     # Alcohol
     # Alcohol is categorical. Its valueset is a subset of rows on the "Social History" tab. The
@@ -463,8 +398,6 @@ def setdefaults(form):
         form.alcohol.data = alcohollist[0]
     else:
         form.alcohol.data = 'PROMPT'
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.alcohol, disabled=True)
 
     # Drug
     # Drug is categorical. Its valueset is a subset of rows on the "Social History" tab. The
@@ -476,8 +409,6 @@ def setdefaults(form):
         form.drug.data = druglist[0]
     else:
         form.drug.data = 'PROMPT'
-    if form.currentdonordata.has_published_datasets:
-        setinputdisabled(form.drug, disabled=True)
 
     # Medical History
     # The Medical History valueset has its own tab. There is no default value.
@@ -494,26 +425,31 @@ def setdefaults(form):
 
     for medhx in medhxlist:
         idx = medhxlist.index(medhx)
-        formmedhxdata[idx].data = medhx
-        if form.currentdonordata.has_published_datasets:
-            setinputdisabled(formmedhxdata[idx], disabled=True)
-            setinputdisabled(form.review, disabled=True)
+        if idx < 10:
+            formmedhxdata[idx].data = medhx
 
     # Set defaults for any medhx list that was not set by donor data.
     for m in range(len(medhxlist), 10):
         formmedhxdata[m].data = 'PROMPT'
 
+    # Error conditions that result in disabling of the form.
+    has_error = False
+
     if len(medhxlist) > 10:
         msg = (f'Donor {form.currentdonordata.donorid} currently has more than 10 Medical History Conditions. '
                f'Edit manually.')
         flash(msg)
-        setinputdisabled(form.review, disabled=True)
+        has_error = True
 
     if form.currentdonordata.has_published_datasets:
         msg = (f'Donor {form.currentdonordata.donorid} is associated with one or more published datasets. '
                f'Edit manually.')
         flash(msg)
-        setinputdisabled(form.review, disabled=True)
+        has_error = True
+
+    if has_error:
+        for field in form:
+            setinputdisabled(field, disabled=True)
 
 
 def translate_age_to_metadata(form) -> dict:
