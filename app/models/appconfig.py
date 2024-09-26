@@ -1,10 +1,15 @@
 """
 Class for working with the Flask app.cfg file.
-app.cfg files for Flask apps differs from config files formatted for use by the ConfigParser package
-in that Flask configurations lack sections.
+app.cfg files for Flask apps differs from config files formatted for use by the ConfigParser package as follows:
+1. Flask configurations lack sections.
+2. String values are wrapped in single quotes, which ConfigParser treats as characters.
+
+This class looks for a file named "app.cfg" in the instance directory.
+
 """
 import os
 from configparser import ConfigParser
+from flask import abort
 
 
 class AppConfig:
@@ -46,7 +51,7 @@ class AppConfig:
 
         for t in self.parser:
             if prefix in t[0]:
-                listfields.append(((t[0].replace("'", "")),t[1].replace("'", "")))
+                listfields.append(((t[0].replace("'", "")), t[1].replace("'", "")))
 
         return listfields
 
@@ -56,6 +61,13 @@ class AppConfig:
         :param key: key in the app.cfg file.
         :return: string value, extracted from the tuple obtained from the app.cfg corresponding to the key.
         """
+        field = ''
         for t in self.parser:
             if key == t[0]:
-                return t[1]
+                # Trim quotes from tring fields in Flask config files.
+                field = t[1].replace("'", "")
+
+        if field == '':
+            abort(400, f'Missing key {key} in application configuration file.')
+
+        return field

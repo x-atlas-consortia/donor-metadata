@@ -3,7 +3,7 @@
 import os
 import logging
 from pathlib import Path
-from flask import Flask
+from flask import Flask, render_template
 import json
 
 # route blueprints
@@ -18,7 +18,7 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s: %(message
 logger = logging.getLogger(__name__)
 
 def to_pretty_json(value):
-    # Custom pretty printer of JSON
+    # Custom pretty printer of JSON, used for rendering JSON in <pre> elements.
     return json.dumps(value, sort_keys=True,
                       indent=4, separators=(',', ': '))
 
@@ -30,6 +30,7 @@ class DonorUI:
         self.app = Flask(__name__,
                          instance_path=os.path.join(os.path.abspath(os.path.dirname(__file__)), 'instance'),
                          instance_relative_config=True)
+
 
         self.app.package_base_dir = package_base_dir
 
@@ -45,9 +46,14 @@ class DonorUI:
         self.app.register_blueprint(search_blueprint)
         self.app.register_blueprint(review_blueprint)
 
-
         # Register the custom JSON pretty print filter.
         self.app.jinja_env.filters['tojson_pretty'] = to_pretty_json
+
+        # Custom 401 error handler.
+        @self.app.errorhandler(401)
+        def unauthorized(error):
+            return render_template('token.html'), 401
+
 
 # ###################################################################################################
 # For local development/testing

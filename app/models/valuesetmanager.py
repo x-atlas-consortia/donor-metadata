@@ -3,32 +3,24 @@ Class for working with information from the Google Sheet of donor clinical metad
 """
 
 import pandas as pd
-import numpy as np
+from flask import abort
 
 # For downloading from Google Sheets
 import gdown
-import logging
-
-logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s:%(lineno)d: %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S',
-                    level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 
 class ValueSetManager:
 
     def __init__(self, url: str, download_full_path: str):
 
         try:
-            logging.info('Downloading latest version of valueset file...')
+            print('Downloading latest version of valueset file...')
             gdown.download(url, output=download_full_path, fuzzy=True)
             # The spreadsheet has multiple tabs, so sheet_name=None
             self.Sheets = pd.read_excel(download_full_path, sheet_name=None)
-            # Get UMLS version field.
+            # Get UMLS version field, which contains fields common to all metadata elements.
             self.umls = self.Sheets['UMLS']['graph_version'][0]
         except FileNotFoundError as e:
-            logger.exception('Failed to load the valuesets Google Sheets document.')
-            raise e
+            abort(f'Failed to load the valuesets Google Sheets document at {url}')
 
     def getvaluesettuple(self, tab: str, col: str = 'preferred_term', group_term: str = None,
                          list_concepts: list = None,
@@ -71,7 +63,7 @@ class ValueSetManager:
         dftab = self.Sheets[tab]
 
         # Trim extraneous white space from concept column.
-        dftab.loc[:,'concept_id'] = dftab['concept_id'].str.strip()
+        dftab.loc[:, 'concept_id'] = dftab['concept_id'].str.strip()
 
         # Apply filters for subset.
         if group_term is not None:
@@ -80,7 +72,7 @@ class ValueSetManager:
             dftab = dftab.loc[dftab['concept_id'].isin(list_concepts)]
 
         # Trim extraneous white space from concept.
-        dftab.loc[:,'concept_id'] = dftab['concept_id'].str.strip()
+        dftab.loc[:, 'concept_id'] = dftab['concept_id'].str.strip()
 
         # Sort and filter to relevant columns.
         dftab = dftab.sort_values(by=['preferred_term'])[['concept_id', col]]
@@ -107,7 +99,6 @@ class ValueSetManager:
         dftab = self.Sheets[tab]
         return dftab[col].drop_duplicates().to_list()
 
-
     def getvaluesetrow(self, tab: str, concept_id: str) -> dict:
         """
         Translates a requested row from the valueset manager into a dict per the donor metadata schema, in which
@@ -128,10 +119,10 @@ class ValueSetManager:
         dfmember = dfmember.reset_index(drop=True)
         dictreturn = {}
         for col in dfmember:
-            if pd.isna(dfmember.loc[0,col]):
-                dictreturn[col]=''
+            if pd.isna(dfmember.loc[0, col]):
+                dictreturn[col] = ''
             else:
-                dictreturn[col] = str(dfmember.loc[0,col])
+                dictreturn[col] = str(dfmember.loc[0, col])
 
         # Add the start_datetime, end_datetime, and graph_version fields.
         dictreturn['start_datetime'] = ''
@@ -139,4 +130,3 @@ class ValueSetManager:
         dictreturn['graph_version'] = self.umls
 
         return dictreturn
-

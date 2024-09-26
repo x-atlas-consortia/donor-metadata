@@ -9,10 +9,23 @@
 <form method=post action="/review">
     <div class="container text-left">
         <div class="row align-items-start">
+            <h3>Differences</h3>
+            <div class="overflow-scroll mt-1 pb-5 bg-light"
+                 style="max-width: 500px; max-height: 200px;">
+                <pre>
+                    {% if form.deepdiff is none %}
+                        No differences
+                    {% else %}
+                        {{ form.deepdiff|tojson_pretty|safe }}
+                    {% endif %}
+                </pre>
+            </div>
+        </div>
+        <div class="row align-items-start">
             <div class="col">
                 <h3>Current Metadata</h3>
                 <div class="overflow-scroll mt-1 pb-5 bg-light"
-                    style="max-width: 500px; max-height: 600px;">
+                    style="max-width: 500px; max-height: 350px;">
                     <pre>
                         {% if form.currentdonordata is none %}
                             no metadata
@@ -25,7 +38,7 @@
             <div class="col">
                 <h3>New Metadata</h3>
                 <div class="overflow-scroll mt-1 pb-5 bg-light"
-                    style="max-width: 500px; max-height: 600px;">
+                    style="max-width: 500px; max-height: 350px;">
                     <pre>
                         {% if form.newdonordata is none %}
                             no metadata

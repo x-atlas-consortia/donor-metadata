@@ -49,6 +49,7 @@ def validate_selectfield_default(form, field):
         msg = f"Selected concept '{field.data}` not in valueset."
         raise ValidationError(msg)
 
+
 def validate_required_selectfield(form, field):
     """
     Custom validator that verifies that the value specified in a SelectField deemed required (e.g., Source)
@@ -71,12 +72,11 @@ class EditForm(Form):
     # Read the app.cfg file outside the Flask application context.
     cfg = AppConfig()
 
-    # token = cfg.getfield(key='GLOBUS_TOKEN').replace("'", "")
-
     # Instantiate the ValuesetManager that reads resources for form controls from a
     # Google Sheet.
     # Get URL to Google sheet, with single quote literals stripped.
-    url = cfg.getfield(key='VALUESETMANAGER').replace("'", "")
+    url = cfg.getfield(key='VALUESETMANAGER')
+
     # Export path for valueset spreadsheet.
     fpath = os.path.join(os.path.dirname(os.getcwd()), 'app/valueset/valuesets.xlsx')
     # Download current version of valueset data.

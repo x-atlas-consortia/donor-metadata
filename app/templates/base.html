@@ -32,7 +32,12 @@
 
     <script type="text/javascript">
         function spinner() {
-            document.getElementById("spinner").style.display = "block";
+            const donorid = document.getElementById('donorid');
+            if (donorid.value ==="") {
+                document.getElementById("spinner").hide();
+            } else {
+                document.getElementById("spinner").style.display = "block";
+            }
         }
     </script>
     <script type="text/javascript">
@@ -52,11 +57,13 @@
     <!-- Flask flash message display -->
     {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <ul class=flashes>
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-        </ul>
+        <div class="text-bg-success p-3">
+          <ul class=flashes>
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        </div>
       {% endif %}
     {% endwith %}
     <meta charset="utf-8">
@@ -67,6 +74,7 @@
     <nav class="navbar bg-dark">
       <a class="navbar-brand" href="#">
         <img src="/static/hubmap.png" alt="HuBMAP" data-height="234" style="max-height: 49.9922px;">
+        <img src="/static/reaper.png" alt="Curator" data-height="234" style="max-height: 49.9922px;">
       </a>
       <p class="text-white bg-dark fs-2">HuBMAP/SenNet Human Donor Clinical Metadata Curator</p>
       <a class="navbar-brand float-right">

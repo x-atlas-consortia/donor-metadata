@@ -7,26 +7,27 @@ Does the following:
 1. Obtains any existing metadata for the donor from provenance.
 2. Sets input forms with defaults that match the existing metadata.
 3. Tranlsates form data into the donor metadata schema.
-4. Routes the existing and changed metadata to the update page.
+4. Routes the existing and changed metadata to the review page.
 """
 
 from flask import Blueprint, request, render_template, abort, flash
-from wtforms import DecimalField, SelectField, Field
+from wtforms import SelectField, Field
 import base64
 import pickle
+import deepdiff
+import json
 
 # Helper classes
 # Represents the metadata for a donor in a consortium database
 from models.donor import DonorData
 # The form used to build request bodies for PUT and POST endpoints of the entity-api
 from models.editform import EditForm
-# entity-api functions
-from models.entity import Entity
 
 
 edit_blueprint = Blueprint('edit', __name__, url_prefix='/edit/<donorid>')
 
-@edit_blueprint.route('', methods=['POST','GET'])
+
+@edit_blueprint.route('', methods=['POST', 'GET'])
 def edit(donorid):
 
     form = EditForm(request.form)
@@ -46,6 +47,14 @@ def edit(donorid):
         # Prepare a base64-encoded string version of the new metadata dictionary that will be decoded
         # by the review.html for the update post to entity-api.
         form.newdonor = base64.b64encode(pickle.dumps(form.newdonordata.metadata)).decode()  # Base64 encoded string
+
+
+        diff = deepdiff.DeepDiff(form.currentdonordata.metadata, form.newdonordata.metadata)
+        if diff == {}:
+            diff = None
+
+        #form.deepdiff=json.dumps(json.loads(diff.to_json()))
+        form.deepdiff = diff
 
         # Pass existing and changed metadata to the review/update form.
         return render_template('review.html', donorid=donorid,
@@ -68,6 +77,7 @@ def setinputdisabled(inputfield, disabled: bool = True):
         inputfield.render_kw['disabled'] = 'disabled'
     else:
         inputfield.render_kw.pop('disabled')
+
 
 def setdefaults(form):
     """
@@ -501,6 +511,7 @@ def setdefaults(form):
               f'This application cannot update the donor metadata.')
         setinputdisabled(form.review, disabled=True)
 
+
 def translate_age_to_metadata(form) -> dict:
     """
     Translates the combination of age and age unit fields in the Edit form to a metadata dict.
@@ -573,6 +584,7 @@ def buildnewdonordata(form, donorid: str) -> DonorData:
 
     """
     Builds a new DonorData object from form data. This includes populating a list of metadata dicts.
+    :param form: a WTForms Form object
     :param donorid: donor id
     :return: a DonorData object.
     """

@@ -6,8 +6,9 @@ Works with searchform.py.
 Allows the user to specify the consortium and donor.
 
 """
-from flask import Blueprint, request, render_template, redirect, session, current_app
+from flask import Blueprint, request, render_template, redirect, session
 
+# Helper classes
 # The form used to execute a GET request against the entity-api of a consortium
 from models.searchform import SearchForm
 # Represents metadata for a donor in a provenance database of a consortium.
@@ -26,11 +27,12 @@ def search():
         # Query the provenance database of the specified consortium to validate that the specified
         # donor currently exists.
 
-        # Obtain the value of consortium selected (not the key).
-        consortium = dict(form.consortium.choices).get(form.consortium.data)
         donorid = form.donorid.data
-        currentDonorData = DonorData(donorid=donorid)
 
+        # Attempt to load metadata for the donor.
+        currentdonordata = DonorData(donorid=donorid)
+
+        # Clear messages related to prior updates.
         if 'flashes' in session:
             session['flashes'].clear()
 

@@ -14,7 +14,7 @@ from models.entity import Entity
 
 class DonorData:
 
-    def __init__(self, donorid: str, isforupdate: bool=False):
+    def __init__(self, donorid: str, isforupdate: bool=False, ):
         """
 
         :param donorid: ID of a donor in a context.

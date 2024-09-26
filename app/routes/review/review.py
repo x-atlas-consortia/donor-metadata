@@ -4,15 +4,15 @@ Final page in the curation workflow.
 
 """
 
-from flask import Blueprint, request, render_template, redirect, jsonify, abort, flash
+from flask import Blueprint, request, redirect, abort, flash
 import pickle
 import base64
 
 # Helper classes
-# entity-api functions
 from models.donor import DonorData
 
 review_blueprint = Blueprint('review', __name__, url_prefix='/review')
+
 
 @review_blueprint.route('', methods=['POST'])
 def review():
@@ -34,7 +34,7 @@ def review():
     else:
         abort(400, 'No donorid')
 
-    donordata = DonorData(donorid = donorid, isforupdate=True)
+    donordata = DonorData(donorid=donorid, isforupdate=True)
     if donordata.updatedonormetadata(dict_metadata=newdonor) == 'ok':
         flash(f'Updated metadata for {donorid}')
         return redirect('/')

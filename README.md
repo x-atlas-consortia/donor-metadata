@@ -1,4 +1,4 @@
-# HuBMAP/SenNet Donor Clinical Metadata data entry application
+# HuBMAP/SenNet Human Donor Clinical Metadata Curator application
 
 # Background
 ## Donor clinical metadata
@@ -26,38 +26,53 @@ Clinical metadata of interest is one of three types:
 2. Categorical
 3. Free text
 
-All types of metadata are associated with discrete codes. Codes that describe a particular type of data
-are collected into valuesets and maintained in spreadsheets.
+Each type of metadata is associated with discrete codes. 
+Codes that describe a particular type of data are collected into valuesets and 
+maintained in spreadsheets. 
+Categorical metadata may be stored in one of two ways:
+1. in a dedicated tab in the spreadsheet (e.g., Race)
+2. as a set of rows in a tab (e.g., ABO blood types in the Blood Type tab)
 
-Because we have few expectations regarding the form of 
-clinical data from providers, it is usually necessary to update the valueset 
-spreadsheet with every set of donors. 
+We have few expectations regarding the form of 
+clinical data from providers beyond the minimum set required to build a DOI for a dataset (race; sex; age; whether 
+organ or living). Clinical data from a provider often contains novel information--e.g., 
+previously undocumented medical history conditions or measurements.
+
+In general, it is necessary to update the valueset spreadsheet for every set of donors. 
 
 # Solution
-The ideal curation solution has features including:
-- A form that allows
+The curation solution features:
+- A user interface that allows
    - data entry--e.g., selection of categorical values or entry of numeric or text values
    - validation--e.g., data type and range
-   - unlimited values--e.g., many entries for patient medical history
+   - multiple entries for patient medical history
 - Encoding of each metadata element to appropriate valuesets
-- Ability to update a neo4j provenance database by:
-  - connecting to the database
-  - preparing and executing a Cypher insert query
+- Form content driven by the valueset spreadsheet to allow rapid changes in valuesets
+- Ability to update a neo4j provenance database for a donor
 
 # Architecture
-## Elements
-- Python
+## Application
+The curator is a Python Web application involving:
+  - Python
   - Flask
   - Flask Blueprints
   - WTForms
   - Jinja2
   - neo4j driver
-- Valueset source (Google Sheets)
-- Docker 
-
-_Diagram pending_ 
+  - HTML
+  - JavaScript
+## Configuration
+The app.cfg for the application is used to set:
+- consortium (HuBMAP or SenNet)
+- entity-api environment
+- the consortium-specific authorization token
+## Databases
+The application works with three databases:
+1. The Google Sheets document of valueset information.
+2. The neo4j provenance databases for the two consortia, as abstracted by consortium-specific instances of entity-api.
+## Docker
+_to do_ 
 
 # Development
 ## Initial tasks
 * Install all packages in *requirements.txt*.
-* 
