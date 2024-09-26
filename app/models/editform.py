@@ -25,6 +25,7 @@ def validate_age(form, field):
 
     ageunit = form.ageunit.data
     age = field.data
+    print(age, ageunit)
 
     if age <= 0:
         raise ValidationError('The minimum age is 1 month.')
@@ -94,7 +95,7 @@ class EditForm(Form):
     ageunits = valuesetmanager.getvaluesettuple(tab='Age', group_term='Age', col='units')
     ageunit = SelectField('units', choices=ageunits)
     agevalue = DecimalField('Age (value)',
-                            validators=[validators.DataRequired(), validators.NumberRange(min=0)])
+                            validators=[validators.DataRequired(), validators.NumberRange(min=0), validate_age])
 
     # Race
     races = valuesetmanager.getvaluesettuple(tab='Race', group_term='Race')

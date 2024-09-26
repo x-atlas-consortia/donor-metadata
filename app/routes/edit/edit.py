@@ -492,23 +492,27 @@ def setdefaults(form):
     medhx_concepts = form.valuesetmanager.getcolumnvalues(tab='Medical History', col='concept_id')
     medhxlist = form.currentdonordata.getmetadatavalues(list_concept=medhx_concepts, key='concept_id')
 
-    if len(medhxlist) > 10:
-        msg = f'Donor {donorid} has more than 10 Medical History Conditions. Edit manually.'
-        abort(400, msg)
-
     for medhx in medhxlist:
         idx = medhxlist.index(medhx)
         formmedhxdata[idx].data = medhx
         if form.currentdonordata.has_published_datasets:
             setinputdisabled(formmedhxdata[idx], disabled=True)
+            setinputdisabled(form.review, disabled=True)
 
     # Set defaults for any medhx list that was not set by donor data.
     for m in range(len(medhxlist), 10):
         formmedhxdata[m].data = 'PROMPT'
 
+    if len(medhxlist) > 10:
+        msg = (f'Donor {form.currentdonordata.donorid} currently has more than 10 Medical History Conditions. '
+               f'Edit manually.')
+        flash(msg)
+        setinputdisabled(form.review, disabled=True)
+
     if form.currentdonordata.has_published_datasets:
-        flash(f'Donor {form.currentdonordata.donorid} is associated with one or more published datasets. '
-              f'This application cannot update the donor metadata.')
+        msg = (f'Donor {form.currentdonordata.donorid} is associated with one or more published datasets. '
+               f'Edit manually.')
+        flash(msg)
         setinputdisabled(form.review, disabled=True)
 
 
