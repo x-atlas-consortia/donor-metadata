@@ -6,6 +6,8 @@
 <title>Donor ID: {{ donorid }} </title>
 
 <!-- Submitting the form posts back to this page.-->
+<!-- Hyphens at the beginning of a Jinja code block trims leading blank spaces, including newlines.
+     Two hyphens are needed to trim all newlines in the JSONs.-->
 <form method=post action="/review">
     <div class="container text-left">
         <div class="row align-items-start">
@@ -13,13 +15,11 @@
             <div class="overflow-scroll mt-1 pb-5 bg-light"
                  style="max-width: 500px; max-height: 200px;">
                 <pre>
-                    <code>
-                        {% if form.deepdiff is none %}
+                        {%- if form.deepdiff is none %}
                             No differences
                         {% else %}
-                            {{ form.deepdiff|tojson_pretty|safe }}
-                        {% endif %}
-                    </code>
+                            {{- form.deepdiff|tojson_pretty|safe}}
+                        {%- endif %}
                 </pre>
             </div>
         </div>
@@ -29,11 +29,11 @@
                 <div class="overflow-scroll mt-1 pb-5 bg-light"
                     style="max-width: 500px; max-height: 350px;">
                     <pre>
-                        {% if form.currentdonordata is none %}
+                        {%- if form.currentdonordata is none or form.currentdonordata.metadata is none %}
                             no metadata
                         {% else %}
-                            {{ form.currentdonordata.metadata|tojson_pretty|safe }}
-                        {% endif %}
+                            {{- form.currentdonordata.metadata|tojson_pretty|safe }}
+                        {%- endif %}
                     </pre>
                 </div>
             </div>
@@ -42,11 +42,11 @@
                 <div class="overflow-scroll mt-1 pb-5 bg-light"
                     style="max-width: 500px; max-height: 350px;">
                     <pre>
-                        {% if form.newdonordata is none %}
+                        {%- if form.newdonordata is none or form.newdonordata.metadata is none %}
                             no metadata
                         {% else %}
-                            {{ form.newdonordata.metadata|tojson_pretty|safe }}
-                        {% endif %}
+                            {{- form.newdonordata.metadata|tojson_pretty|safe }}
+                        {%- endif %}
                     </pre>
                 </div>
             </div>

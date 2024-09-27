@@ -66,9 +66,22 @@ class Entity:
             rjson = response.json()
             entity_type = rjson.get('entity_type')
 
-            if entity_type != "Donor":
-                msg = f'ID {self.donorid} is an entity of type {entity_type}. This application works only with donors.'
+            if not entity_type in ['Donor','Source']:
+                if self.consortium == 'hubmapconsortium':
+                    target = "Donors"
+                else:
+                    target = "Sources"
+
+                msg = (f'ID {self.donorid} is an entity of type {entity_type}. '
+                       f'This application works only with {target}.')
                 abort(400, msg)
+
+            if self.consortium == 'sennetconsortium':
+                source_type = rjson.get('source_type')
+                if source_type != 'Human':
+                    msg = (f'ID {self.donorid} is an source of type {source_type}. '
+                           f'This application works only with human sources.')
+                    abort(400, msg)
 
             donor = rjson.get('metadata')
             return donor

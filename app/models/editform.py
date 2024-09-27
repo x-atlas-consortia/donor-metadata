@@ -25,7 +25,6 @@ def validate_age(form, field):
 
     ageunit = form.ageunit.data
     age = field.data
-    print(age, ageunit)
 
     if age <= 0:
         raise ValidationError('The minimum age is 1 month.')
@@ -58,7 +57,7 @@ def validate_required_selectfield(form, field):
 
     """
     if field.data == 'PROMPT':
-        msg = f"Required field"
+        msg = f'Required'
         raise ValidationError(msg)
 
 

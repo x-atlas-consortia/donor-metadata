@@ -9,11 +9,11 @@
             <div class="col">
                 <h3 text-bg-warning>Minimal Metadata</h3>
                 <div class="row text-bg-warning">
-                    <div class="col">
+                   <div class="col">
                         <strong>{{ form.consortium.label }}</strong>
                     </div>
                     <div class="col">
-                        {{ form.consortium}}
+                        {{ form.consortium }}
                     </div>
                 </div>
                 <div class="row text-bg-warning">
@@ -21,7 +21,7 @@
                         <strong> {{ form.donorid.label }}</strong>
                     </div>
                     <div class="col">
-                        {{ form.donorid }}
+                        {{ render_field(form.donorid) }}
                     </div>
                 </div>
                  <div class="row text-bg-warning">

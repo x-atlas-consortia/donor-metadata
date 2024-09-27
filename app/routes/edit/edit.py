@@ -34,6 +34,7 @@ def edit(donorid):
     # Obtain current donor metadata from provenance.
     form.currentdonordata = DonorData(donorid=donorid, isforupdate=False)
 
+
     if request.method == 'GET':
         # Redirect from the search page.
         # Populate the edit form with current metadata for the donor.
@@ -60,6 +61,14 @@ def edit(donorid):
         # Pass existing and changed metadata to the review/update form.
         return render_template('review.html', donorid=donorid,
                                form=form)
+    else:
+        # Donor id
+        form.donorid.data = form.currentdonordata.donorid
+        setinputdisabled(form.donorid, disabled=True)
+
+        # Consortium
+        form.consortium.data = form.currentdonordata.consortium
+        setinputdisabled(form.consortium, disabled=True)
 
     return render_template('edit.html', donorid=donorid, form=form)
 
