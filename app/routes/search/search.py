@@ -21,6 +21,10 @@ search_blueprint = Blueprint('search', __name__, url_prefix='/')
 def search():
 
     form = SearchForm(request.form)
+    if request.method == 'GET':
+        # Obtain the authentication token from the session cookie.
+        if 'HMSNDonortoken' in session:
+            form.token.data = session['HMSNDonortoken']
 
     if request.method == 'POST' and form.validate():
 
@@ -29,8 +33,14 @@ def search():
 
         donorid = form.donorid.data
 
-        # Attempt to load metadata for the donor.
-        currentdonordata = DonorData(donorid=donorid)
+        # Write the token to a session cookie.
+        if 'HMSNDonortoken' in session:
+            session.pop('HMSNDonortoken', None)
+        session['HMSNDonortoken'] = form.token.data
+
+        # Attempt to load metadata for the donor. The load will abort if unable to load data.
+        token = session['HMSNDonortoken']
+        currentdonordata = DonorData(donorid=donorid, token=token)
 
         # Clear messages related to prior updates.
         if 'flashes' in session:

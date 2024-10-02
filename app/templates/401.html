@@ -2,11 +2,28 @@
 
 {% block content %}
 
-<title>Application tokens</title>
+<title>Unauthorized (401)</title>
 <br>
 <div class="container text-left">
-    <h1>Application tokens</h1>
+    <h1>Unauthorized</h1>
+    <p><br><br></p>
+    <div>
+        <img src="/static/401.png" alt="Unauthorized" data-height="300" style="max-height: 168px;">
+    </div>
     <br>
+    <br>
+    <p>This application is not authorized to access the specified provenance database.</p>
+    <p>Possible reasons for this include:</p>
+    <ol>
+        <li>Your account does not have the necessary permissions in the application (HuBMAP or SenNet). Contact the application administrator.</li>
+        <li>The value of <strong>GLOBUS_TOKEN</strong> in the application configuration file is not for a valid authorization token.</li>
+    </ol>
+    <br>
+    <p>Possible reasons for an invalid authorization token include:</p>
+    <ol>
+        <li>The token is for the incorrect consortium--e.g., you specified a HuBMAP token for an update to a donor in SenNet.</li>
+        <li>The token has expired.</li>
+    </ol>
     <br>
     <p>To obtain a new authorization token,</p>
     <ol>

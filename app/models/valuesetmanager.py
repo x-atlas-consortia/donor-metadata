@@ -8,6 +8,7 @@ from flask import abort
 # For downloading from Google Sheets
 import gdown
 
+
 class ValueSetManager:
 
     def __init__(self, url: str, download_full_path: str):
@@ -19,8 +20,8 @@ class ValueSetManager:
             self.Sheets = pd.read_excel(download_full_path, sheet_name=None)
             # Get UMLS version field, which contains fields common to all metadata elements.
             self.umls = self.Sheets['UMLS']['graph_version'][0]
-        except FileNotFoundError as e:
-            abort(f'Failed to load the valuesets Google Sheets document at {url}')
+        except FileNotFoundError:
+            abort(400, f'Failed to load the valuesets Google Sheets document at {url}')
 
     def getvaluesettuple(self, tab: str, col: str = 'preferred_term', group_term: str = None,
                          list_concepts: list = None,

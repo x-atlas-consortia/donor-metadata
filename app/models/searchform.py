@@ -2,12 +2,13 @@
 Form used to search for a donor by ID in the provenance database of a consortium.
 First form in the workflow.
 """
-from flask import session, flash, make_response, request
 
 import os
 
 from wtforms import Form, validators, ValidationError, SelectField, StringField
 from .appconfig import AppConfig
+from flask import current_app, session
+
 
 def validate_donorid(form, field):
     """
@@ -33,7 +34,6 @@ def validate_donorid(form, field):
 
 class SearchForm(Form):
 
-
     # POPULATE FORM FIELDS. In particular, populate SelectFields with lists obtained from the valueset manager.
 
     # Read the app.cfg file outside the Flask application context.
@@ -57,7 +57,10 @@ class SearchForm(Form):
                                                   validators.regexp(regex=regex, message=message),
                                                   validate_donorid])
 
+    token = StringField('Token', validators=[validators.DataRequired()])
+
     # Clear validation errors. This handles the common use case in which the user returns to the search form after
     # seeing a 4XX error.
     donorid.errors = []
-    consortium.errors =[]
+    consortium.errors = []
+    token.errors = []

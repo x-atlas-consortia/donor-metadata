@@ -10,7 +10,7 @@ Does the following:
 4. Routes the existing and changed metadata to the review page.
 """
 
-from flask import Blueprint, request, render_template, flash
+from flask import Blueprint, request, render_template, flash, session, abort
 from wtforms import SelectField, Field
 import base64
 import pickle
@@ -32,8 +32,13 @@ def edit(donorid):
 
     form = EditForm(request.form)
     # Obtain current donor metadata from provenance.
-    form.currentdonordata = DonorData(donorid=donorid, isforupdate=False)
+    # First, obtain the authentication token from the session cookie.
+    if 'HMSNDonortoken' in session:
+        token = session['HMSNDonortoken']
+    else:
+        abort(401)
 
+    form.currentdonordata = DonorData(donorid=donorid, token=token, isforupdate=False)
 
     if request.method == 'GET':
         # Redirect from the search page.
@@ -43,7 +48,7 @@ def edit(donorid):
     if request.method == 'POST' and form.validate():
         # Translate revised donor metadata fields into the encoded donor metadata schema.
 
-        form.newdonordata = buildnewdonordata(form, donorid=donorid)
+        form.newdonordata = buildnewdonordata(form, token=token, donorid=donorid)
 
         # Prepare a base64-encoded string version of the new metadata dictionary that will be decoded
         # by the review.html for the update post to entity-api.
@@ -55,8 +60,10 @@ def edit(donorid):
         else:
             diff = deepdiff.DeepDiff(form.currentdonordata.metadata, form.newdonordata.metadata)
             if diff == {}:
-                diff = None
-            form.deepdiff = json.loads(diff.to_json())
+                # A return of None is translated by review.html as no change.
+                form.deepdiff = None
+            else:
+                form.deepdiff = json.loads(diff.to_json())
 
         # Pass existing and changed metadata to the review/update form.
         return render_template('review.html', donorid=donorid,
@@ -529,15 +536,16 @@ def translate_field_value_to_metadata(form, formfield: Field, tab: str, concept_
     return dictvalueset
 
 
-def buildnewdonordata(form, donorid: str) -> DonorData:
+def buildnewdonordata(form, token: str, donorid: str) -> DonorData:
 
     """
     Builds a new DonorData object from form data. This includes populating a list of metadata dicts.
     :param form: a WTForms Form object
     :param donorid: donor id
+    :param token: globus groups_token for consortium entity-api
     :return: a DonorData object.
     """
-    donor = DonorData(donorid=donorid, isforupdate=True)
+    donor = DonorData(donorid=donorid, token=token, isforupdate=True)
 
     # organ_donor_data or living_donor_data key.
     donor_data_key = dict(form.source.choices).get(form.source.data)

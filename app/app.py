@@ -10,6 +10,7 @@ import json
 from routes.edit.edit import edit_blueprint
 from routes.search.search import search_blueprint
 from routes.review.review import review_blueprint
+from routes.token.token import token_blueprint
 
 # Configure consistent logging. This is done at the beginning of each module instead of with a superclass of
 # logger to avoid the need to overload function calls to logger.
@@ -17,10 +18,12 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s: %(message
                     level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
 
+
 def to_pretty_json(value):
     # Custom pretty printer of JSON, used for rendering JSON in <pre> elements.
     return json.dumps(value, sort_keys=True,
                       indent=4, separators=(',', ': '))
+
 
 class DonorUI:
 
@@ -29,7 +32,6 @@ class DonorUI:
         self.app = Flask(__name__,
                          instance_path=os.path.join(os.path.abspath(os.path.dirname(__file__)), 'instance'),
                          instance_relative_config=True)
-
 
         self.app.package_base_dir = package_base_dir
 
@@ -44,6 +46,7 @@ class DonorUI:
         self.app.register_blueprint(edit_blueprint)
         self.app.register_blueprint(search_blueprint)
         self.app.register_blueprint(review_blueprint)
+        self.app.register_blueprint(token_blueprint)
 
         # Register the custom JSON pretty print filter.
         self.app.jinja_env.filters['tojson_pretty'] = to_pretty_json
@@ -51,7 +54,7 @@ class DonorUI:
         # Custom 401 error handler.
         @self.app.errorhandler(401)
         def unauthorized(error):
-            return render_template('token.html'), 401
+            return render_template('401.html'), 401
 
 
 # ###################################################################################################

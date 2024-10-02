@@ -6,7 +6,5 @@ ENDPOINT_BASE='https://entity-api.dev'
 #ENDPOINT_BASE='https://entity-api'
 # App key
 KEY='My key'
-# The value of GLOBUS_TOKEN should be obtained from the globus_group key of a cookie set by a consortium application.
-GLOBUS_TOKEN='globus token'
 # Google Sheets resource for metadata valuesets
 VALUESETMANAGER='https://docs.google.com/spreadsheets/d/1VhBA3eC78X8w47_ej5f_wq5uvvgO2kY0kfC7utgDqhI/edit?usp=sharing'

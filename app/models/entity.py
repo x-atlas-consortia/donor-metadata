@@ -7,11 +7,13 @@ import requests
 # Represents the app.cfg file
 from .appconfig import AppConfig
 
+
 class Entity:
 
-    def __init__(self, donorid: str):
+    def __init__(self, donorid: str, token: str):
         """
         :param donorid: ID of a donor entity in a provenance database
+        :param token: globus groups_token for the consortium's entity-api.
 
         """
 
@@ -23,13 +25,16 @@ class Entity:
         self.cfg = AppConfig()
         # The url base depends on both the consortium and the enviroment (i.e., development vs production).
         self.urlbase = self.cfg.getfield(key='ENDPOINT_BASE')
-        self.headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+        self.headers = {'Accept': 'application/json',
+                        'Content-Type': 'application/json'}
+        if self.consortium == 'sennetconsortium':
+            self.headers['X-SenNet-Application'] = 'entity-api'
 
         # The bearer token in the configuration file should be the globus_group key from the
         # info cookie set by the consortium application:
         # 1. HuBMAP - as a client cookie. (Use the Ingest UI.)
         # 2. SenNet - as a base64-encoded server cookie.
-        self.token = self.cfg.getfield(key='GLOBUS_TOKEN')
+        self.token = token
 
         self.headers['Authorization'] = f'Bearer {self.token}'
 
@@ -58,7 +63,6 @@ class Entity:
         :return: if there is a donor entity with id=donorid, a dict that corresponds to the metadata
         object.
         """
-
         url = f'{self.urlbase}.{self.consortium}.org/entities/{self.donorid}'
         response = requests.get(url=url, headers=self.headers)
 
@@ -66,7 +70,7 @@ class Entity:
             rjson = response.json()
             entity_type = rjson.get('entity_type')
 
-            if not entity_type in ['Donor','Source']:
+            if entity_type not in ['Donor', 'Source']:
                 if self.consortium == 'hubmapconsortium':
                     target = "Donors"
                 else:
@@ -97,8 +101,6 @@ class Entity:
                 abort(response.status_code, response.json().get('error'))
         else:
             abort(response.status_code, response.json().get('error'))
-
-
 
     def updatedonormetadata(self, dict_metadata: dict):
         """

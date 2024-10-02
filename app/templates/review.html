@@ -11,16 +11,22 @@
 <form method=post action="/review">
     <div class="container text-left">
         <div class="row align-items-start">
-            <h3>Differences</h3>
-            <div class="overflow-scroll mt-1 pb-5 bg-light"
+            <div class="col">
+                <h3>Differences</h3>
+                <div class="overflow-scroll mt-1 pb-5 bg-light"
                  style="max-width: 500px; max-height: 200px;">
-                <pre>
+                    <pre>
                         {%- if form.deepdiff is none %}
                             No differences
                         {% else %}
                             {{- form.deepdiff|tojson_pretty|safe}}
                         {%- endif %}
-                </pre>
+                    </pre>
+                </div>
+            </div>
+            <div class = "col">
+                <p> New metadata comprises the original metadata modified by any changes from the Edit form.</p>
+                <p> Some metadata may be standardized--e.g, converted to decimal; grouping concepts changes.</p>
             </div>
         </div>
         <div class="row align-items-start">

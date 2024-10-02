@@ -4,7 +4,7 @@ Final page in the curation workflow.
 
 """
 
-from flask import Blueprint, request, redirect, abort, flash
+from flask import Blueprint, request, redirect, abort, flash, session
 import pickle
 import base64
 
@@ -34,7 +34,13 @@ def review():
     else:
         abort(400, 'No donorid')
 
-    donordata = DonorData(donorid=donorid, isforupdate=True)
+    # Obtain token from session cookie.
+    if 'HMSNDonortoken' in session:
+        token = session['HMSNDonortoken']
+    else:
+        abort(401)
+
+    donordata = DonorData(donorid=donorid, token=token, isforupdate=True)
     if donordata.updatedonormetadata(dict_metadata=newdonor) == 'ok':
         flash(f'Updated metadata for {donorid}')
         return redirect('/')
