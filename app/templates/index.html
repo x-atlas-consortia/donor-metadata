@@ -15,8 +15,9 @@
         <div>
             &#8679; ID format is <i>(CCCnnn.XXXX.nnn)</i>, with <i>CCC</i> in (HBM,SNT); <i>n</i> integer; <i>X</i> non-numeric
         </div>
-        <div>
+        <div class="col-sm">
             {{ render_field(form.token) }}
+            <a class="btn btn-primary" href={{ url_for('token.token_clear') }} role="button">Clear</a>
         </div>
         <div>
             &#8679; provide the appropriate <code>groups_token</code> for the consortium application, as described <a href={{ url_for('token.token') }}>here</a>.
