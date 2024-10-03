@@ -152,31 +152,50 @@ This file contains a custom Jinja script used to populate content from WTForms f
 | DonorUI         | encapsulates the Flask app                     | app        |
 
 
-## Business rules
+# Business rules
 1. The application can only update metadata for an existing donor; it does not create donor entities in provenance.
 2. The application will not update metadata for a donor that is associated with published datasets. 
 2. The application can document a maximum of 10 medical conditions. The application cannot update metadata for a donor if the current metadata includes more than 10 conditions.
 3. The application will only update metadata if there was a change.
 4. In SenNet, the application will only update donors that are human sources.
 
-## Authentication token
+# Authentication token
 The entity-api requires an authentication token. 
 An authentication token for a consortium's entity-api is set via the consortium's Single Sign On. 
 The **token.html** page provides instructions on how to obtain the authentication token.
 
 The user enters an authentication token in the form on the home page.
 
-### Token caching
+## Token caching
 The application caches the authentication token in a session cookie. 
 Caching the token facilitates the curation of multiple donors in a session: it is not necessary to supply the token for each donor.
 
 Although authenticaion tokens have a long expiration period (72 hours), the application clears the cached token from the session cookie after 5 minutes. 
 It is also possible to clear the session cookie explicitly using a button in the form in the home page.
 
-### 401 (Access denied) errors
+## 401 (Access denied) errors
 The application will raise a HTTP 401 exception when:
 1. The authentication token expires at the consortium level.
 2. The authentication token is for the incorrect consortium--e.g., if the user provides a HuBMAP token for an update to a donor in SenNet.
 
-## Docker
+# Potential issues
+## Non-compliant current data
+Donors already containing metadata may diverge from the current schema. This is especially the case for
+donors in HuBMAP who were registered prior to the implementation of valuesets.
+
+Examples of divergence include: 
+1. Some early donors have a race of "Hispanic". The current practice is to code "Hispanic" as an ethnicity.
+2. Grouping concepts for some categorical metadata may have changed.
+
+Donors with metadata that does not comply with the current schema may cause issues in the Edit form. 
+For example, if the value for a categorical metadata element is not in the current valueset associated 
+with the metadata element, the Edit form will raise a validation error.
+
+## Units
+Units are currently not encoded in metadata, but stored as free text. 
+This has resulted in variance in units--i.e., different spellings or case.
+Because the Edit form emulates encoding of metadata using a list (e.g., only "in" and "cm" for height), there will be 
+validation errors for measurements with variant units (e.g., "inches").
+
+# Docker
 _to do_ 
