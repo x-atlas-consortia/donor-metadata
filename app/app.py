@@ -3,7 +3,7 @@
 import os
 import logging
 from pathlib import Path
-from flask import Flask, render_template
+from flask import Flask, render_template, session
 import json
 
 # route blueprints
@@ -50,6 +50,11 @@ class DonorUI:
 
         # Register the custom JSON pretty print filter.
         self.app.jinja_env.filters['tojson_pretty'] = to_pretty_json
+
+        # The consortium authentication token is stored in a session cookie.
+        # Set cookie expiration:
+        # 1. Set the session lifetime to 5 minutes (in seconds).
+        self.app.config['PERMANENT_SESSION_LIFETIME'] = 300
 
         # Custom 401 error handler.
         @self.app.errorhandler(401)

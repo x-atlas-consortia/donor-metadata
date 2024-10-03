@@ -509,6 +509,8 @@ def translate_field_value_to_metadata(form, formfield: Field, tab: str, concept_
     """
         Translates a combination of value and unit fields in the Edit form to a metadata dict.
 
+        Converts to metric units.
+
         Numeric values in the donor
         metadata object are strings.
         :param form: the edit form
@@ -524,14 +526,33 @@ def translate_field_value_to_metadata(form, formfield: Field, tab: str, concept_
     if formfield.data == '':
         return {}
 
-    value = formfield.data
+    # Get schema information for metadata from valueset.
     dictvalueset = form.valuesetmanager.getvaluesetrow(tab=tab, concept_id=concept_id)
-    dictvalueset['data_value'] = str(value)
 
-    if unitfield is not None:
+    # Get values from form.
+    value = formfield.data
+    if unitfield is None:
+        unit_value = ''
+    else:
         # Unit is not encoded.
         unit_value = dict(unitfield.choices).get(unitfield.data)
-        dictvalueset['units'] = unit_value
+
+    # Convert to metric:
+    # 1. Height
+    # 2. Weight
+    # 3. Waist circumfernce
+    if concept_id in ['C0005890', 'C0455829']:
+        if unitfield.data == '1': # in
+            unit_value = 'cm'
+            value = float(value) * 2.54
+
+    if concept_id == 'C0005910':
+        if unitfield.data == '1': # lb
+            unit_value = 'kg'
+            value = float(value) / 2.2
+
+    dictvalueset['data_value'] = str(value)
+    dictvalueset['units'] = unit_value
 
     return dictvalueset
 

@@ -24,9 +24,18 @@
                     </pre>
                 </div>
             </div>
-            <div class = "col">
-                <p> New metadata comprises the original metadata modified by any changes from the Edit form.</p>
-                <p> Some metadata may be standardized--e.g, converted to decimal; grouping concepts changes.</p>
+            <div class = "col text-bg-warning">
+                <p> New metadata consists of the original metadata modified by any changes from the Edit form.</p>
+                <p> Metadata will be standardized--e.g., </p>
+                <ul>
+                    <li>converted to decimal</li>
+                    <li>converted to metric units (in to cm; lb to kg)</li>
+                </ul>
+                <p> In addition, previously curated metadata will be corrected and updated for consistency--e.g.,</p>
+                <ul>
+                    <li>grouping concepts</li>
+                    <li>race and ethnicity for donors with race of "Hispanic"</li>
+                </ul>
             </div>
         </div>
         <div class="row align-items-start">
@@ -63,7 +72,11 @@
             <input name="donorid" type="hidden" value="{{ donorid}}">
         </div>
         <div class="d-grid gap-2 col-6 mx-auto">
-            <button  type="submit" class="btn btn-primary btn-lg" value="Update">Update</button>
+            {% if form.deepdiff is none %}
+                <button  type="submit" class="btn btn-primary btn-lg disabled" value="Update" aria-disabled="true">Update</button>
+            {% else %}
+                <button  type="submit" class="btn btn-primary btn-lg" value="Update">Update</button>
+            {% endif %}
             <a href="/" class="btn btn-primary btn-lg">Cancel</a>
         </div>
     </div>

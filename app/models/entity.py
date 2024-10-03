@@ -28,7 +28,7 @@ class Entity:
         self.headers = {'Accept': 'application/json',
                         'Content-Type': 'application/json'}
         if self.consortium == 'sennetconsortium':
-            self.headers['X-SenNet-Application'] = 'entity-api'
+            self.headers['X-SenNet-Application'] = 'portal-ui'
 
         # The bearer token in the configuration file should be the globus_group key from the
         # info cookie set by the consortium application:

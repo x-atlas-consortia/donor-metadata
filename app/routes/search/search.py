@@ -37,6 +37,8 @@ def search():
         if 'HMSNDonortoken' in session:
             session.pop('HMSNDonortoken', None)
         session['HMSNDonortoken'] = form.token.data
+        # The cookie should expire at the end of the browser session.
+        session.permanent = False
 
         # Attempt to load metadata for the donor. The load will abort if unable to load data.
         token = session['HMSNDonortoken']

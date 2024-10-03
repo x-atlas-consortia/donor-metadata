@@ -24,10 +24,10 @@ def validate_donorid(form, field):
 
     if idcontext == 'HBM':
         if form.consortium.data != 'CONTEXT_HUBMAP':
-            raise ValidationError('HuBMAP IDs must begin with HMB.')
+            raise ValidationError('Incorrect consortium for donor ID.')
     elif idcontext == 'SNT':
         if form.consortium.data != 'CONTEXT_SENNET':
-            raise ValidationError('SenNet IDs must begin with SNT.')
+            raise ValidationError('Incorrect consortium for donor ID.')
     else:
         raise ValidationError(f'Unknown ID prefix {idcontext}')
 
