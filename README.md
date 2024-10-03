@@ -59,17 +59,17 @@ The curation solution features:
 ## User Interface
 The curator is a Python Web application involving:
 
-| tool                                                                            | purpose                                                      |
-|---------------------------------------------------------------------------------|--------------------------------------------------------------|
-| Python                                                                          | application function                                         |
-| [Flask](https://flask.palletsprojects.com/en/3.0.x/)                            | Python web framework                                         |
-| [Flask Blueprints](https://flask.palletsprojects.com/en/3.0.x/blueprints/)      | modular Flask applications                                   |
-| [WTForms](https://wtforms.readthedocs.io/en/2.3.x/forms/)                       | forms in Flask applications                                  |
-| [Jinja](https://jinja.palletsprojects.com/en/3.1.x/)                            | Web page templating                                          |
+| tool                                                                            | purpose                                                     |
+|---------------------------------------------------------------------------------|-------------------------------------------------------------|
+| Python                                                                          | application function                                        |
+| [Flask](https://flask.palletsprojects.com/en/3.0.x/)                            | Python web framework                                        |
+| [Flask Blueprints](https://flask.palletsprojects.com/en/3.0.x/blueprints/)      | modular Flask applications                                  |
+| [WTForms](https://wtforms.readthedocs.io/en/2.3.x/forms/)                       | forms in Flask applications                                 |
+| [Jinja](https://jinja.palletsprojects.com/en/3.1.x/)                            | Web page templating                                         |
 | Javascript                                                                      | Event handling and UI features (including a spinner control) |
-| [Bootstrap](https://getbootstrap.com/)                                          | UI toolkit                                                   |
-| [HuBMAP entity-api](https://smart-api.info/ui/0065e419668f3336a40d1f5ab89c6ba3) | Reads/updates donor metadata in HuBMAP provenance            |
-| [SenNet entity-api](https://smart-api.info/ui/7d838c9dee0caa2f8fe57173282c5812) | Reads/updates human source metadata in SenNet provenance     |
+| [Bootstrap](https://getbootstrap.com/)                                          | UI toolkit                                                  |
+| [HuBMAP entity-api](https://smart-api.info/ui/0065e419668f3336a40d1f5ab89c6ba3) | Reads/updates donor metadata in HuBMAP provenance           |
+| [SenNet entity-api](https://smart-api.info/ui/7d838c9dee0caa2f8fe57173282c5812) | Reads/updates source metadata in SenNet provenance     |
 
 
 ## Configuration
