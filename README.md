@@ -83,7 +83,7 @@ The application works with three databases:
 2. the neo4j provenance databases for the two consortia, abstracted by consortium-specific instances of entity-api.
 
 ## Workflow
-![img.png](img.png)
+![Curator application architecture.jpg](doc%2FCurator%20application%20architecture.jpg)
 
 ### app
 The application:

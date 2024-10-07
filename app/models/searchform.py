@@ -7,7 +7,6 @@ import os
 
 from wtforms import Form, validators, ValidationError, SelectField, StringField
 from .appconfig import AppConfig
-from flask import current_app, session
 
 
 def validate_donorid(form, field):
