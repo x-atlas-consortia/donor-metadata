@@ -5,6 +5,6 @@ CONTEXT_SENNET='sennetconsortium'
 ENDPOINT_BASE='https://entity-api.dev'
 #ENDPOINT_BASE='https://entity-api'
 # App key
-KEY='My key'
+KEY='3297cfde42810c26ac86b4625f13c11ac877333ca6efc80986b26187bbce5788'
 # Google Sheets resource for metadata valuesets
 VALUESETMANAGER='https://docs.google.com/spreadsheets/d/1VhBA3eC78X8w47_ej5f_wq5uvvgO2kY0kfC7utgDqhI/edit?usp=sharing'

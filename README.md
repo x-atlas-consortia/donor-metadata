@@ -198,4 +198,23 @@ Because the Edit form emulates encoding of metadata using a list (e.g., only "in
 validation errors for measurements with variant units (e.g., "inches").
 
 # Docker
-_to do_ 
+The application can be Dockerized.
+
+To run the application in a local container:
+
+1. Clone this repo.
+2. In the *app/instance* directory, copy **app.cfg.example** to **app.cfg**.
+3. In **app.cfg**, edit the value of the ENDPOINT_BASE key to point to the desired instance of entity-api.
+4. Install [Docker](https://docs.docker.com/engine/install/) on the local machine.
+
+## Using Docker
+5. Execute **build_local.sh** to create a Docker image named **hmsn/donor-data-local**.
+6. Execute **run_local.sh** to create a Docker container named **donor-data**.
+
+## Using Docker Compose
+5. Execute **compose-run.sh**.
+
+
+The containerized application is mapped to the URL http://127.0.0.1:5002 on the local machine.
+The **run_local.sh** script opens the default browser to the URL.
+

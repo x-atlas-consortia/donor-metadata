@@ -6,6 +6,7 @@ from pathlib import Path
 from flask import Flask, render_template, session
 import json
 
+
 # route blueprints
 from routes.edit.edit import edit_blueprint
 from routes.search.search import search_blueprint
