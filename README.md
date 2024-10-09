@@ -207,11 +207,11 @@ To run the application in a local container:
 3. In **app.cfg**, edit the value of the ENDPOINT_BASE key to point to the desired instance of entity-api.
 4. Install [Docker](https://docs.docker.com/engine/install/) on the local machine.
 
-## Using Docker
+### Using Docker
 5. Execute **build_local.sh** to create a Docker image named **hmsn/donor-data-local**.
 6. Execute **run_local.sh** to create a Docker container named **donor-data**.
 
-## Using Docker Compose
+### Using Docker Compose
 5. Execute **compose-run.sh**.
 
 
