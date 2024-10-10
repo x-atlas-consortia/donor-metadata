@@ -197,7 +197,7 @@ This has resulted in variance in units--i.e., different spellings or case.
 Because the Edit form emulates encoding of metadata using a list (e.g., only "in" and "cm" for height), there will be 
 validation errors for measurements with variant units (e.g., "inches").
 
-# Docker
+# Docker - Local 
 The application can be Dockerized.
 
 To run the application in a local container:
@@ -214,6 +214,8 @@ To run the application in a local container:
 ### Using Docker Compose
 5. Execute **compose-run.sh**.
 
+# Docker - from Docker Hub
+1. Execute **run_hub.sh**. This script uses the latest release of the Docker image at **hubmap/donor-metadata**.
 
 The containerized application is mapped to the URL http://127.0.0.1:5002 on the local machine.
 The **run_local.sh** script opens the default browser to the URL.

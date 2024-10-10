@@ -3,8 +3,8 @@ FROM python:3.11-alpine
 LABEL description="HuBMAP/SenNet Donor Clinical Metadata Curator service"
 
 # Set up environment variables for Python
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # Create and set the working directory
 WORKDIR /usr/src/app
