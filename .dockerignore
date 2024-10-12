@@ -22,3 +22,5 @@ coverage.xml
 
 # app-specific
 **/tests
+# location of config files
+**/app/instance

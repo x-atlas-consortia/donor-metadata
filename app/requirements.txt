@@ -12,3 +12,4 @@ gdown==5.2.0
 openpyxl==3.1.5
 
 deepdiff==8.0.1
+globus-sdk==3.45.0

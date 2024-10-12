@@ -10,6 +10,14 @@ This class looks for a file named "app.cfg" in the instance directory.
 import os
 from configparser import ConfigParser
 from flask import abort
+from pathlib import Path
+import logging
+
+# Configure consistent logging. This is done at the beginning of each module instead of with a superclass of
+# logger to avoid the need to overload function calls to logger.
+logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+                    level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger(__name__)
 
 
 class AppConfig:
@@ -17,23 +25,33 @@ class AppConfig:
     # Class to work with the app.cfg file. This file does not contain a section, as expected by ConfigParser.
 
     def __init__(self):
+
+        # The configuration file contains a number of highly sensitive keys, including those for the
+        # Globus clients for both HuBMAP and SenNet. The configuration file is stored outside of the
+        # repository, in a subfolder of the user home named 'donor-metadata'.
+        home = str(Path('~').expanduser())
+        self.path = home + '/donor-metadata'
+        self.file = self.path + '/app.cfg'
         self.parser = self.getconfigparser()
 
     def getconfigparser(self) -> list:
-
-        # Read from the app.cfg file.
-        fpath = os.path.dirname(os.getcwd())
-        fpath = os.path.join(fpath, 'app/instance/app.cfg')
 
         # The ConfigParser expects a section in the file. Add a section to the read.
         parser = ConfigParser()
         # Set case sensitivity.
         parser.optionxform = str
 
-        with open(fpath) as stream:
-            parser.read_string("[top]\n" + stream.read())
+        try:
+            with open(self.file) as stream:
+                parser.read_string("[top]\n" + stream.read())
 
-        return parser.items('top')
+            return parser.items('top')
+
+        except FileNotFoundError as e:
+            print(str(e))
+            logger.error(e, exc_info=True)
+            print(f'Missing configuration file {self.file}.')
+            exit(1)
 
     def getfieldlist(self, prefix: str) -> list:
         """

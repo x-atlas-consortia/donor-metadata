@@ -78,7 +78,7 @@ class EditForm(Form):
     url = cfg.getfield(key='VALUESETMANAGER')
 
     # Export path for valueset spreadsheet.
-    fpath = os.path.join(os.path.dirname(os.getcwd()), 'app/valueset/valuesets.xlsx')
+    fpath = cfg.path + '/valuesets.xlsx'
     # Download current version of valueset data.
     valuesetmanager = ValueSetManager(url=url, download_full_path=fpath)
 

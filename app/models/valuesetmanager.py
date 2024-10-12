@@ -8,7 +8,6 @@ from flask import abort
 # For downloading from Google Sheets
 import gdown
 
-
 class ValueSetManager:
 
     def __init__(self, url: str, download_full_path: str):

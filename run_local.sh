@@ -8,10 +8,31 @@ echo "Removing prior containers for this application..."
 docker stop donor-metadata-local > /dev/null 2>&1
 docker rm donor-metadata-local > /dev/null 2>&1
 
+# Set path to external bind mount to the cfg directory that contains the app.cfg file.
+# The assumption is that the app.cfg file is in a subdirectory of the current directory, named cfg.
+
+# Get relative path to current directory.
+base_dir="$(dirname -- "${BASH_SOURCE[0]}")"
+# Convert to absolute path.
+base_dir="$(cd -- "$base_dir" && pwd -P;)"
+cfgdir="$base_dir"/cfg
+
+config_file= "$cfgdir"/app.cfg
+if [ "$config_file" == "" ]
+then
+  echo "Error: No configuration file at $config_file."
+  exit;
+fi
+
 # Run the container locally.
 # Port 5002 is the port for a local instance.
 echo "Starting application..."
-docker run -d --rm --name donor-metadata-local -p 5002:5002 hmsn/donor-metadata-local;
+docker run \
+  -d \
+  --rm \
+  -v "$cfgdir":/usr/src/app/instance \
+  --name donor-metadata-local \
+  -p 5002:5002 hmsn/donor-metadata-local;
 
 url="http://127.0.0.1:5002"
 # Wait for the application to load.

@@ -36,8 +36,6 @@ class SearchForm(Form):
     # POPULATE FORM FIELDS. In particular, populate SelectFields with lists obtained from the valueset manager.
 
     # Read the app.cfg file outside the Flask application context.
-    fpath = os.path.dirname(os.getcwd())
-    fpath = os.path.join(fpath, 'app/instance/app.cfg')
     cfg = AppConfig()
 
     # Application context for entity-api URLs, corresponding to a consortium.

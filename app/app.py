@@ -3,15 +3,18 @@
 import os
 import logging
 from pathlib import Path
-from flask import Flask, render_template, session
+from flask import Flask, render_template
 import json
 
+from models.appconfig import AppConfig
 
 # route blueprints
 from routes.edit.edit import edit_blueprint
 from routes.search.search import search_blueprint
 from routes.review.review import review_blueprint
 from routes.token.token import token_blueprint
+from routes.login.login import login_blueprint
+from routes.globus.globus import globus_blueprint
 
 # Configure consistent logging. This is done at the beginning of each module instead of with a superclass of
 # logger to avoid the need to overload function calls to logger.
@@ -48,6 +51,8 @@ class DonorUI:
         self.app.register_blueprint(search_blueprint)
         self.app.register_blueprint(review_blueprint)
         self.app.register_blueprint(token_blueprint)
+        self.app.register_blueprint(login_blueprint)
+        self.app.register_blueprint(globus_blueprint)
 
         # Register the custom JSON pretty print filter.
         self.app.jinja_env.filters['tojson_pretty'] = to_pretty_json
@@ -68,8 +73,12 @@ class DonorUI:
 # ###################################################################################################
 
 if __name__ == "__main__":
+
+    # Obtain the path to the configuration file.
+    cfg = AppConfig()
+
     try:
-        donor_app = DonorUI('./app.cfg', Path(__file__).absolute().parent.parent.parent).app
+        donor_app = DonorUI(cfg.file, Path(__file__).absolute().parent.parent.parent).app
         donor_app.run(host='0.0.0.0', port='5002')
     except Exception as e:
         print(str(e))

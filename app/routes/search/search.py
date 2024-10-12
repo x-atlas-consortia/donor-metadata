@@ -14,7 +14,7 @@ from models.searchform import SearchForm
 # Represents metadata for a donor in a provenance database of a consortium.
 from models.donor import DonorData
 
-search_blueprint = Blueprint('search', __name__, url_prefix='/')
+search_blueprint = Blueprint('search', __name__, url_prefix='/search')
 
 
 @search_blueprint.route('', methods=['GET', 'POST'])

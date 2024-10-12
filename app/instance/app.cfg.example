@@ -1,10 +1,15 @@
-# Application context (consortium)
+# Application contexts (consortia)
 CONTEXT_HUBMAP='hubmapconsortium'
 CONTEXT_SENNET='sennetconsortium'
+# Google Sheets resource for metadata valuesets
+VALUESETMANAGER='https://docs.google.com/spreadsheets/d/1VhBA3eC78X8w47_ej5f_wq5uvvgO2kY0kfC7utgDqhI/edit?usp=sharing'
 # Provenance environment
 ENDPOINT_BASE='https://entity-api.dev'
 #ENDPOINT_BASE='https://entity-api'
-# App key
-KEY='3297cfde42810c26ac86b4625f13c11ac877333ca6efc80986b26187bbce5788'
-# Google Sheets resource for metadata valuesets
-VALUESETMANAGER='https://docs.google.com/spreadsheets/d/1VhBA3eC78X8w47_ej5f_wq5uvvgO2kY0kfC7utgDqhI/edit?usp=sharing'
+# Application key
+KEY='Flask-app-key'
+# Globus keys
+GLOBUS_HUBMAP_CLIENT='globus-hubmap-client'
+GLOBUS_HUBMAP_SECRET='globus-hubmap-secret'
+GLOBUS_SENNET_CLIENT='globus-sennet-client'
+GLOBUS_SENNET_SECRET='globus-sennet-secret'

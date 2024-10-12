@@ -1,4 +1,4 @@
-<!--donor search page-->
+<!--Globus login page-->
 {% extends 'base.html' %}
 
 {% block content %}
@@ -9,31 +9,14 @@
         <div>
             {{ render_field(form.consortium) }}
         </div>
-        <div>
-            {{ render_field(form.donorid) }}
-        </div>
-        <div>
-            &#8679; ID format is <i>(CCCnnn.XXXX.nnn)</i>, with <i>CCC</i> in (HBM,SNT); <i>n</i> integer; <i>X</i> non-numeric
-        </div>
-        <div>
-            {{ render_field(form.token) }}
-        </div>
-        <div>
-            &#8679; Provide the appropriate <code>groups_token</code> for the consortium application, as described <a href={{ url_for('token.token') }}>here</a>.
-        </div>
-        <br>
-        <div>
-            <a class="btn btn-secondary" href={{ url_for('token.token_clear') }} role="button">Clear token</a>
-        </div>
-        <br>
         <br>
         <div>
             <button type="submit"  class="btn btn-primary btn-lg"
-                    value="Search" onclick="spinner()">Search</button>
+                    value="Login" onclick="spinner()">Login</button>
         </div>
         <br>
         <br>
-        <!-- Spinner that displays while searching -->
+        <!-- Spinner that displays while logging in -->
         <div id="spinner" class="loading">
         </div>
         <br>
