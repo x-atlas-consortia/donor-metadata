@@ -9,12 +9,17 @@
         <div>
             {{ render_field(form.consortium) }}
         </div>
+        <div>
+            {{ render_field(form.donorid) }}
+        </div>
+        <div>
+            &#8679; ID format is <i>(CCCnnn.XXXX.nnn)</i>, with <i>CCC</i> in (HBM,SNT); <i>n</i> integer; <i>X</i> non-numeric
+        </div>
         <br>
         <div>
             <button type="submit"  class="btn btn-primary btn-lg"
-                    value="Login" onclick="spinner()">Login</button>
+                    value="Search" onclick="spinner()">Search</button>
         </div>
-        <br>
         <br>
         <!-- Spinner that displays while logging in -->
         <div id="spinner" class="loading">

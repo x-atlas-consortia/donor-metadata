@@ -72,14 +72,14 @@ class DonorData:
 
         if grouping_concept is not None:
             for m in metadata:
-                group = m.get('grouping_concept')
+                group = m.get('grouping_concept').strip()
                 if group == grouping_concept:
                     val = m.get(key)
                     if val is not None:
                         listret.append(val)
         elif list_concept is not None:
             for m in metadata:
-                m_concept = m.get('concept_id')
+                m_concept = m.get('concept_id').strip()
                 if m_concept in list_concept:
                     val = m.get(key)
                     if val is not None:

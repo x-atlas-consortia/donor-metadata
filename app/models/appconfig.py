@@ -15,9 +15,9 @@ import logging
 
 # Configure consistent logging. This is done at the beginning of each module instead of with a superclass of
 # logger to avoid the need to overload function calls to logger.
-logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
-                    level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
-logger = logging.getLogger(__name__)
+#logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+                    #level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
+#logger = logging.getLogger(__name__)
 
 
 class AppConfig:

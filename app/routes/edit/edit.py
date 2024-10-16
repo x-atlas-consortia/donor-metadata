@@ -23,25 +23,43 @@ from models.donor import DonorData
 # The form used to build request bodies for PUT and POST endpoints of the entity-api
 from models.editform import EditForm
 
+edit_blueprint = Blueprint('edit', __name__, url_prefix='/edit')
 
-edit_blueprint = Blueprint('edit', __name__, url_prefix='/edit/<donorid>')
+
+def setinputdisabled(inputfield, disabled: bool = True):
+    """
+    Disables the given field.
+    :param inputfield: the WTForms input to disable
+    :param disabled: if true set the disabled attribute of the input
+    :return: nothing
+    """
+
+    if inputfield.render_kw is None:
+        inputfield.render_kw = {}
+    if disabled:
+        inputfield.render_kw['disabled'] = 'disabled'
+    else:
+        inputfield.render_kw.pop('disabled')
 
 
 @edit_blueprint.route('', methods=['POST', 'GET'])
-def edit(donorid):
+def edit():
 
     form = EditForm(request.form)
     # Obtain current donor metadata from provenance.
     # First, obtain the authentication token from the session cookie.
-    if 'HMSNDonortoken' in session:
-        token = session['HMSNDonortoken']
+    if 'groups_token' in session:
+        token = session['groups_token']
     else:
         abort(401)
+
+    # Obtain the donor id from the session cookie.
+    donorid = session['donorid']
 
     form.currentdonordata = DonorData(donorid=donorid, token=token, isforupdate=False)
 
     if request.method == 'GET':
-        # Redirect from the search page.
+        # This is from the redirect from the login page.
         # Populate the edit form with current metadata for the donor.
         setdefaults(form)
 
@@ -78,22 +96,6 @@ def edit(donorid):
         setinputdisabled(form.consortium, disabled=True)
 
     return render_template('edit.html', donorid=donorid, form=form)
-
-
-def setinputdisabled(inputfield, disabled: bool = True):
-    """
-    Disables the given field.
-    :param inputfield: the WTForms input to disable
-    :param disabled: if true set the disabled attribute of the input
-    :return: nothing
-    """
-
-    if inputfield.render_kw is None:
-        inputfield.render_kw = {}
-    if disabled:
-        inputfield.render_kw['disabled'] = 'disabled'
-    else:
-        inputfield.render_kw.pop('disabled')
 
 
 def setdefaults(form):
@@ -221,9 +223,15 @@ def setdefaults(form):
     heightunitlist = form.currentdonordata.getmetadatavalues(grouping_concept=height_concept, key='units')
 
     if len(heightunitlist) > 0:
-        # Translate the metadata value into its corresponding selection in the list.
+        # Translate the metadata value into its corresponding selection in the list. Convert known variances in
+        # unit.
         dictchoices = dict(form.heightunit.choices)
-        form.heightunit.data = list(dictchoices.keys())[list(dictchoices.values()).index(heightunitlist[0])]
+        if heightunitlist[0] == 'inches':
+            heightunitlist[0] = 'in'
+        if heightunitlist[0] not in ['in','cm']:
+            form.heightunit.data = '0'  #cm
+        else:
+            form.heightunit.data = list(dictchoices.keys())[list(dictchoices.values()).index(heightunitlist[0])]
     else:
         form.heightunit.data = '0'  # cm
 
@@ -238,9 +246,16 @@ def setdefaults(form):
     # The Weight unit is currently linked to the Height valueset, and has a default of kg.
     weightunitlist = form.currentdonordata.getmetadatavalues(grouping_concept=weight_concept, key='units')
     if len(weightunitlist) > 0:
-        # Translate the metadata value into its corresponding selection in the list.
+        # Translate the metadata value into its corresponding selection in the list. Convert known variances in
+        # unit.
         dictchoices = dict(form.weightunit.choices)
-        form.weightunit.data = list(dictchoices.keys())[list(dictchoices.values()).index(weightunitlist[0])]
+        print(dictchoices)
+        if weightunitlist[0] == 'pounds':
+            weightunitlist[0] = 'lb'
+        if weightunitlist[0] not in ['lb','kg']:
+            form.heightunit.data = '0'  #cm
+        else:
+            form.weightunit.data = list(dictchoices.keys())[list(dictchoices.values()).index(weightunitlist[0])]
     else:
         form.weightunit.data = '0'  # kg
 
@@ -279,11 +294,17 @@ def setdefaults(form):
 
     # Waist Circumference unit
     # The Waist Circumference unit is currently linked to the Height valueset, and has a default of cm.
+    # Convert known variances in unit.
     waistunitlist = form.currentdonordata.getmetadatavalues(grouping_concept=waist_concept, key='units')
     if len(waistunitlist) > 0:
         # Translate the metadata value into its corresponding selection in the list.
         dictchoices = dict(form.waistunit.choices)
-        form.waistunit.data = list(dictchoices.keys())[list(dictchoices.values()).index(waistunitlist[0])]
+        if waistunitlist[0] == 'inches':
+            waistunitlist[0] = 'in'
+        if waistunitlist[0] not in ['in','cm']:
+            form.heightunit.data = '0'  #cm
+        else:
+            form.waistunit.data = list(dictchoices.keys())[list(dictchoices.values()).index(waistunitlist[0])]
     else:
         form.waistunit.data = '0'  # cm
 
@@ -463,6 +484,27 @@ def setdefaults(form):
         flash(msg)
         has_error = True
 
+    if len(heightunitlist) > 0:
+        if heightunitlist[0] not in ['in','cm']:
+            msg = (f'Donor {form.currentdonordata.donorid} has metadata with an unexpected height '
+                   f'unit {heightunitlist[0]}. Edit manually.')
+            flash(msg)
+            has_error = True
+
+    if len(weightunitlist) > 0:
+        if weightunitlist[0] not in ['lb', 'kg']:
+            msg = (f'Donor {form.currentdonordata.donorid} has metadata with an unexpected weight '
+                   f'unit {weightunitlist[0]}. Edit manually.')
+            flash(msg)
+            has_error = True
+
+    if len(waistunitlist) > 0:
+        if waistunitlist[0] not in ['in','cm']:
+            msg = (f'Donor {form.currentdonordata.donorid} has metadata with an unexpected waist '
+                   f'circumference unit {waistunitlist[0]}. Edit manually.')
+            flash(msg)
+            has_error = True
+
     if has_error:
         for field in form:
             setinputdisabled(field, disabled=True)
@@ -542,12 +584,12 @@ def translate_field_value_to_metadata(form, formfield: Field, tab: str, concept_
     # 2. Weight
     # 3. Waist circumfernce
     if concept_id in ['C0005890', 'C0455829']:
-        if unitfield.data == '1': # in
+        if unitfield.data == '1':  # in
             unit_value = 'cm'
             value = float(value) * 2.54
 
     if concept_id == 'C0005910':
-        if unitfield.data == '1': # lb
+        if unitfield.data == '1':  # lb
             unit_value = 'kg'
             value = float(value) / 2.2
 

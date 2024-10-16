@@ -10,16 +10,15 @@ from models.appconfig import AppConfig
 
 # route blueprints
 from routes.edit.edit import edit_blueprint
-from routes.search.search import search_blueprint
 from routes.review.review import review_blueprint
 from routes.token.token import token_blueprint
-from routes.login.login import login_blueprint
+from routes.auth.auth import login_blueprint
 from routes.globus.globus import globus_blueprint
 
 # Configure consistent logging. This is done at the beginning of each module instead of with a superclass of
 # logger to avoid the need to overload function calls to logger.
 logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
-                    level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
+                    level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger(__name__)
 
 
@@ -48,7 +47,6 @@ class DonorUI:
 
         # Register route Blueprints.
         self.app.register_blueprint(edit_blueprint)
-        self.app.register_blueprint(search_blueprint)
         self.app.register_blueprint(review_blueprint)
         self.app.register_blueprint(token_blueprint)
         self.app.register_blueprint(login_blueprint)
@@ -67,6 +65,12 @@ class DonorUI:
         def unauthorized(error):
             return render_template('401.html'), 401
 
+        # Custom 404 error handler.
+        @self.app.errorhandler(404)
+        def unauthorized(error):
+            return render_template('404.html'), 404
+
+
 
 # ###################################################################################################
 # For local development/testing
@@ -79,7 +83,7 @@ if __name__ == "__main__":
 
     try:
         donor_app = DonorUI(cfg.file, Path(__file__).absolute().parent.parent.parent).app
-        donor_app.run(host='0.0.0.0', port='5002')
+        donor_app.run(host='0.0.0.0', port='5000')
     except Exception as e:
         print(str(e))
         logger.error(e, exc_info=True)

@@ -71,7 +71,7 @@
   </head>
   <body onpageload="spinneroff()">
     <nav class="navbar bg-dark">
-      <a class="navbar-brand" href={{ url_for('search.search') }}>
+      <a class="navbar-brand" href={{ url_for('globus.globus') }}>
         <img src="/static/hubmap.png" alt="HuBMAP" data-height="234" style="max-height: 49.9922px;">
         <img src="/static/doctor_11542314.png" alt="Icon by Iconriver" data-height="234" style="max-height: 49.9922px;">
       </a>
@@ -81,9 +81,7 @@
         <img src="/static/sennet.png" alt="SenNet" data-height="234" style="max-height: 49.9922px;">
       </a>
     </nav>
-    <div>
-      <p class="text-white center bg-dark fs-4"><i>Environment: {{ config["ENDPOINT_BASE"] }}</i> </p>
-    </div>
+    <p class="bg-secondary text-white fs-4">Environment: {% if "dev" in config["ENDPOINT_BASE"]%} development {% else %} production {% endif %}</p>
     {% block content %}
     {% endblock %}
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script> -->

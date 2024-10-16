@@ -35,8 +35,8 @@ def review():
         abort(400, 'No donorid')
 
     # Obtain token from session cookie.
-    if 'HMSNDonortoken' in session:
-        token = session['HMSNDonortoken']
+    if 'groups_token' in session:
+        token = session['groups_token']
     else:
         abort(401)
 

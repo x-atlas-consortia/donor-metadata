@@ -9,16 +9,16 @@ docker stop donor-metadata-local > /dev/null 2>&1
 docker rm donor-metadata-local > /dev/null 2>&1
 
 # Set path to external bind mount to the cfg directory that contains the app.cfg file.
-# The assumption is that the app.cfg file is in a subdirectory of the current directory, named cfg.
+# The assumption is that the app.cfg file is in the current directory.
 
 # Get relative path to current directory.
 base_dir="$(dirname -- "${BASH_SOURCE[0]}")"
 # Convert to absolute path.
 base_dir="$(cd -- "$base_dir" && pwd -P;)"
-cfgdir="$base_dir"/cfg
+echo "base_dir = $base_dir"
 
-config_file= "$cfgdir"/app.cfg
-if [ "$config_file" == "" ]
+config_file="app.cfg"
+if [ ! -e "$config_file" ]
 then
   echo "Error: No configuration file at $config_file."
   exit;
@@ -30,8 +30,8 @@ echo "Starting application..."
 docker run \
   -d \
   --rm \
-  -v "$cfgdir":/usr/src/app/instance \
   --name donor-metadata-local \
+  -v "$base_dir":/usr/src/app/instance\
   -p 5002:5002 hmsn/donor-metadata-local;
 
 url="http://127.0.0.1:5002"
