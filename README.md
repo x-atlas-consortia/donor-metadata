@@ -75,7 +75,12 @@ The curator is a Python Web application involving:
 ## Configuration
 The application uses **app.cfg** to obtain:
 - consortium options (HuBMAP or SenNet)
+- environment option (dev or production)
 - entity-api environment (e.g., development or production)
+- URI for the Valueset Manager Google sheet
+- Globus client keys and secrets for HuBMAP and SenNet
+
+The application expects to find the app-config file in a folder on the local machine named donor-metadata.
 
 ## Databases
 The application works with three databases:
@@ -96,10 +101,9 @@ The application:
 1. The Home HTML page **index.html** includes a form that allows the user to specify 
    * consortium (HuBMAP or SenNet)
    * Donor ID
-   * consortium-specific authentication token
-2. The WTForm **searchform.py** populates **index.html** with information from the **app.cfg** file.
-3. The Blueprint route **seach.py**:
-   * sets/reads an authentication token from a session cookie
+2. The WTForm **globusform.py** populates **index.html** with information from the **app.cfg** file.
+3. The Blueprint route **globus.py**:
+   * authenticates the user in the appropriate Globus context
    * works with the **donor** helper class to verify that the donor is in provenance
    * redirects either to the Edit page or the custom 401 page
 
@@ -126,11 +130,11 @@ The application:
    * works with the **donor** helper class to update the donor metadata in provenance
    * redirects to **index.html**
 
-### Token page
-The Token page **token.html** is a static page with instructions on how to obtain an authentication cookie for a particular consortium.
-
 ### 401 page
 The **401.html** page is a custom 401 error that explains potential causes and solutions for authentication errors.
+
+### 404 page
+The **404.html** page is a custom 404 error. The 404 error in this case is "donor not found", not "file not found".
 
 ### base.html
 All HTML files in the application inherit from **base.html**, which includes:
@@ -158,13 +162,11 @@ This file contains a custom Jinja script used to populate content from WTForms f
 2. The application can document a maximum of 10 medical conditions. The application cannot update metadata for a donor if the current metadata includes more than 10 conditions.
 3. The application will only update metadata if there was a change.
 4. In SenNet, the application will only update donors that are human sources.
+5. The application attempts to standardize on units (e.g., *in* and *cm* for height). If an existing unit is unexpected, the application will require manual intervention.
 
 # Authentication token
-The entity-api requires an authentication token. 
-An authentication token for a consortium's entity-api is set via the consortium's Single Sign On. 
-The **token.html** page provides instructions on how to obtain the authentication token.
-
-The user enters an authentication token in the form on the home page.
+The entity-api requires an authentication token, which is obtained from Globus.
+An authentication token for a consortium's entity-api is set via the consortium's Single Sign On.
 
 ## Token caching
 The application caches the authentication token in a session cookie. 
@@ -203,8 +205,13 @@ The application can be Dockerized.
 To run the application in a local container:
 
 1. Clone this repo.
-2. In the *app/instance* directory, copy **app.cfg.example** to **app.cfg**.
+2. In the *app/instance* directory, copy **app.cfg.example** to a file named **app.cfg** in a directory on the local manchine named **donor-metadata**.
 3. In **app.cfg**, edit the value of the ENDPOINT_BASE key to point to the desired instance of entity-api.
+4. Specify values for 
+   * GLOBUS_HUBMAP_CLIENT
+   * GLOBUS_HUBMAP_SECRET
+   * GLOBUS_SENNET_CLIENT
+   * GLOBUS_SENNET_SECRET
 4. Install [Docker](https://docs.docker.com/engine/install/) on the local machine.
 
 ### Using Docker
@@ -217,6 +224,6 @@ To run the application in a local container:
 # Docker - from Docker Hub
 1. Execute **run_hub.sh**. This script uses the latest release of the Docker image at **hubmap/donor-metadata**.
 
-The containerized application is mapped to the URL http://127.0.0.1:5002 on the local machine.
+The containerized application is mapped to the URL http://127.0.0.1:5000 on the local machine.
 The **run_local.sh** script opens the default browser to the URL.
 

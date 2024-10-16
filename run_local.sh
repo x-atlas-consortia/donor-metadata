@@ -34,7 +34,7 @@ docker run \
   -v "$base_dir":/usr/src/app/instance\
   -p 5002:5002 hmsn/donor-metadata-local;
 
-url="http://127.0.0.1:5002"
+url="http://127.0.0.1:5000"
 # Wait for the application to load.
 response_code=0;
 while [[ $response_code -ne 200 ]]; do

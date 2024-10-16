@@ -10,9 +10,9 @@ docker rm donor-metadata-local > /dev/null 2>&1
 
 # Run the container based on the Docker Hub image.
 echo "Starting application..."
-docker run -d --rm --name donor-metadata -p 5002:5002 hubmap/donor-metadata;
+docker run -d --rm --name donor-metadata -p 5000:5000 hubmap/donor-metadata;
 
-url="http://127.0.0.1:5002"
+url="http://127.0.0.1:5000"
 # Wait for the application to load.
 response_code=0;
 while [[ $response_code -ne 200 ]]; do

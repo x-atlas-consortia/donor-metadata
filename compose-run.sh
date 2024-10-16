@@ -1,7 +1,7 @@
 #!/bin/bash
 docker-compose up -d;
 
-url="http://127.0.0.1:5002"
+url="http://127.0.0.1:5000"
 # Wait for the application to load.
 response_code=0;
 while [[ $response_code -ne 200 ]]; do
