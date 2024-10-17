@@ -99,24 +99,25 @@ The application:
 1. uses the **valuesetmanager** helper class to read from the Valueset Manager spreadsheet
 2. manages the Flask session
 3. registers Flask Blueprints
-4. customizes HTTP error handling, routing to **401.html**
+4. customizes HTTP error handling, routing to **401.html** and **404.html**.
 
-### Home (search) page
+### Home page
 1. The Home HTML page **index.html** includes a form that allows the user to specify 
    * consortium (HuBMAP or SenNet)
    * Donor ID
-2. The WTForm **globusform.py** populates **index.html** with information from the **app.cfg** file.
-3. The Blueprint route **globus.py**:
+2. The WTForm **globusform.py** populates the home page **index.html** with information from the **app.cfg** file.
+3. The Blueprint routes */* and */login*:
    * authenticates the user in the appropriate Globus context
    * works with the **donor** helper class to verify that the donor is in provenance
-   * redirects either to the Edit page or the custom 401 page
+   * redirects either to the Edit page or the custom 404 page
+![img.png](img.png)
 
 ### Edit page
 1. The Edit page **edit.html** includes a form that allows metadata data entry.
 2. The WTForm **editform.py**:
    * works with the **valuesetmanager** helper class to obtain valueset content
    * populates the form in **edit.html**, including content of categorical lists
-3. The Blueprint route **edit.py**:
+3. The Blueprint route */edit*:
    * works with the **donor** helper class to obtain current donor metadata from provenance
    * populates the form in **edit.html** with current metadata values
    * translates form data into a revised metadata JSON that conforms to the donor metadata schema in provenance.
@@ -125,20 +126,22 @@ The application:
    * compares current and revised metadata JSON for the donor
    * posts JSONs for current metadata, revised metadata, and comparison to **review.html**
 
+![img_1.png](img_1.png)
 ### Review page
 1. The Review page **review.html** displays:
    * the current metadata JSON for the donor
    * the new metadata JSON for the donor
    * the comparison of the current and new metadata JSONs
-2. The Blueprint route **review.py**:
+2. The Blueprint route */review*:
    * works with the **donor** helper class to update the donor metadata in provenance
    * redirects to **index.html**
+![img_2.png](img_2.png)
 
 ### 401 page
 The **401.html** page is a custom 401 error that explains potential causes and solutions for authentication errors.
 
 ### 404 page
-The **404.html** page is a custom 404 error. The 404 error in this case is "donor not found", not "file not found".
+The **404.html** page is a custom 404 error page. The 404 error in this case is "donor not found", not "file not found".
 
 ### base.html
 All HTML files in the application inherit from **base.html**, which includes:
@@ -171,13 +174,6 @@ This file contains a custom Jinja script used to populate content from WTForms f
 # Authentication token
 The entity-api requires an authentication token, which is obtained from Globus.
 An authentication token for a consortium's entity-api is set via the consortium's Single Sign On.
-
-## Token caching
-The application caches the authentication token in a session cookie. 
-Caching the token facilitates the curation of multiple donors in a session: it is not necessary to supply the token for each donor.
-
-Although authenticaion tokens have a long expiration period (72 hours), the application clears the cached token from the session cookie after 5 minutes. 
-It is also possible to clear the session cookie explicitly using a button in the form in the home page.
 
 ## 401 (Access denied) errors
 The application will raise a HTTP 401 exception when:
