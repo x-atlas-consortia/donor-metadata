@@ -55,8 +55,8 @@ class DonorData:
         Returns donor metadata of a specified type.
         :param grouping_concept: Corresponds to the "grouping_concept" column of a tab in the
         donor metadata valueset
-        :param list_concept: Optional list Corresponding to a group of related concepts.
-        NOTE: grouping_concept takes precedence over concept_list.
+        :param list_concept: Optional list Corresponding to a group of related concepts,
+                             **filtered by** grouping_concpept.
         :param key: key in the dictionary of metadata
         :return: the value in the metadata dictionary corresponding to key
         """
@@ -70,17 +70,19 @@ class DonorData:
         # Extract the relevant metadata dicts from the list, and then the relevant value from each dict.
         listret = []
 
-        if grouping_concept is not None:
-            for m in metadata:
-                group = m.get('grouping_concept').strip()
-                if group == grouping_concept:
-                    val = m.get(key)
-                    if val is not None:
-                        listret.append(val)
-        elif list_concept is not None:
+        if list_concept is not None:
             for m in metadata:
                 m_concept = m.get('concept_id').strip()
                 if m_concept in list_concept:
+                    group = m.get('grouping_concept').strip()
+                    if group == grouping_concept:
+                        val = m.get(key)
+                        if val is not None:
+                            listret.append(val)
+        elif grouping_concept is not None:
+            for m in metadata:
+                group = m.get('grouping_concept').strip()
+                if group == grouping_concept:
                     val = m.get(key)
                     if val is not None:
                         listret.append(val)

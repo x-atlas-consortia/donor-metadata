@@ -67,8 +67,8 @@ class DonorUI:
 
         # Custom 404 error handler.
         @self.app.errorhandler(404)
-        def unauthorized(error):
-            return render_template('404.html'), 404
+        def notfound(error):
+            return render_template('404.html',error=error), 404
 
 
 

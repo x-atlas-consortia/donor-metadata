@@ -26,3 +26,4 @@ BUILD
 /tests/*/*.xlsx
 
 /valueset/*.csv
+**/*.zip

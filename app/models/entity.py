@@ -91,12 +91,14 @@ class Entity:
             return donor
 
         elif response.status_code == 404:
-            abort(404, f'No donor with id {self.donorid} found in provenance for {self.consortium}')
+            abort(404, f'No donor with id {self.donorid} found in provenance for {self.consortium} '
+                       f'in environment {self.urlbase}')
         elif response.status_code == 400:
             err = response.json().get('error')
             if 'is not a valid id format' in err:
                 # Translate this as a 404, not a 400.
-                abort(404, f'No donor with id {self.donorid} found in provenance for {self.consortium}')
+                abort(404, f'No donor with id {self.donorid} found in provenance for {self.consortium} '
+                           f'in environment {self.urlbase}')
             else:
                 abort(response.status_code, response.json().get('error'))
         else:
@@ -142,12 +144,14 @@ class Entity:
             return haspublisheddatasets
 
         elif response.status_code == 404:
-            abort(404, f'No donor with id {self.donorid} found in provenance for {self.consortium}')
+            abort(404, f'No donor with id {self.donorid} found in provenance for {self.consortium} '
+                       f'in environment {self.urlbase}')
         elif response.status_code == 400:
             err = response.json().get('error')
             if 'is not a valid id format' in err:
                 # Translate this as a 404, not 400.
-                abort(404, f'No donor with id {self.donorid} found in provenance for {self.consortium}')
+                abort(404, f'No donor with id {self.donorid} found in provenance for {self.consortium} '
+                           f'in environment {self.urlbase}')
             else:
                 abort(response.status_code, response.json().get('error'))
         else:

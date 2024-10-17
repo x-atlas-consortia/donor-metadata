@@ -15,9 +15,9 @@ import logging
 
 # Configure consistent logging. This is done at the beginning of each module instead of with a superclass of
 # logger to avoid the need to overload function calls to logger.
-#logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
-                    #level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
-#logger = logging.getLogger(__name__)
+logging.basicConfig(format='[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+                    level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger(__name__)
 
 
 class AppConfig:
@@ -26,12 +26,33 @@ class AppConfig:
 
     def __init__(self):
 
-        # The configuration file contains a number of highly sensitive keys, including those for the
-        # Globus clients for both HuBMAP and SenNet. The configuration file is stored outside of the
-        # repository, in a subfolder of the user home named 'donor-metadata'.
-        home = str(Path('~').expanduser())
-        self.path = home + '/donor-metadata'
+        """
+        The configuration file contains a number of sensitive keys, including those for the
+        Globus clients for both HuBMAP and SenNet. The configuration file must be kept separate from the application
+        in either possible deployment:
+        1. In a "bare-metal" deployment, in which the application is run from within a clone of the GitHub repository,
+           the configuration file must not be in the repo.
+        2. In a "containerized" deployment, in which the application is executed from within a Docker container, the
+           configuration file must not be in the container.
+
+        In a "bare-metal" deployment, the application looks for the app.cfg file in a subfolder of the user root
+        named "donor-metadata".
+        In a "containerized" deployment, the application looks for the app.cfg file in the /usr/src/app/instance
+        folder, which is bound to a volume on the host machine.
+        """
+
+        # Try the volume folder first.
+        self.path = '/usr/src/app/instance'
         self.file = self.path + '/app.cfg'
+        try:
+            stream = open(self.file,'r')
+        except FileNotFoundError as e:
+            print(f'The app.cfg is not in the path  {self.path}. This is a bare-metal (non-containerized) '
+                  f'deployment. Trying path on host machine.')
+            home = str(Path('~').expanduser())
+            self.path = home + '/donor-metadata'
+            self.file = self.path + '/app.cfg'
+
         self.parser = self.getconfigparser()
 
     def getconfigparser(self) -> list:

@@ -179,7 +179,9 @@ def setdefaults(form):
     # cod_grouping_concept = form.valuesetmanager.getcolumnvalues(tab='Cause of Death', col='grouping_concept')[0]
     # codlist = form.currentdonordata.getmetadatavalues(grouping_concept=cod_grouping_concept, key='concept_id')
     cod_concepts = form.valuesetmanager.getcolumnvalues(tab='Cause of Death', col='concept_id')
-    codlist = form.currentdonordata.getmetadatavalues(list_concept=cod_concepts, key='concept_id')
+    grouping_concept = 'C0007465'  # Cause of Death
+    codlist = form.currentdonordata.getmetadatavalues(list_concept=cod_concepts,
+                                                      grouping_concept=grouping_concept, key='concept_id')
     if len(codlist) > 0:
         form.cause.data = codlist[0]
     else:
@@ -192,9 +194,11 @@ def setdefaults(form):
     # mechlist = form.currentdonordata.getmetadatavalues(grouping_concept=mech_grouping_concept, key='concept_id')
 
     # Future development note: Some existing donor records use an incorrect grouping_concept_id for
-    # mechanism of injury. After these donors are corrected, change medhxlist to use group_concept.
+    # mechanism of injury. After these donors are corrected, change mech_concepts to use group_concept.
     mech_concepts = form.valuesetmanager.getcolumnvalues(tab='Mechanism of Injury', col='concept_id')
-    mechlist = form.currentdonordata.getmetadatavalues(list_concept=mech_concepts, key='concept_id')
+    grouping_concept = 'C0449413'  # Mechanism of Injury
+    mechlist = form.currentdonordata.getmetadatavalues(list_concept=mech_concepts,
+                                                       grouping_concept=grouping_concept, key='concept_id')
     if len(mechlist) > 0:
         form.mechanism.data = mechlist[0]
     else:
@@ -205,7 +209,9 @@ def setdefaults(form):
     # event_grouping_concept = form.valuesetmanager.getcolumnvalues(tab='Death Event', col='grouping_concept')[0]
     # eventlist = form.currentdonordata.getmetadatavalues(grouping_concept=event_grouping_concept, key='concept_id')
     event_concepts = form.valuesetmanager.getcolumnvalues(tab='Death Event', col='concept_id')
-    eventlist = form.currentdonordata.getmetadatavalues(list_concept=event_concepts, key='concept_id')
+    grouping_concept = 'C0011065'  # Death Event
+    eventlist = form.currentdonordata.getmetadatavalues(list_concept=event_concepts,
+                                                        grouping_concept=grouping_concept, key='concept_id')
     if len(eventlist) > 0:
         form.event.data = eventlist[0]
     else:
@@ -228,8 +234,8 @@ def setdefaults(form):
         dictchoices = dict(form.heightunit.choices)
         if heightunitlist[0] == 'inches':
             heightunitlist[0] = 'in'
-        if heightunitlist[0] not in ['in','cm']:
-            form.heightunit.data = '0'  #cm
+        if heightunitlist[0] not in ['in', 'cm']:
+            form.heightunit.data = '0'  # cm
         else:
             form.heightunit.data = list(dictchoices.keys())[list(dictchoices.values()).index(heightunitlist[0])]
     else:
@@ -252,8 +258,8 @@ def setdefaults(form):
         print(dictchoices)
         if weightunitlist[0] == 'pounds':
             weightunitlist[0] = 'lb'
-        if weightunitlist[0] not in ['lb','kg']:
-            form.heightunit.data = '0'  #cm
+        if weightunitlist[0] not in ['lb', 'kg']:
+            form.heightunit.data = '0'  # cm
         else:
             form.weightunit.data = list(dictchoices.keys())[list(dictchoices.values()).index(weightunitlist[0])]
     else:
@@ -301,8 +307,8 @@ def setdefaults(form):
         dictchoices = dict(form.waistunit.choices)
         if waistunitlist[0] == 'inches':
             waistunitlist[0] = 'in'
-        if waistunitlist[0] not in ['in','cm']:
-            form.heightunit.data = '0'  #cm
+        if waistunitlist[0] not in ['in', 'cm']:
+            form.heightunit.data = '0'  # cm
         else:
             form.waistunit.data = list(dictchoices.keys())[list(dictchoices.values()).index(waistunitlist[0])]
     else:
@@ -410,7 +416,9 @@ def setdefaults(form):
     # Smoking is categorical. Its valueset is a subset of rows on the "Social History" tab. The
     # valueset concepts do not share a grouping concept.
     smoking_concepts = ['C0337664', 'C0337672', 'C0337671']
-    smokinglist = form.currentdonordata.getmetadatavalues(list_concept=smoking_concepts, key='concept_id')
+    grouping_concept = 'C0424945'
+    smokinglist = form.currentdonordata.getmetadatavalues(list_concept=smoking_concepts,
+                                                          grouping_concept=grouping_concept, key='concept_id')
     if len(smokinglist) > 0:
         form.smoking.data = smokinglist[0]
     else:
@@ -420,7 +428,9 @@ def setdefaults(form):
     # Tobacco is categorical. Its valueset is a subset of rows on the "Social History" tab. The
     # valueset concepts do not share a grouping concept.
     tobacco_concepts = ['C3853727']
-    tobaccolist = form.currentdonordata.getmetadatavalues(list_concept=tobacco_concepts, key='concept_id')
+    grouping_concept = 'C0424945'
+    tobaccolist = form.currentdonordata.getmetadatavalues(list_concept=tobacco_concepts,
+                                                          grouping_concept=grouping_concept, key='concept_id')
     if len(tobaccolist) > 0:
         form.tobacco.data = tobaccolist[0]
     else:
@@ -430,7 +440,9 @@ def setdefaults(form):
     # Alcohol is categorical. Its valueset is a subset of rows on the "Social History" tab. The
     # valueset concepts do not share a grouping concept.
     alcohol_concepts = ['C0001948', 'C0457801']
-    alcohollist = form.currentdonordata.getmetadatavalues(list_concept=alcohol_concepts, key='concept_id')
+    grouping_concept = 'C0424945'
+    alcohollist = form.currentdonordata.getmetadatavalues(list_concept=alcohol_concepts,
+                                                          grouping_concept=grouping_concept, key='concept_id')
     if len(alcohollist) > 0:
         form.alcohol.data = alcohollist[0]
     else:
@@ -441,7 +453,9 @@ def setdefaults(form):
     # valueset concepts do not share a grouping concept.
     drug_concepts = ['C4518790', 'C0524662', 'C0242566', 'C1456624', 'C3266350',
                      'C0281875', 'C0013146', 'C0239076']
-    druglist = form.currentdonordata.getmetadatavalues(list_concept=drug_concepts, key='concept_id')
+    grouping_concept = 'C0424945'
+    druglist = form.currentdonordata.getmetadatavalues(list_concept=drug_concepts,
+                                                       grouping_concept=grouping_concept, key='concept_id')
     if len(druglist) > 0:
         form.drug.data = druglist[0]
     else:
@@ -458,7 +472,9 @@ def setdefaults(form):
     # Future development note: Some existing records incorrectly use concept_id for grouping_concept_id. After
     # these donors are corrected, change medhxlist to use group_concept.
     medhx_concepts = form.valuesetmanager.getcolumnvalues(tab='Medical History', col='concept_id')
-    medhxlist = form.currentdonordata.getmetadatavalues(list_concept=medhx_concepts, key='concept_id')
+    grouping_concept = 'C0262926'
+    medhxlist = form.currentdonordata.getmetadatavalues(list_concept=medhx_concepts,
+                                                        grouping_concept=grouping_concept, key='concept_id')
 
     for medhx in medhxlist:
         idx = medhxlist.index(medhx)
@@ -485,7 +501,7 @@ def setdefaults(form):
         has_error = True
 
     if len(heightunitlist) > 0:
-        if heightunitlist[0] not in ['in','cm']:
+        if heightunitlist[0] not in ['in', 'cm']:
             msg = (f'Donor {form.currentdonordata.donorid} has metadata with an unexpected height '
                    f'unit {heightunitlist[0]}. Edit manually.')
             flash(msg)
@@ -499,7 +515,7 @@ def setdefaults(form):
             has_error = True
 
     if len(waistunitlist) > 0:
-        if waistunitlist[0] not in ['in','cm']:
+        if waistunitlist[0] not in ['in', 'cm']:
             msg = (f'Donor {form.currentdonordata.donorid} has metadata with an unexpected waist '
                    f'circumference unit {waistunitlist[0]}. Edit manually.')
             flash(msg)

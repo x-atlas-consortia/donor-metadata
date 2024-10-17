@@ -5,15 +5,43 @@ echo "**************************************************************"
 echo ""
 echo "Removing prior containers for this application..."
 # Remove any prior instances of the container.
-docker stop donor-metadata-local > /dev/null 2>&1
-docker rm donor-metadata-local > /dev/null 2>&1
+docker stop donor-metadata > /dev/null 2>&1
+docker rm donor-metadata > /dev/null 2>&1
 
-# Run the container based on the Docker Hub image.
+# Set path to external volume that contains the app.cfg file.
+# The assumption is that the external volume is the current directory.
+
+# Get relative path to current directory.
+base_dir="$(dirname -- "${BASH_SOURCE[0]}")"
+# Convert to absolute path.
+base_dir="$(cd -- "$base_dir" && pwd -P;)"
+
+# Check for the presence of the configuration file in the current directory.
+config_file="$base_dir/app.cfg"
+if [ ! -e "$config_file" ]
+then
+  echo "Error: No configuration file at $config_file."
+  exit;
+fi
+
+# Generate a detached container from the Docker Hub image
+# Mount the current directory to the usr/src/app/instance folder of the container, so that the
+# application can find the configuration file on the host machine.
+# Use port 5000.
+
 echo "Starting application..."
-docker run -d --rm --name donor-metadata -p 5000:5000 hubmap/donor-metadata;
 
+docker run \
+  -d \
+  --rm \
+  --name donor-metadata \
+  -v "$base_dir":/usr/src/app/instance\
+  -p 5000:5000 hubmap/donor-metadata:latest;
+
+
+# Wait for the application to load completely.
+# Extract the response code from a curl of the url and sleep until it is 200.
 url="http://127.0.0.1:5000"
-# Wait for the application to load.
 response_code=0;
 while [[ $response_code -ne 200 ]]; do
     echo "Waiting..."

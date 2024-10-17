@@ -80,7 +80,11 @@ The application uses **app.cfg** to obtain:
 - URI for the Valueset Manager Google sheet
 - Globus client keys and secrets for HuBMAP and SenNet
 
-The application expects to find the app-config file in a folder on the local machine named donor-metadata.
+The configuration file must be kept separate from the application in either of its possible deployments:
+1. In a "bare-metal" deployment, in which the application is run from within a clone of the GitHub repository, the configuration file must not be in the repo. the application looks for the app.cfg file in a subfolder of the user root
+named **donor-metadata**.
+2. In a "containerized" deployment, in which the application is executed from within a Docker container, the configuration file must not be in the container. the application looks for the app.cfg file in the /usr/src/app/instance
+folder, which is bound to a volume on the host machine.
 
 ## Databases
 The application works with three databases:
@@ -199,31 +203,51 @@ This has resulted in variance in units--i.e., different spellings or case.
 Because the Edit form emulates encoding of metadata using a list (e.g., only "in" and "cm" for height), there will be 
 validation errors for measurements with variant units (e.g., "inches").
 
-# Docker - Local 
-The application can be Dockerized.
+# Deployments 
+The application can run in one of three types of deployment:
+1. In a "bare-metal" deployment, running on a local machine.
+2. As a containerized application running from a local Docker image.
+3. As a containerized application running from an image pulled from Docker Hub.
 
-To run the application in a local container:
-
-1. Clone this repo.
-2. In the *app/instance* directory, copy **app.cfg.example** to a file named **app.cfg** in a directory on the local manchine named **donor-metadata**.
-3. In **app.cfg**, edit the value of the ENDPOINT_BASE key to point to the desired instance of entity-api.
-4. Specify values for 
+## Build app.cfg
+1. Copy **app.cfg.example** to a file named **app.cfg**.
+2. Edit the value of the ENDPOINT_BASE key to point to the desired instance of entity-api.
+3. Generate a value for the Flask application (KEY). The preferred method from the Flask documentation is to run ```python -c 'import secrets; print(secrets.token_hex())'```
+4. Provide values for the following Globus authentication parameters:
    * GLOBUS_HUBMAP_CLIENT
    * GLOBUS_HUBMAP_SECRET
    * GLOBUS_SENNET_CLIENT
    * GLOBUS_SENNET_SECRET
-4. Install [Docker](https://docs.docker.com/engine/install/) on the local machine.
+   
+   Obtain these parameters from the Globus administrator.
 
-### Using Docker
-5. Execute **build_local.sh** to create a Docker image named **hmsn/donor-data-local**.
-6. Execute **run_local.sh** to create a Docker container named **donor-data**.
+## Docker
+Install [Docker](https://docs.docker.com/engine/install/) on the local machine.
 
-### Using Docker Compose
-5. Execute **compose-run.sh**.
+## Bare-metal deployment
+1. Copy **app.cfg** to a subfolder of the user root (~) named *donor-metadata*.
+2. ```python app.py```
 
-# Docker - from Docker Hub
-1. Execute **run_hub.sh**. This script uses the latest release of the Docker image at **hubmap/donor-metadata**.
+### Local Docker deployment
+1. Copy **app.cfg** to the same folder that contains the **run_local.sh** script.
+2. Execute **build_local.sh** to create a Docker image named **hmsn/donor-data-local**.
+2. Execute **run_local.sh** to create a Docker container named **donor-data**.
+
+### Docker Hub deployment
+1. Copy **app.cfg** to the same folder that contains the **run_hub.sh** script. 
+2. Execute **build_hub.sh** to create a Docker image named **hmsn/donor-data**. 
+3. Execute **run_hub.sh** to create a Docker container named **hmsn/donor-data**.
 
 The containerized application is mapped to the URL http://127.0.0.1:5000 on the local machine.
-The **run_local.sh** script opens the default browser to the URL.
+The **run_*.sh** scripts open the default browser to the URL.
 
+### Docker Compose
+1. Copy **app.cfg** to the same folder that contains the **compose-run.sh** script.
+2. Execute **compose-run.sh** to create a Docker Compose container.
+
+## Hub Distribution Zip
+Create a Zip archive containing:
+1. **app.cfg**
+2. **run_hub.sh**
+
+This archive contains the minimal set of files needed to install the application on a local machine running Docker.
