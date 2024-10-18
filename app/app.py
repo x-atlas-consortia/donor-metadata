@@ -11,7 +11,6 @@ from models.appconfig import AppConfig
 # route blueprints
 from routes.edit.edit import edit_blueprint
 from routes.review.review import review_blueprint
-from routes.token.token import token_blueprint
 from routes.auth.auth import login_blueprint
 from routes.globus.globus import globus_blueprint
 
@@ -48,7 +47,6 @@ class DonorUI:
         # Register route Blueprints.
         self.app.register_blueprint(edit_blueprint)
         self.app.register_blueprint(review_blueprint)
-        self.app.register_blueprint(token_blueprint)
         self.app.register_blueprint(login_blueprint)
         self.app.register_blueprint(globus_blueprint)
 
