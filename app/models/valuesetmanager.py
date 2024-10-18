@@ -20,7 +20,7 @@ class ValueSetManager:
             # Get UMLS version field, which contains fields common to all metadata elements.
             self.umls = self.Sheets['UMLS']['graph_version'][0]
         except FileNotFoundError:
-            abort(400, f'Failed to load the valuesets Google Sheets document at {url}')
+            abort(400, f'Failed to load the Valueset Manager Google Sheets document at {url}')
 
     def getvaluesettuple(self, tab: str, col: str = 'preferred_term', group_term: str = None,
                          list_concepts: list = None,

@@ -87,7 +87,7 @@ class DonorData:
                     if val is not None:
                         listret.append(val)
         else:
-            abort(500, "Invalid call to DonorData.getmetadatavalues: "
+            abort(400, "Invalid call to DonorData.getmetadatavalues: "
                        "both grouping_concept and list_concept are null")
 
         return listret

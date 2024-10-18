@@ -60,6 +60,11 @@ class DonorUI:
         # 1. Set the session lifetime to 5 minutes (in seconds).
         self.app.config['PERMANENT_SESSION_LIFETIME'] = 300
 
+        # Custom 400 error handler.
+        @self.app.errorhandler(400)
+        def badrequest(error):
+            return render_template('400.html'), 400
+
         # Custom 401 error handler.
         @self.app.errorhandler(401)
         def unauthorized(error):
@@ -70,11 +75,10 @@ class DonorUI:
         def notfound(error):
             return render_template('404.html',error=error), 404
 
-
-
 # ###################################################################################################
 # For local development/testing
 # ###################################################################################################
+
 
 if __name__ == "__main__":
 

@@ -71,8 +71,9 @@ class AppConfig:
         except FileNotFoundError as e:
             print(str(e))
             logger.error(e, exc_info=True)
-            print(f'Missing configuration file {self.file}.')
-            exit(1)
+            msg = f'Missing configuration file {self.file}.'
+            print(msg)
+            abort(400,msg)
 
     def getfieldlist(self, prefix: str) -> list:
         """
