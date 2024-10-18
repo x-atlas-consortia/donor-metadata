@@ -63,12 +63,19 @@ class DonorUI:
         # Custom 400 error handler.
         @self.app.errorhandler(400)
         def badrequest(error):
-            return render_template('400.html'), 400
+            return render_template('400.html',error=error), 400
+
+            # Custom 400 error handler.
+
 
         # Custom 401 error handler.
         @self.app.errorhandler(401)
         def unauthorized(error):
             return render_template('401.html'), 401
+
+        @self.app.errorhandler(403)
+        def forbidden(error):
+            return render_template('403.html', error=error), 403
 
         # Custom 404 error handler.
         @self.app.errorhandler(404)
