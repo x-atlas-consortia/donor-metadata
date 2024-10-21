@@ -7,7 +7,7 @@ Index route that:
 from flask import Blueprint, request, render_template, redirect, session
 
 # Helper classes
-from forms.globusform import GlobusForm
+from models.globusform import GlobusForm
 
 globus_blueprint = Blueprint('globus', __name__, url_prefix='/')
 

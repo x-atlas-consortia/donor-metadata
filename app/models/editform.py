@@ -9,9 +9,9 @@ from wtforms import (Form, StringField, SelectField, DecimalField, validators, V
 
 # Helper classes
 # Represents the app.cfg file
-from app.models.appconfig import AppConfig
+from models.appconfig import AppConfig
 # Represents the Google Sheets of donor clinical metadata valuesets
-from app.models.valuesetmanager import ValueSetManager
+from models.valuesetmanager import ValueSetManager
 
 
 def validate_age(form, field):

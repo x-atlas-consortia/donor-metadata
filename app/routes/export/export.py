@@ -6,7 +6,7 @@ Routes for the metadata export workflow.
 from flask import Blueprint, request, redirect, render_template, session, make_response, flash
 
 # Helper classes
-from forms.exportform import ExportForm
+from models.exportform import ExportForm
 from models.searchapi import SearchAPI
 
 export_select_blueprint = Blueprint('export_select', __name__, url_prefix='/export/select')
