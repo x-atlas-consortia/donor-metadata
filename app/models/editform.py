@@ -1,6 +1,6 @@
 """
 Form used to build the JSON of new metadata for a donor in provenance.
-Second form in the workflow.
+Second form in the curation workflow.
 """
 import os
 
@@ -94,7 +94,7 @@ class EditForm(Form):
     ageunits = valuesetmanager.getvaluesettuple(tab='Age', group_term='Age', col='units')
     ageunit = SelectField('units', choices=ageunits)
     agevalue = DecimalField('Age (value)',
-                            validators=[validators.DataRequired(), validators.NumberRange(min=0), validate_age])
+                            places=1, validators=[validators.DataRequired(), validators.NumberRange(min=0), validate_age])
 
     # Race
     races = valuesetmanager.getvaluesettuple(tab='Race', group_term='Race')

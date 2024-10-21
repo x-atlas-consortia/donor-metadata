@@ -27,6 +27,7 @@ def globus():
         # Pass the donor id.
         session['donorid'] = form.donorid.data
         # Authenticate to Globus via the login route.
+        # If login is successful, Globus will redirect to the edit page.
         return redirect(f'/login')
 
     # Render the Globus login form.

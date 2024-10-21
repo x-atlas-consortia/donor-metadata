@@ -1,6 +1,6 @@
 """
 Form used to log a user into a consortium's Globus environment.
-First form in the workflow.
+First form in the curation workflow.
 """
 
 from wtforms import Form, validators, ValidationError, SelectField, StringField, PasswordField

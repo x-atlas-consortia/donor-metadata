@@ -1,0 +1,20 @@
+<!-- Review differences between existing metadata and changed metadata-->
+{% extends 'base.html' %}
+
+{% block content %}
+<!--{% from "_formhelpers.html" import render_field %}-->
+<title>Consortium Donor Metadata </title>
+
+<form method=post action="/review">
+
+    <button  type="submit" class="btn btn-primary btn-lg" value="Update">Export</button>
+    <a href="/" class="btn btn-primary btn-lg">Cancel</a>
+
+    <div class="overflow-scroll mt-1 pb-5"
+                 style="max-width: 1800px; max-height: 800px;">">
+        {{ table|safe }}
+    </div>
+
+</form>
+
+{% endblock %}

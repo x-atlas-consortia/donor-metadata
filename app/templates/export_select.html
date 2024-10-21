@@ -1,0 +1,27 @@
+<!-- Review differences between existing metadata and changed metadata-->
+{% extends 'base.html' %}
+
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+<title>Export</title>
+<form method=post>
+    <div class="container-fluid">
+        <h1>Export Donor Metadata</h1>
+        <br>
+        <div>
+            {{ render_field(form.consortium) }}
+        </div>
+        <br>
+        <div>
+            <button type="submit"  class="btn btn-primary btn-lg"
+                    value="Search" onclick="spinner2()">Select</button>
+        </div>
+        <br>
+        <!-- Spinner that displays while searching -->
+        <div id="spinner" class="loading">
+        </div>
+        <br>
+    </div>
+</form>
+
+{% endblock %}

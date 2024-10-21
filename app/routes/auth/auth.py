@@ -39,12 +39,12 @@ def load_app_client(consortium: str) -> ConfidentialAppAuthClient:
 
 login_blueprint = Blueprint('login', __name__, url_prefix='/login')
 
-
 @login_blueprint.route('', methods=['GET'])
 def login():
     """
-    Login via Globus Auth.
-    This route is invoked twice.
+    Login via Globus Auth for the curation and export workflows.
+
+    This route is invoked twice for a workflow.
 
     1. Before authentication to Globus,
        a. The Globus Auth session has no value for the "state" argument of the request.
@@ -109,5 +109,8 @@ def login():
         session['donorid'] = donorid
         session['userid'] = user_info.get('preferred_username')
 
-        # Redirect to the edit page.
-        return redirect(f'/edit')
+        # Redirect to the appropriate page, based  on the workflow.
+        if donorid == 'ALL':
+            return redirect(f'/export/review')
+        else:
+            return redirect(f'/edit')
