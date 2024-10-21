@@ -147,10 +147,15 @@ class EditForm(Form):
     pathologynote = TextAreaField('Pathology Note', validators=[validators.Optional()])
     apoephenotype = TextAreaField('APOE phenotype', validators=[validators.Optional()])
 
-    # The Fitzpatrick Skin Type, blood type, and blood Rh factor are categorical measurements.
+    # The Fitzpatrick Skin Type, Other Anatomic, blood type, and blood Rh factor are categorical measurements.
     fitz = valuesetmanager.getvaluesettuple(tab='Measurements', group_term="Fitzpatrick Classification Scale",
                                             addprompt=True)
     fitzpatrick = SelectField('Fitzpatrick Scale', choices=fitz,
+                              validators=[validate_selectfield_default, validators.Optional()])
+
+    other_anatomics = valuesetmanager.getvaluesettuple(tab='Measurements', group_term="Other Anatomic Concept",
+                                            addprompt=True)
+    other_anatomic = SelectField('Other Anatomic', choices=other_anatomics,
                               validators=[validate_selectfield_default, validators.Optional()])
 
     bloodtypes = valuesetmanager.getvaluesettuple(tab='Blood Type', group_term="ABO blood group system",

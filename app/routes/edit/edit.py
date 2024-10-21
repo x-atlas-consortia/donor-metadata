@@ -412,6 +412,16 @@ def setdefaults(form):
     else:
         form.fitzpatrick.data = 'PROMPT'
 
+    # Other Anatomic Site
+    # Other Anatomic Site is categorical.
+    other_anatomical_concepts = ['C4331357']
+    otherlist = form.currentdonordata.getmetadatavalues(list_concept=other_anatomical_concepts,
+                                                        grouping_concept='C1518643', key='concept_id')
+    if len(otherlist) > 0:
+        form.other_anatomic.data = otherlist[0]
+    else:
+        form.other_anatomic.data = 'PROMPT'
+
     # Smoking
     # Smoking is categorical. Its valueset is a subset of rows on the "Social History" tab. The
     # valueset concepts do not share a grouping concept.
@@ -494,7 +504,12 @@ def setdefaults(form):
         flash(msg)
         has_error = True
 
-    if form.currentdonordata.has_published_datasets:
+    if form.currentdonordata.descendantcount > 10:
+        msg = (f'Donor {form.currentdonordata.donorid} is associated with over 10 descendants. '
+               f'Edit manually.')
+        flash(msg)
+        has_error = True
+    elif form.currentdonordata.has_published_datasets:
         msg = (f'Donor {form.currentdonordata.donorid} is associated with one or more published datasets. '
                f'Edit manually.')
         flash(msg)
@@ -524,6 +539,7 @@ def setdefaults(form):
     if has_error:
         for field in form:
             setinputdisabled(field, disabled=True)
+
 
 
 def translate_age_to_metadata(form) -> dict:
@@ -762,6 +778,11 @@ def buildnewdonordata(form, token: str, donorid: str) -> DonorData:
     fitzpatrick = translate_selectfield_to_metadata(form, formfield=form.fitzpatrick, tab='Measurements')
     if fitzpatrick != {}:
         donor.metadata[donor_data_key].append(fitzpatrick)
+
+    # Other Anatomic Site
+    other_anatomic = translate_selectfield_to_metadata(form, formfield=form.other_anatomic, tab='Measurements')
+    if other_anatomic != {}:
+        donor.metadata[donor_data_key].append(other_anatomic)
 
     # Blood Type
     bloodtype = translate_selectfield_to_metadata(form, formfield=form.bloodtype, tab='Blood Type')

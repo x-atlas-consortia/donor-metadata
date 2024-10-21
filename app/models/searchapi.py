@@ -102,3 +102,5 @@ class SearchAPI:
                        f'in environment {self.urlbase}')
         elif response.status_code == 400:
             abort(response.status_code, response.json().get('error'))
+        else:
+            abort(500,'Error when calling the param-search endpoint in search-api')

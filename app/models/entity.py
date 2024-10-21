@@ -1,12 +1,11 @@
 # Class representing interactions with the entity-api for a donor.
 
-from flask import abort
+from flask import abort, flash
 import requests
 
 # Helper classes
 # Represents the app.cfg file
 from .appconfig import AppConfig
-
 
 class Entity:
 
@@ -102,7 +101,7 @@ class Entity:
             else:
                 abort(response.status_code, response.json().get('error'))
         else:
-            abort(response.status_code, response.json().get('error'))
+            abort(response.status_code, f'Error after calling /entities GET endpoint in entity-api for donor {self.donorid}')
 
     def updatedonormetadata(self, dict_metadata: dict):
         """
@@ -117,29 +116,62 @@ class Entity:
         response = requests.put(url, json=data, headers=self.headers)
 
         if response.status_code not in [200, 201]:
-            abort(response.status_code, response.json().get('error'))
+            abort(response.status_code, f'Error after calling /entities PUT endpoint in entity-api for donor {self.donorid} ')
 
         return 'ok'
+
+    def is_published_dataset(self, uuid:str) -> bool:
+        """
+        Returns whether an entity's descendant is a published dataseet.
+        :param uuid: UUID of a descendant in provenance.
+        """
+
+        url = f'{self.urlbase}.{self.consortium}.org/entities/{uuid}'
+        response = requests.get(url=url, headers=self.headers)
+
+        if response.status_code == 200:
+            rjson = response.json()
+            entity_type = rjson.get('entity_type')
+            if entity_type == 'Dataset':
+                status = rjson.get('status').lower()
+                if status == 'published':
+                    return True
+
+            return False
+
+        elif response.status_code == 404:
+            abort(404, f'No donor with id {self.donorid} found in provenance for {self.consortium} '
+                       f'in environment {self.urlbase}')
+        elif response.status_code == 400:
+            err = response.json().get('error')
+            if 'is not a valid id format' in err:
+                # Translate this as a 404, not 400.
+                abort(404, f'No donor with id {self.donorid} found in provenance for {self.consortium} '
+                           f'in environment {self.urlbase}')
+            else:
+                abort(response.status_code, f'Error after calling /entities GET endpoint in entity-api for uuid {uuid}')
+        else:
+            abort(response.status_code, f'Error after calling /entities GET endpoint in entity-api for uuid {uuid}')
+
 
     def has_published_datasets(self) -> bool:
         """
         Checks whether a donor is associated with published datasets in provenance.
         :return: boolean
         """
-        url = f'{self.urlbase}.{self.consortium}.org/descendants/{self.donorid}'
+        url = f'{self.urlbase}.{self.consortium}.org/descendants/{self.donorid}?property=uuid'
         response = requests.get(url=url, headers=self.headers)
 
         if response.status_code == 200:
             rjson = response.json()
-
+            self.descendantcount = len(rjson)
             haspublisheddatasets = False
-            for e in rjson:
-                entity_type = e.get('entity_type')
-                if entity_type == 'Dataset':
-                    status = e.get('status').lower()
-                    if status == 'published':
-                        haspublisheddatasets = True
-                        break
+            if self.descendantcount > 10:
+                return True
+            for uuid in rjson:
+                if self.is_published_dataset(uuid=uuid):
+                    haspublisheddatasets = True
+                    break
 
             return haspublisheddatasets
 
@@ -155,4 +187,4 @@ class Entity:
             else:
                 abort(response.status_code, response.json().get('error'))
         else:
-            abort(response.status_code, response.json().get('error'))
+            abort(response.status_code, f'Error after calling /descendants GET endpoint in entity-api for donor {self.donorid}')

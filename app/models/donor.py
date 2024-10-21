@@ -49,6 +49,7 @@ class DonorData:
                         abort(400, msg)
 
             self.has_published_datasets = self.entity.has_published_datasets()
+            self.descendantcount = self.entity.descendantcount
 
     def getmetadatavalues(self, key: str, grouping_concept=None, list_concept=None) -> list:
         """

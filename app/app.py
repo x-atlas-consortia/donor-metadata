@@ -85,6 +85,11 @@ class DonorUI:
         def notfound(error):
             return render_template('404.html',error=error), 404
 
+        # Custom 404 error handler.
+        @self.app.errorhandler(500)
+        def servererror(error):
+            return render_template('500.html', error=error), 500
+
 # ###################################################################################################
 # For local development/testing
 # ###################################################################################################
