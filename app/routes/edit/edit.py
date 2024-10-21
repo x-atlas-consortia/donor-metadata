@@ -21,7 +21,7 @@ import json
 # Represents the metadata for a donor in a consortium database
 from models.donor import DonorData
 # The form used to build request bodies for PUT and POST endpoints of the entity-api
-from models.editform import EditForm
+from forms.editform import EditForm
 
 edit_blueprint = Blueprint('edit', __name__, url_prefix='/edit')
 

@@ -4,7 +4,7 @@ First form in the curation workflow.
 """
 
 from wtforms import Form, validators, ValidationError, SelectField, StringField, PasswordField
-from .appconfig import AppConfig
+from app.models.appconfig import AppConfig
 
 def validate_donorid(form, field):
     """

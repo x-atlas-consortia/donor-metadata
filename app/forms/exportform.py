@@ -3,7 +3,7 @@ Form used to select a set of donors to export.
 """
 
 from wtforms import Form, SelectField
-from .appconfig import AppConfig
+from app.models.appconfig import AppConfig
 
 class ExportForm(Form):
 

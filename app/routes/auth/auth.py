@@ -39,6 +39,7 @@ def load_app_client(consortium: str) -> ConfidentialAppAuthClient:
 
 login_blueprint = Blueprint('login', __name__, url_prefix='/login')
 
+
 @login_blueprint.route('', methods=['GET'])
 def login():
     """

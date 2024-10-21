@@ -3,10 +3,10 @@ Routes for the metadata export workflow.
 
 """
 
-from flask import Blueprint, request, redirect, render_template, session
+from flask import Blueprint, request, redirect, render_template, session, make_response, flash
 
 # Helper classes
-from models.exportform import ExportForm
+from forms.exportform import ExportForm
 from models.searchapi import SearchAPI
 
 export_select_blueprint = Blueprint('export_select', __name__, url_prefix='/export/select')
@@ -46,13 +46,14 @@ def export_review():
     # Obtains all donor metadata for a consortium.
     # Sends metadata to export review form as a Pandas DataFrame for display.
 
-    if request.method == 'GET':
-        # Populate review form with consortium donor metadata.
-        consortium = session['consortium']
-        token = session['groups_token']
+    # Populate review form with consortium donor metadata.
+    consortium = session['consortium']
+    token = session['groups_token']
 
-        # Get DataFrame of metadata rows.
-        metadata = SearchAPI(consortium=consortium, token=token).metadata
+    # Get DataFrame of metadata rows.
+    metadata = SearchAPI(consortium=consortium, token=token).metadata
+
+    if request.method == 'GET':
         # Remove irrelevant columns for display purposes.
         metadata = metadata[['id', 'source_name',
                              'code', 'concept_id',
@@ -62,8 +63,17 @@ def export_review():
                              'grouping_sab', 'numeric_operator',
                              'preferred_term', 'sab', 'units']]
         table = metadata.to_html(classes='table table-hover .table-condensed { font-size: 8px !important; } table-bordered table-responsive-sm')
-        return render_template('export_review.html', table=table)
+
     if request.method == 'POST':
         # Export form content to excel.
-        return redirect('/')
+        csv_string = metadata.to_csv(index=False)
+        # Create a response with the CSV data
+        response = make_response(csv_string)
+        fname = consortium.split('_')[1].lower()
+        response.headers["Content-Disposition"] = f"attachment; filename={fname}_metadata.csv"
+        response.headers["Content-Type"] = "text/csv"
+        flash(f'Metadata for {fname} exported.')
+        return response
+
+    return render_template('export_review.html', table=table)
 
