@@ -91,17 +91,24 @@ The application works with three databases:
 1. the Valueset Manager, a Google Sheets document
 2. the neo4j provenance databases for the two consortia, abstracted by consortium-specific instances of entity-api.
 
-## Workflow
+## Workflows
+
+There are two workflows in the application:
+1. A **curation workflow** that allows for editing of the metadata for a single donor in a consortium.
+2. An **export workflow** that exports metadata for all donors in a consortium to a CSV file.
+
+### Curation workflow
+![doctor_11542314.png](app%2Fstatic%2Fdoctor_11542314.png)
 ![Curator application architecture.jpg](doc%2FCurator%20application%20architecture.jpg)
 
-### app
+#### app
 The application:
 1. uses the **valuesetmanager** helper class to read from the Valueset Manager spreadsheet
 2. manages the Flask session
 3. registers Flask Blueprints
 4. customizes HTTP error handling, routing to **401.html** and **404.html**.
 
-### Home page
+#### Home page
 1. The Home HTML page **index.html** includes a form that allows the user to specify 
    * consortium (HuBMAP or SenNet)
    * Donor ID
@@ -110,9 +117,9 @@ The application:
    * authenticates the user in the appropriate Globus context
    * works with the **donor** helper class to verify that the donor is in provenance
    * redirects either to the Edit page or the custom 404 page
-![img.png](img.png)
+![img.png](doc/img.png)
 
-### Edit page
+#### Edit page
 1. The Edit page **edit.html** includes a form that allows metadata data entry.
 2. The WTForm **editform.py**:
    * works with the **valuesetmanager** helper class to obtain valueset content
@@ -126,8 +133,8 @@ The application:
    * compares current and revised metadata JSON for the donor
    * posts JSONs for current metadata, revised metadata, and comparison to **review.html**
 
-![img_1.png](img_1.png)
-### Review page
+![img_1.png](doc/img_1.png)
+#### Review page
 1. The Review page **review.html** displays:
    * the current metadata JSON for the donor
    * the new metadata JSON for the donor
@@ -135,10 +142,30 @@ The application:
 2. The Blueprint route */review*:
    * works with the **donor** helper class to update the donor metadata in provenance
    * redirects to **index.html**
-![img_2.png](img_2.png)
+![img_2.png](doc/img_2.png)
+
+### Export workflow
+![csv.png](app%2Fstatic%2Fcsv.png)
+![Export application architecture.jpg](doc%2FExport%20application%20architecture.jpg)
+
+#### Export select page
+The page allows the user to select a consortium for which donor metadata should be exported.
+![img_3.png](doc/img_3.png)
+
+#### Export review page
+The page displays in spreadsheet format the metadata for human donors in the consortium provenance.
+![img_4.png](doc/img_4.png)
+
+The **Export** button downloads a file named *consortium*_metadata.csv.
+
+### 400 page
+The **400.html** page is a custom 400 error page
 
 ### 401 page
-The **401.html** page is a custom 401 error that explains potential causes and solutions for authentication errors.
+The **401.html** page is a custom 401 error page that explains potential causes and solutions for authentication errors.
+
+### 403 page
+The **403.html** page is a custom 403 error page.
 
 ### 404 page
 The **404.html** page is a custom 404 error page. The 404 error in this case is "donor not found", not "file not found".
@@ -161,6 +188,7 @@ This file contains a custom Jinja script used to populate content from WTForms f
 | entity          | reads from and writes to a provenance database | entity-api |
 | donor           | represents donor metadata                      | entity     |
 | DonorUI         | encapsulates the Flask app                     | app        |
+| searchAPI       | reads from a provenance database               | search-api |
 
 
 # Business rules
