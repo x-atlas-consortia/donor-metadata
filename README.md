@@ -1,6 +1,7 @@
 # HuBMAP/SenNet Human Donor Clinical Metadata Curator application
 
 ![help.png](app%2Fstatic%2Fhelp.png)
+***
 # Background
 ## Donor clinical metadata
 When registering datasets generated from tissue samples collected from human donors, providers such as HuBMAP Tissue Mapping Centers (TMCs) include
@@ -46,6 +47,7 @@ previously undocumented medical history conditions or measurements.
 
 In general, it is necessary to update the Valueset Manager spreadsheet for every set of donors. 
 
+***
 # Solution
 The curation solution features:
 - A user interface that allows
@@ -87,29 +89,30 @@ named **donor-metadata**.
 2. In a "containerized" deployment, in which the application is executed from within a Docker container, the configuration file must not be in the container. the application looks for the app.cfg file in the /usr/src/app/instance
 folder, which is bound to a volume on the host machine.
 
-## Databases
+# Databases
 The application works with three databases:
 1. the Valueset Manager, a Google Sheets document
 2. the neo4j provenance databases for the two consortia, abstracted by consortium-specific instances of entity-api.
 
-## Workflows
+***
+# Workflows
 
 There are two workflows in the application:
 1. A **curation workflow** that allows for editing of the metadata for a single donor in a consortium.
 2. An **export workflow** that exports metadata for all donors in a consortium to a CSV file.
 
-### Curation workflow
+# Curation workflow
 ![doctor_11542314.png](app%2Fstatic%2Fdoctor_11542314.png)
 ![Curator application architecture.jpg](doc%2FCurator%20application%20architecture.jpg)
 
-#### app
+## Application (app)
 The application:
 1. uses the **valuesetmanager** helper class to read from the Valueset Manager spreadsheet
 2. manages the Flask session
 3. registers Flask Blueprints
 4. customizes HTTP error handling, routing to **401.html** and **404.html**.
 
-#### Home page
+## Home page
 1. The Home HTML page **index.html** includes a form that allows the user to specify 
    * consortium (HuBMAP or SenNet)
    * Donor ID
@@ -120,7 +123,7 @@ The application:
    * redirects either to the Edit page or the custom 404 page
 ![img.png](doc/img.png)
 
-#### Edit page
+## Edit page
 1. The Edit page **edit.html** includes a form that allows metadata data entry.
 2. The WTForm **editform.py**:
    * works with the **valuesetmanager** helper class to obtain valueset content
@@ -135,7 +138,7 @@ The application:
    * posts JSONs for current metadata, revised metadata, and comparison to **review.html**
 
 ![img_1.png](doc/img_1.png)
-#### Review page
+## Review page
 1. The Review page **review.html** displays:
    * the current metadata JSON for the donor
    * the new metadata JSON for the donor
@@ -144,43 +147,32 @@ The application:
    * works with the **donor** helper class to update the donor metadata in provenance
    * redirects to **index.html**
 ![img_2.png](doc/img_2.png)
-
-### Export workflow
+   
+***
+# Export workflow
 ![csv.png](app%2Fstatic%2Fcsv.png)
 ![Export application architecture.jpg](doc%2FExport%20application%20architecture.jpg)
 
-#### Export select page
+## Export select page
 The page allows the user to select a consortium for which donor metadata should be exported.
 ![img_3.png](doc/img_3.png)
 
-#### Export review page
+## Export review page
 The page displays in spreadsheet format the metadata for human donors in the consortium provenance.
 ![img_4.png](doc/img_4.png)
 
 The **Export** button downloads a file named *consortium*_metadata.csv.
 
-### 400 page
-The **400.html** page is a custom 400 error page
-
-### 401 page
-The **401.html** page is a custom 401 error page that explains potential causes and solutions for authentication errors.
-
-### 403 page
-The **403.html** page is a custom 403 error page.
-
-### 404 page
-The **404.html** page is a custom 404 error page. The 404 error in this case is "donor not found", not "file not found".
-
-### base.html
+# base.html
 All HTML files in the application inherit from **base.html**, which includes:
 * a navbar
 * a message panel that displays Flask flash messages
 * a spinner control to animate waiting in the search form
 
-### _formhelpers.html
+# _formhelpers.html
 This file contains a custom Jinja script used to populate content from WTForms forms in a HTML page.
 
-### Helper classes
+# Helper classes
 
 | name            | role                                           | uses       |
 |-----------------|------------------------------------------------|------------|
@@ -208,7 +200,7 @@ An authentication token for a consortium's entity-api is set via the consortium'
 The application will raise a HTTP 401 exception when:
 1. The authentication token expires at the consortium level.
 2. The authentication token is for the incorrect consortium--e.g., if the user provides a HuBMAP token for an update to a donor in SenNet.
-
+***
 # Potential issues
 ## Non-compliant current data
 Donors already containing metadata may diverge from the current schema. This is especially the case for
@@ -227,6 +219,7 @@ Units are currently not encoded in metadata, but stored as free text.
 This has resulted in variance in units--i.e., different spellings or case.
 Because the Edit form emulates encoding of metadata using a list (e.g., only "in" and "cm" for height), there will be 
 validation errors for measurements with variant units (e.g., "inches").
+***
 
 # Deployments 
 The application can run in one of three types of deployment:
@@ -235,6 +228,8 @@ The application can run in one of three types of deployment:
 3. As a containerized application running from an image pulled from Docker Hub.
 
 ## Build app.cfg
+Every deployment will need a copy of **app.cfg**.
+
 1. Copy **app.cfg.example** to a file named **app.cfg**.
 2. Edit the value of the ENDPOINT_BASE key to point to the desired instance of entity-api.
 3. Generate a value for the Flask application (KEY). The preferred method from the Flask documentation is to run ```python -c 'import secrets; print(secrets.token_hex())'```
@@ -270,7 +265,7 @@ The **run_*.sh** scripts open the default browser to the URL.
 1. Copy **app.cfg** to the same folder that contains the **compose-run.sh** script.
 2. Execute **compose-run.sh** to create a Docker Compose container.
 
-## Hub Distribution Zip
+## Minimal Deployment (Hub Distribution Zip)
 Create a Zip archive containing:
 1. **app.cfg**
 2. **run_hub.sh**
