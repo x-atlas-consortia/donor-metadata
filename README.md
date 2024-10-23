@@ -99,7 +99,7 @@ There are two workflows in the application:
 2. An **export workflow** that exports metadata for all donors in a consortium to a CSV file.
 
 ### Curation workflow
-![doctor_11542314.png](app%2Fstatic%2Fdoctor_11542314.png =225)
+![<img src="doctor_11542314.png" width="250"/>]
 ![Curator application architecture.jpg](doc%2FCurator%20application%20architecture.jpg)
 
 #### app
