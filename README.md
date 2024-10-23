@@ -1,5 +1,6 @@
 # HuBMAP/SenNet Human Donor Clinical Metadata Curator application
 
+![help.png](app%2Fstatic%2Fhelp.png)
 # Background
 ## Donor clinical metadata
 When registering datasets generated from tissue samples collected from human donors, providers such as HuBMAP Tissue Mapping Centers (TMCs) include

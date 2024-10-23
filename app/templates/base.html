@@ -85,23 +85,25 @@
     </style>
   </head>
   <body onpageload="spinneroff()">
-
-    <nav class="navbar bg-dark">
-      <a class="navbar-brand" href={{ url_for('globus.globus') }}>
-         <img src="/static/doctor_11542314.png" alt="Icon by Iconriver" data-height="234" style="max-height: 49.9922px;">
-      </a>
-      <p class="text-white bg-dark fs-2">HuBMAP/SenNet Human Donor Clinical Metadata Curator</p>
-      <a class="navbar-brand float-right" href="https://portal.hubmapconsortium.org/" alt="HuBMAP">
-        <img src="/static/hubmap.png" alt="HuBMAP" data-height="234" style="max-height: 49.9922px;">
+      <nav class="navbar bg-dark">
+        <!--<p class="text-white bg-dark fs-4">HuBMAP/SenNet Human Donor Clinical Metadata Curator</p>-->
+        <a class="navbar-brand" href={{ url_for('globus.globus') }}>
+          <img src="/static/doctor_11542314.png" alt="Icon by Iconriver" data-height="234" style="max-height: 40px;">
         </a>
-      <a class="navbar-brand float-right" href="https://data.sennetconsortium.org/" alt="SenNet">
-        <img src="/static/sennet.png" alt="SenNet" data-height="234" style="max-height: 49.9922px;">
-       </a>
-      <a class="navbar-brand float-right" href={{ url_for('export_select.export_select') }}>
-         <img src="/static/excel.png" alt="Export" data-height="234" style="max-height: 49.9922px;">
-      </a>
-    </nav>
-    <p class="bg-secondary text-white fs-4">Environment: {% if "dev" in config["ENDPOINT_BASE"]%} development {% else %} production {% endif %}</p>
+        <a class="navbar-brand" href={{ url_for('export_select.export_select') }}>
+          <img src="/static/excel.png" alt="Export" data-height="234" style="max-height: 40px;">
+        </a>
+        <a class="navbar-brand" href="https://github.com/x-atlas-consortia/donor-metadata?tab=readme-ov-file#hubmapsennet-human-donor-clinical-metadata-curator-application">
+          <img src="/static/help.png" alt="Help" data-height="234" style="max-height: 40px;">
+        </a>
+        <a class="navbar-brand" href="https://portal.hubmapconsortium.org/" alt="HuBMAP">
+          <img src="/static/hubmap.png" alt="HuBMAP" data-height="234" style="max-height: 40px;">
+        </a>
+        <a class="navbar-brand" href="https://data.sennetconsortium.org/" alt="SenNet">
+          <img src="/static/sennet.png" alt="SenNet" data-height="234" style="max-height: 40px;">
+        </a>
+      </nav>
+   <!-- <p class="bg-secondary text-white fs-4">Environment: {% if "dev" in config["ENDPOINT_BASE"]%} development {% else %} production {% endif %}</p>-->
     {% block content %}
     {% endblock %}
     <div class="container">

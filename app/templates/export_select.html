@@ -4,9 +4,14 @@
 {% block content %}
 {% from "_formhelpers.html" import render_field %}
 <title>Export</title>
+<div class="container-fluid bg-secondary text-white">
+    <br>
+    <img src="/static/excel.png" alt="Export" data-height="234" style="max-height: 40px;">
+    <br>
+    <h4>Export Donor Metadata</h4>
+</div>
 <form method=post>
     <div class="container-fluid">
-        <h1>Export Donor Metadata</h1>
         <br>
         <div>
             {{ render_field(form.consortium) }}
