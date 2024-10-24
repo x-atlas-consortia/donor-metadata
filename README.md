@@ -1,6 +1,5 @@
 # HuBMAP/SenNet Human Donor Clinical Metadata Curator application
 
-![help.png](app%2Fstatic%2Fhelp.png)
 ***
 # Background
 ## Donor clinical metadata
