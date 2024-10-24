@@ -1,6 +1,6 @@
 # HuBMAP/SenNet Human Donor Clinical Metadata Curator application
 
-![](/Users/jas971/PycharmProjects/donor-metadata/app/static/help.png)
+<img height="100" src="/Users/jas971/PycharmProjects/donor-metadata/app/static/help.png" width="100"/>
 ***
 # Background
 ## Donor clinical metadata
@@ -102,7 +102,7 @@ There are two workflows in the application:
 2. An **export workflow** that exports metadata for all donors in a consortium to a CSV file.
 
 # Curation workflow
-<img src="/Users/jas971/PycharmProjects/donor-metadata/app/static/doctor_11542314.png"/ height="100" width="100">
+<img height="100" src="/Users/jas971/PycharmProjects/donor-metadata/app/static/doctor_11542314.png" width="100"/>
 ![Curator application architecture.jpg](doc%2FCurator%20application%20architecture.jpg)
 
 ## Application (app)
