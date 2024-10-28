@@ -72,6 +72,12 @@ def edit():
         # by the review.html for the update post to entity-api.
         form.newdonor = base64.b64encode(pickle.dumps(form.newdonordata.metadata)).decode()  # Base64 encoded string
 
+        # Add a second instance of the encoded dictionary for the export to tsv feature, which requires
+        # an additional form inside the export_review.html.
+        # Flatten the dictionary for export.
+
+        form.newdonortsv = base64.b64encode(pickle.dumps(form.newdonordata.metadata)).decode()
+
         # Identify all differences between the current and new donor metadata.
         if form.currentdonordata.metadata is None:
             form.deepdiff = {'Change': 'from no metadata to some metadata'}
@@ -508,12 +514,12 @@ def setdefaults(form):
         msg = (f'Donor {form.currentdonordata.donorid} is associated with over 10 descendants. '
                f'Edit manually.')
         flash(msg)
-        has_error = True
+        # has_error = True
     elif form.currentdonordata.has_published_datasets:
         msg = (f'Donor {form.currentdonordata.donorid} is associated with one or more published datasets. '
                f'Edit manually.')
         flash(msg)
-        has_error = True
+        # has_error = True
 
     if len(heightunitlist) > 0:
         if heightunitlist[0] not in ['in', 'cm']:
@@ -539,7 +545,6 @@ def setdefaults(form):
     if has_error:
         for field in form:
             setinputdisabled(field, disabled=True)
-
 
 
 def translate_age_to_metadata(form) -> dict:

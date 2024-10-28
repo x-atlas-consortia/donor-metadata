@@ -98,7 +98,6 @@ def login():
 
         # Get all Bearer tokens
         auth_token = token_response.by_resource_server['auth.globus.org']['access_token']
-        print(auth_token)
         # nexus_token = token_response.by_resource_server['nexus.api.globus.org']['access_token']
         # transfer_token = token_response.by_resource_server['transfer.api.globus.org']['access_token']
         groups_token = token_response.by_resource_server['groups.api.globus.org']['access_token']

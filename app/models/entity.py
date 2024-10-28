@@ -1,11 +1,12 @@
 # Class representing interactions with the entity-api for a donor.
 
-from flask import abort, flash
+from flask import abort
 import requests
 
 # Helper classes
 # Represents the app.cfg file
 from .appconfig import AppConfig
+
 
 class Entity:
 
@@ -85,6 +86,9 @@ class Entity:
                     msg = (f'ID {self.donorid} is an source of type {source_type}. '
                            f'This application works only with human sources.')
                     abort(400, msg)
+                self.source_type = source_type
+            else:
+                self.source_type = 'Human'
 
             donor = rjson.get('metadata')
             return donor
@@ -101,7 +105,8 @@ class Entity:
             else:
                 abort(response.status_code, response.json().get('error'))
         else:
-            abort(response.status_code, f'Error after calling /entities GET endpoint in entity-api for donor {self.donorid}')
+            abort(response.status_code, f'Error after calling /entities GET endpoint in entity-api '
+                                        f'for donor {self.donorid}')
 
     def updatedonormetadata(self, dict_metadata: dict):
         """
@@ -116,11 +121,12 @@ class Entity:
         response = requests.put(url, json=data, headers=self.headers)
 
         if response.status_code not in [200, 201]:
-            abort(response.status_code, f'Error after calling /entities PUT endpoint in entity-api for donor {self.donorid} ')
+            abort(response.status_code, f'Error after calling /entities PUT endpoint '
+                                        f'in entity-api for donor {self.donorid} ')
 
         return 'ok'
 
-    def is_published_dataset(self, uuid:str) -> bool:
+    def is_published_dataset(self, uuid: str) -> bool:
         """
         Returns whether an entity's descendant is a published dataseet.
         :param uuid: UUID of a descendant in provenance.
@@ -152,7 +158,6 @@ class Entity:
                 abort(response.status_code, f'Error after calling /entities GET endpoint in entity-api for uuid {uuid}')
         else:
             abort(response.status_code, f'Error after calling /entities GET endpoint in entity-api for uuid {uuid}')
-
 
     def has_published_datasets(self) -> bool:
         """
@@ -187,4 +192,5 @@ class Entity:
             else:
                 abort(response.status_code, response.json().get('error'))
         else:
-            abort(response.status_code, f'Error after calling /descendants GET endpoint in entity-api for donor {self.donorid}')
+            abort(response.status_code, f'Error after calling /descendants GET endpoint in '
+                                        f'entity-api for donor {self.donorid}')

@@ -26,6 +26,7 @@ class DonorData:
         self.donorid = donorid
         self.entity = Entity(donorid=donorid, token=token)
         self.consortium = self.entity.consortium
+        self.source_type = self.entity
 
         # The highest level key of the metadata dictionary is one of the following:
         # organ_donor_data
