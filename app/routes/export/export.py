@@ -6,11 +6,12 @@ Routes for the metadata export workflow.
 from flask import Blueprint, request, redirect, render_template, session, make_response, flash, abort
 import pickle
 import base64
-import pandas as pd
 
 # Helper classes
 from models.exportform import ExportForm
 from models.searchapi import SearchAPI
+from models.metadataframe import MetadataFrame
+from models.getmetadatabytype import getmetadatabytype
 
 export_select_blueprint = Blueprint('export_select', __name__, url_prefix='/export/select')
 
@@ -54,11 +55,11 @@ def export_review():
     token = session['groups_token']
 
     # Get DataFrame of metadata rows.
-    exportmetadata = SearchAPI(consortium=consortium, token=token).metadata
+    dfexportmetadata = SearchAPI(consortium=consortium, token=token).dfalldonormetata
 
     if request.method == 'GET':
         # Remove irrelevant columns for display purposes.
-        metadatadisplay = exportmetadata[['id', 'source_name',
+        dfmetadatadisplay = dfexportmetadata[['id', 'source_name',
                                                     'code', 'concept_id',
                                                     'data_type', 'data_value',
                                                     'grouping_code', 'grouping_concept',
@@ -66,12 +67,12 @@ def export_review():
                                                     'grouping_sab', 'numeric_operator',
                                                     'preferred_term', 'sab', 'units']]
         # Convert to HTML table.
-        table = metadatadisplay.to_html(classes='table table-hover .table-condensed { font-size: 8px !important; } '
-                                                'table-bordered table-responsive-sm')
+        table = dfmetadatadisplay.to_html(classes='table table-hover .table-condensed { font-size: 8px !important; } '
+                                                  'table-bordered table-responsive-sm')
 
     if request.method == 'POST':
         # Export form content to excel.
-        csv_string = exportmetadata.to_csv(index=False)
+        csv_string = dfexportmetadata.to_csv(index=False)
         # Create a response with the CSV data
         response = make_response(csv_string)
         fname = consortium.split('_')[1].lower()
@@ -86,7 +87,7 @@ def export_review():
 export_tsv_blueprint = Blueprint('export_tsv', __name__, url_prefix='/export/tsv')
 
 
-@export_tsv_blueprint.route('', methods=['POST', 'GET'])
+@export_tsv_blueprint.route('', methods=['POST'])
 def export_tsv():
 
     # Obtain and decode the base64-encoded dictionary of new donor metadata,
@@ -96,12 +97,20 @@ def export_tsv():
         newdonor = pickle.loads(base64.b64decode(newdonorb64[0]))  # Decoded back to dictionary
     else:
         abort(400, 'No new metadata')
-        # Remove irrelevant columns for display purposes.
-    print(newdonor)
-    metadata = pd.DataFrame([newdonor])
-    metadata = df_for_display(df=metadata)
-    # Convert to HTML table.
-    table = metadata.to_html(
-        classes='table table-hover .table-condensed { font-size: 8px !important; } table-bordered table-responsive-sm')
 
-    return render_template('export_review.html', table=table)
+    # Flatten for source_name.
+    dfnewdonortype = getmetadatabytype(dictmetadata=newdonor)
+
+    # Flatten for donor id.
+    donorid = session['donorid']
+    dfexportmetadata = MetadataFrame(metadata=dfnewdonortype, donorid=donorid).dfexport
+
+    # Export form content to tsv.
+    tsv_string = dfexportmetadata.to_csv(index=False,sep='\t')
+    # Create a response with the TSV data
+    response = make_response(tsv_string)
+    # Get the donor ID
+    response.headers["Content-Disposition"] = f"attachment; filename={donorid}_metadata.tsv"
+    response.headers["Content-Type"] = "text/tsv"
+    flash(f'Metadata for {donorid} exported to TSV.')
+    return response

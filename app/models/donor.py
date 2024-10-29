@@ -11,13 +11,12 @@ from flask import abort
 # Helper classes
 # Entity-api functions
 from models.entity import Entity
-
+from models.getmetadatabytype import getmetadatabytype
 
 class DonorData:
 
     def __init__(self, donorid: str, token: str, isforupdate: bool = False):
         """
-
         :param donorid: ID of a donor in a context.
         :param isforupdate: Is this for an update, or existing metadata?
         :param token: globus groups_token for the consortium's entity-api
@@ -26,29 +25,18 @@ class DonorData:
         self.donorid = donorid
         self.entity = Entity(donorid=donorid, token=token)
         self.consortium = self.entity.consortium
-        self.source_type = self.entity
 
         # The highest level key of the metadata dictionary is one of the following:
         # organ_donor_data
         # living_donor_data
 
         if isforupdate:
+            # This instance will contain new metadata.
             self.metadata = {}
         else:
-            self.metadata = self.entity.getdonormetadata()
-            if self.metadata is not None:
-                metadata = self.metadata.get('organ_donor_data')
-                if metadata is not None:
-                    self.metadata_type = 'organ_donor_data'
-                else:
-                    metadata = self.metadata.get('living_donor_data')
-                    if metadata is not None:
-                        self.metadata_type = 'living_donor_data'
-                    else:
-                        msg = ("Invalid donor metadata. The highest-level key should be either "
-                               "'organ_donor_data' or 'living_donor_data'.")
-                        abort(400, msg)
-
+            # This instance will contain existing metadata.
+            dictmetadata = self.entity.getdonormetadata()
+            self.metadata = getmetadatabytype(dictmetadata=dictmetadata)
             self.has_published_datasets = self.entity.has_published_datasets()
             self.descendantcount = self.entity.descendantcount
 
@@ -58,7 +46,7 @@ class DonorData:
         :param grouping_concept: Corresponds to the "grouping_concept" column of a tab in the
         donor metadata valueset
         :param list_concept: Optional list Corresponding to a group of related concepts,
-                             **filtered by** grouping_concpept.
+                             **filtered by** grouping_concept.
         :param key: key in the dictionary of metadata
         :return: the value in the metadata dictionary corresponding to key
         """
@@ -66,7 +54,7 @@ class DonorData:
         if self.metadata is None:
             metadata = {}
         else:
-            metadata = self.metadata.get(self.metadata_type)
+            metadata = self.metadata
 
         # Donor metadata is a list of dicts.
         # Extract the relevant metadata dicts from the list, and then the relevant value from each dict.

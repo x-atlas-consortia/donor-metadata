@@ -128,8 +128,10 @@ def setdefaults(form):
 
     # Age
     # The Age valueset has its own tab.
-    age_grouping_concept = form.valuesetmanager.getcolumnvalues(tab='Age', col='grouping_concept')[0]
-    agelist = form.currentdonordata.getmetadatavalues(grouping_concept=age_grouping_concept, key='data_value')
+    age_concept = form.valuesetmanager.getcolumnvalues(tab='Age', col='concept_id')[0]
+    age_grouping_concept = 'C0001779'
+    agelist = form.currentdonordata.getmetadatavalues(list_concept=age_concept,
+                                                      grouping_concept=age_grouping_concept, key='data_value')
     if len(agelist) > 0:
         form.agevalue.data = float(agelist[0])
 
@@ -169,16 +171,14 @@ def setdefaults(form):
         form.sex.data = 'C0421467'  # Unknown
 
     # Source name
-    # The source name is not encoded in a valuset.
+    # The source name is not encoded in a valueset.
     if form.currentdonordata.metadata is None:
         # No existing metadata.
         form.source.data = 'PROMPT'
-    elif form.currentdonordata.metadata_type == 'living_donor_data':
-        form.source.data = '0'
-    elif form.currentdonordata.metadata_type == 'organ_donor_data':
-        form.source.data = '1'
     else:
-        form.source.data = 'PROMPT'
+        # Obtain the source name from the first metadata list member. The donordata classes flatten metadata so that
+        # source name is in every member of the list.
+        form.source.data = form.currentdonordata.metadata[0].get('source_name')
 
     # Cause of Death
     # The Cause of Death valueset has its own tab. There is no default value.

@@ -71,27 +71,34 @@
             <input name="newdonor" type="hidden" value={{ form.newdonor }} >
             <input name="donorid" type="hidden" value="{{ donorid}}">
         </div>
-        <div class="d-grid gap-2 col-6 mx-auto">
-            {% if form.deepdiff is none %}
-                <button  type="submit" class="btn btn-primary btn-lg disabled" value="Update" aria-disabled="true">Update</button>
-            {% elif form.currentdonordata.descendantcount > 10 %}
-                <button  type="submit" class="btn btn-primary btn-lg disabled" value="Update" aria-disabled="true">Update</button>
-            {% elif form.has_published_datasets %}
-                <button  type="submit" class="btn btn-primary btn-lg disabled" value="Update" aria-disabled="true">Update</button>
-            {% else %}
-                <button  type="submit" class="btn btn-primary btn-lg" value="Update">Update</button>
-            {% endif %}
-            <a href="/" class="btn btn-primary btn-lg">Cancel</a>
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-2">
+                {% if form.deepdiff is none %}
+                    <button  type="submit" class="btn btn-primary btn-lg disabled" value="Update" aria-disabled="true">Update</button>
+                {% elif form.currentdonordata.descendantcount > 10 %}
+                    <button  type="submit" class="btn btn-primary btn-lg disabled" value="Update" aria-disabled="true">Update</button>
+                {% elif form.has_published_datasets %}
+                    <button  type="submit" class="btn btn-primary btn-lg disabled" value="Update" aria-disabled="true">Update</button>
+                {% else %}
+                    <button  type="submit" class="btn btn-primary btn-lg" value="Update">Update</button>
+                {% endif %}
+            </div>
+            <div class="col col-lg-2">
+                <a href="/" class="btn btn-primary btn-lg">Cancel</a>
+            </div>
         </div>
     </div>
     <br>
 </form>
 <form method=post action="/export/tsv">
-        <div>
-            <input name="newdonortsv" type="hidden" value={{ form.newdonortsv }} >
+    <input name="newdonortsv" type="hidden" value={{ form.newdonortsv }} >
+    <div class="container text-left">
+        <div class="row justify-content-md-center">
+            <div class="col col-lg-4">
+                <button  type="submit" class="btn btn-primary btn-lg" value="TSV">TSV</button>
+            </div>
         </div>
-    <div class="d-grid gap-2 col-6 mx-auto">
-        <button  type="submit" class="btn btn-primary btn-lg" value="Export to TSV">Export to TSV</button>
     </div>
 </form>
+<br>
 {% endblock %}
