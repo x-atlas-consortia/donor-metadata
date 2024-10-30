@@ -62,6 +62,7 @@
     <!-- Flask flash message display -->
     {% with messages = get_flashed_messages() %}
       {% if messages %}
+
         <div class="text-bg-success p-3">
           <ul class=flashes>
             {% for message in messages %}
@@ -106,15 +107,14 @@
    <!-- <p class="bg-secondary text-white fs-4">Environment: {% if "dev" in config["ENDPOINT_BASE"]%} development {% else %} production {% endif %}</p>-->
     {% block content %}
     {% endblock %}
-      <footer class="text-center text-lg-start fixed-bottom">
-        <div class="container-fluid">
-          <p>HuBMAP/SenNet Human Donor Metadata Curator/Exporter © 2024  Atlas Consortia</p>
-          <a href="https://www.flaticon.com/free-icons/healthcare-and-medical" title="healthcare and medical icons">
-            <img src="/static/doctor_11542314.png" alt="Icon by Iconriver" data-height="234" style="max-height: 40px;"> Image Attribution
+      <footer>
+        <div class="navbar-fixed-bottom">
+          <a class="navbar-brand" href="https://www.flaticon.com/free-icons/healthcare-and-medical" title="healthcare and medical icons">
+            <img src="/static/doctor_11542314.png" alt="Icon by Iconriver" data-height="234" style="max-height: 30px;" align="right">
+            <p class="text-center">HuBMAP/SenNet Human Donor Metadata Curator/Exporter © 2024  Atlas Consortia</p>
           </a>
         </div>
       </footer>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js/bootstrap.bundle.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   </body>
 </html>

@@ -1,9 +1,16 @@
-# Class representing interactions with the search-api for donors
+# Class representing interactions with the search-api for donors.
+# Converts a call to the search-api into a DataFrame flattened to the level of individual metadata element, with
+# each row including columns for common elements, including donor id.
 
 from flask import abort
 import requests
 import pandas as pd
 
+# Helper classes
+# Optimizes donor metadata for display in a DataFrame
+from .metadataframe import MetadataFrame
+
+from .getmetadatabytype import getmetadatabytype
 
 class SearchAPI:
 
@@ -29,15 +36,16 @@ class SearchAPI:
         if self.consortium == 'sennetconsortium.org':
             self.headers['X-SenNet-Application'] = 'portal-ui'
 
-        self.metadata = self.getalldonormetadata()
+        self.dfalldonormetata = self._getalldonormetadata()
 
-    def getalldonormetadata(self) -> pd.DataFrame:
+    def _getalldonormetadata(self) -> pd.DataFrame:
         """
         Searches for metadata for donor in a consortium, using the search-api.
-        :return: if there is a donor entity with id=donorid, a dict that corresponds to the metadata
-        object.
+        :return: if there is a donor entity with id=donorid, a DataFrame with flattened donor metadata.
         """
-        listrow = []
+        listalldonordf = []
+
+        # HuBMAP entity-api uses donors; SenNet entity-api uses sources.
         if self.consortium == 'hubmapconsortium.org':
             entities = 'donors'
         else:
@@ -50,51 +58,30 @@ class SearchAPI:
 
             respjson = response.json()
 
-            for donor in respjson:
+            for donorjson in respjson:
 
                 # Only return metadata for human sources in SenNet.
                 if self.consortium == 'sennetconsortium.org':
-                    entity_type = donor['source_type']
-                    getdonor = entity_type == 'Human'
+                    source_type = donorjson.get('source_type')
+                    donorid = donorjson.get('sennet_id')
+                    getdonor = source_type == 'Human'
                 else:
                     getdonor = True
+                    donorid = donorjson.get('hubmap_id')
 
                 if getdonor:
-                    donor_metadata = donor.get('metadata')
-                    # Metadata is keyed differently based on whether the donor was living or an organ donor.
-                    if donor_metadata is not None:
-                        if 'organ_donor_data' in donor_metadata.keys():
-                            source_name = 'organ_donor_data'
-                        else:
-                            source_name = 'living_donor_data'
+                    dictmetadata = donorjson.get('metadata')
+                    if dictmetadata is not None and dictmetadata!={}:
+                        metadata = getmetadatabytype(dictmetadata=dictmetadata)
+                        donorexport = MetadataFrame(metadata=metadata, donorid=donorid)
+                        listalldonordf.append(donorexport.dfexport)
 
-                        # ID key is based on consortium.
-                        if self.consortium == 'hubmapconsortium.org':
-                            donorid = donor['hubmap_id']
-                        else:
-                            donorid = donor['sennet_id']
-
-                        metadata = donor_metadata.get(source_name)
-                        if metadata is not None:
-                            for m in metadata:
-                                # Flatten each metadata element for a donor into a row that includes the donor id and
-                                # source name. Order columns.
-                                mnew = {}
-                                mnew['id'] = donorid
-                                mnew['source_name'] = source_name
-                                for key in m:
-                                    mnew[key] = m[key]
-
-                                # Create the metadata element into a DataFrame, wrapping the dict in a list.
-                                dfdonor = pd.DataFrame([mnew])
-                                listrow.append(dfdonor)
-
-            if len(listrow) == 0:
+            if len(listalldonordf) == 0:
                 abort(404, f'No human donors found in provenance for {self.consortium }'
                            f' in environment {self.urlbase}')
 
             # Build a DataFrame for all human donors with metadata in the consortium.
-            dfconsortium = pd.concat(listrow, ignore_index=True)
+            dfconsortium = pd.concat(listalldonordf, ignore_index=True)
             return dfconsortium
 
         elif response.status_code == 404:
@@ -103,4 +90,4 @@ class SearchAPI:
         elif response.status_code == 400:
             abort(response.status_code, response.json().get('error'))
         else:
-            abort(500,'Error when calling the param-search endpoint in search-api')
+            abort(500, 'Error when calling the param-search endpoint in search-api')

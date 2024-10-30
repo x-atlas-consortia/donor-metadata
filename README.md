@@ -61,17 +61,17 @@ The curation solution features:
 ## User Interface
 The curator is a Python Web application involving:
 
-| tool                                                                            | purpose                                                     |
-|---------------------------------------------------------------------------------|-------------------------------------------------------------|
-| Python                                                                          | application function                                        |
-| [Flask](https://flask.palletsprojects.com/en/3.0.x/)                            | Python web framework                                        |
-| [Flask Blueprints](https://flask.palletsprojects.com/en/3.0.x/blueprints/)      | modular Flask applications                                  |
-| [WTForms](https://wtforms.readthedocs.io/en/2.3.x/forms/)                       | forms in Flask applications                                 |
-| [Jinja](https://jinja.palletsprojects.com/en/3.1.x/)                            | Web page templating                                         |
+| tool                                                                            | purpose                                                      |
+|---------------------------------------------------------------------------------|--------------------------------------------------------------|
+| Python                                                                          | application function                                         |
+| [Flask](https://flask.palletsprojects.com/en/3.0.x/)                            | Python web framework                                         |
+| [Flask Blueprints](https://flask.palletsprojects.com/en/3.0.x/blueprints/)      | modular Flask applications                                   |
+| [WTForms](https://wtforms.readthedocs.io/en/2.3.x/forms/)                       | forms in Flask applications                                  |
+| [Jinja](https://jinja.palletsprojects.com/en/3.1.x/)                            | Web page templating                                          |
 | Javascript                                                                      | Event handling and UI features (including a spinner control) |
-| [Bootstrap](https://getbootstrap.com/)                                          | UI toolkit                                                  |
-| [HuBMAP entity-api](https://smart-api.info/ui/0065e419668f3336a40d1f5ab89c6ba3) | Reads/updates donor metadata in HuBMAP provenance           |
-| [SenNet entity-api](https://smart-api.info/ui/7d838c9dee0caa2f8fe57173282c5812) | Reads/updates source metadata in SenNet provenance     |
+| [Bootstrap](https://getbootstrap.com/)                                          | UI toolkit                                                   ||
+| [HuBMAP entity-api](https://smart-api.info/ui/0065e419668f3336a40d1f5ab89c6ba3) | Reads/updates donor metadata in HuBMAP provenance            |
+| [SenNet entity-api](https://smart-api.info/ui/7d838c9dee0caa2f8fe57173282c5812) | Reads/updates source metadata in SenNet provenance           |
 
 
 ## Configuration
@@ -96,13 +96,12 @@ The application works with three databases:
 ***
 # Workflows
 
-There are two workflows in the application:
+There are three workflows in the application:
 1. A **curation workflow** that allows for editing of the metadata for a single donor in a consortium.
 2. An **export workflow** that exports metadata for all donors in a consortium to a CSV file.
+3. An **export workflow** that exports metadata for a single donor to TSV.
 
 # Curation workflow
-![doctor_11542314.png](app%2Fstatic%2Fdoctor_11542314.png)
-![Curator application architecture.jpg](doc%2FCurator%20application%20architecture.jpg)
 
 ## Application (app)
 The application:
@@ -120,7 +119,7 @@ The application:
    * authenticates the user in the appropriate Globus context
    * works with the **donor** helper class to verify that the donor is in provenance
    * redirects either to the Edit page or the custom 404 page
-![img.png](doc/img.png)
+
 
 ## Edit page
 1. The Edit page **edit.html** includes a form that allows metadata data entry.
@@ -136,7 +135,6 @@ The application:
    * compares current and revised metadata JSON for the donor
    * posts JSONs for current metadata, revised metadata, and comparison to **review.html**
 
-![img_1.png](doc/img_1.png)
 ## Review page
 1. The Review page **review.html** displays:
    * the current metadata JSON for the donor
@@ -145,20 +143,16 @@ The application:
 2. The Blueprint route */review*:
    * works with the **donor** helper class to update the donor metadata in provenance
    * redirects to **index.html**
-![img_2.png](doc/img_2.png)
+
    
 ***
 # Export workflow
-![csv.png](app%2Fstatic%2Fcsv.png)
-![Export application architecture.jpg](doc%2FExport%20application%20architecture.jpg)
 
 ## Export select page
 The page allows the user to select a consortium for which donor metadata should be exported.
-![img_3.png](doc/img_3.png)
 
 ## Export review page
 The page displays in spreadsheet format the metadata for human donors in the consortium provenance.
-![img_4.png](doc/img_4.png)
 
 The **Export** button downloads a file named *consortium*_metadata.csv.
 
@@ -181,6 +175,7 @@ This file contains a custom Jinja script used to populate content from WTForms f
 | donor           | represents donor metadata                      | entity     |
 | DonorUI         | encapsulates the Flask app                     | app        |
 | searchAPI       | reads from a provenance database               | search-api |
+| metadataframe   | formats metadata for export (flattens)         |            |
 
 
 # Business rules
