@@ -610,10 +610,16 @@ def translate_field_value_to_metadata(form, formfield: Field, tab: str, concept_
 
     # Get values from form.
     value = formfield.data
+
+    # Unit is not encoded.
     if unitfield is None:
-        unit_value = ''
+        # Look for a default unit.
+        dictdefaultunit = form.valuesetmanager.getvaluesetrow(tab='Defaults',concept_id=concept_id)
+        if dictdefaultunit == {}:
+            abort(500,f'Valueset manager does not have default units for field {form.formfield.name}')
+        else:
+            unit_value=dictdefaultunit['units']
     else:
-        # Unit is not encoded.
         unit_value = dict(unitfield.choices).get(unitfield.data)
 
     # Convert to metric:
@@ -702,6 +708,7 @@ def buildnewdonordata(form, token: str, donorid: str) -> DonorData:
     bmi = translate_field_value_to_metadata(form, formfield=form.bmi, tab='Measurements', concept_id='C1305855')
     if bmi != {}:
         donor.metadata[donor_data_key].append(bmi)
+
 
     # waist circumference
     waist = translate_field_value_to_metadata(form, formfield=form.waistvalue, unitfield=form.waistunit,
