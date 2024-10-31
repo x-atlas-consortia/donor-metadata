@@ -172,18 +172,21 @@ def setdefaults(form):
 
     # Source name
     # The source name is not encoded in a valueset.
-    if form.currentdonordata.metadata is None:
+    # The source name is the first key of the metadata dictionary, and can be either 'living_donor_data'
+    # or 'organ_donor_data'.
+    if form.currentdonordata.metadata is not None:
+        source = 'living_donor_data'
+        if source not in form.currentdonordata.metadata.keys():
+            source = 'organ_donor_data'
+        if source not in form.currentdonordata.metadata.keys():
+            abort(500,'Unknown donor metadata key')
+        form.source.data = source
+    else:
         # No existing metadata.
         form.source.data = 'PROMPT'
-    else:
-        # Obtain the source name from the first metadata list member. The donordata classes flatten metadata so that
-        # source name is in every member of the list.
-        form.source.data = form.currentdonordata.metadata[0].get('source_name')
 
     # Cause of Death
     # The Cause of Death valueset has its own tab. There is no default value.
-    # cod_grouping_concept = form.valuesetmanager.getcolumnvalues(tab='Cause of Death', col='grouping_concept')[0]
-    # codlist = form.currentdonordata.getmetadatavalues(grouping_concept=cod_grouping_concept, key='concept_id')
     cod_concepts = form.valuesetmanager.getcolumnvalues(tab='Cause of Death', col='concept_id')
     grouping_concept = 'C0007465'  # Cause of Death
     codlist = form.currentdonordata.getmetadatavalues(list_concept=cod_concepts,
@@ -511,13 +514,11 @@ def setdefaults(form):
         has_error = True
 
     if form.currentdonordata.descendantcount > 10:
-        msg = (f'Donor {form.currentdonordata.donorid} is associated with over 10 descendants. '
-               f'Edit manually.')
+        msg = (f'Donor {form.currentdonordata.donorid} is associated with {form.currentdonordata.descendantcount} descendants.')
         flash(msg)
         # has_error = True
     elif form.currentdonordata.has_published_datasets:
-        msg = (f'Donor {form.currentdonordata.donorid} is associated with one or more published datasets. '
-               f'Edit manually.')
+        msg = (f'Donor {form.currentdonordata.donorid} is associated with one or more published datasets.')
         flash(msg)
         # has_error = True
 
@@ -590,6 +591,9 @@ def translate_field_value_to_metadata(form, formfield: Field, tab: str, concept_
 
         Converts to metric units.
 
+        Corrects legacy data entry issues with respect to:
+        1. Medical History
+
         Numeric values in the donor
         metadata object are strings.
         :param form: the edit form
@@ -614,7 +618,7 @@ def translate_field_value_to_metadata(form, formfield: Field, tab: str, concept_
     # Unit is not encoded.
     if unitfield is None:
         # Look for a default unit.
-        dictdefaultunit = form.valuesetmanager.getvaluesetrow(tab='Defaults',concept_id=concept_id)
+        dictdefaultunit = form.valuesetmanager.getvaluesetrow(tab='Measurements',concept_id=concept_id)
         if dictdefaultunit == {}:
             abort(500,f'Valueset manager does not have default units for field {form.formfield.name}')
         else:
@@ -629,12 +633,21 @@ def translate_field_value_to_metadata(form, formfield: Field, tab: str, concept_
     if concept_id in ['C0005890', 'C0455829']:
         if unitfield.data == '1':  # in
             unit_value = 'cm'
-            value = float(value) * 2.54
+            value = round(float(value) * 2.54,2)
 
     if concept_id == 'C0005910':
         if unitfield.data == '1':  # lb
             unit_value = 'kg'
-            value = float(value) / 2.2
+            value = round(float(value) / 2.2,2)
+
+
+    # Some legacy metadata incorrectly coded:
+    # 1. Race
+    # 2. Sex
+    # 3. Medical History
+    if formfield.name in ['race', 'sex', 'medhx']:
+        dictvalueset['data_value'] = dictvalueset['preferred_term']
+
 
     dictvalueset['data_value'] = str(value)
     dictvalueset['units'] = unit_value

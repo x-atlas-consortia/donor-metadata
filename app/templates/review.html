@@ -75,10 +75,6 @@
             <div class="col col-lg-2">
                 {% if form.deepdiff is none %}
                     <button  type="submit" class="btn btn-primary btn-lg disabled" value="Update" aria-disabled="true">Update</button>
-                {% elif form.currentdonordata.descendantcount > 10 %}
-                    <button  type="submit" class="btn btn-primary btn-lg disabled" value="Update" aria-disabled="true">Update</button>
-                {% elif form.has_published_datasets %}
-                    <button  type="submit" class="btn btn-primary btn-lg disabled" value="Update" aria-disabled="true">Update</button>
                 {% else %}
                     <button  type="submit" class="btn btn-primary btn-lg" value="Update">Update</button>
                 {% endif %}
@@ -95,7 +91,7 @@
     <div class="container text-left">
         <div class="row justify-content-md-center">
             <div class="col col-lg-4">
-                <button  type="submit" class="btn btn-primary btn-lg" value="TSV">TSV</button>
+                <button  type="submit" class="btn btn-primary btn-lg" value="Export to TSV">Export to TSV</button>
             </div>
         </div>
     </div>

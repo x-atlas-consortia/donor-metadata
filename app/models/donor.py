@@ -35,8 +35,9 @@ class DonorData:
             self.metadata = {}
         else:
             # This instance will contain existing metadata.
-            dictmetadata = self.entity.getdonormetadata()
-            self.metadata = getmetadatabytype(dictmetadata=dictmetadata)
+            #dictmetadata = self.entity.getdonormetadata()
+            #self.metadata = getmetadatabytype(dictmetadata=dictmetadata)
+            self.metadata = self.entity.getdonormetadata()
             self.has_published_datasets = self.entity.has_published_datasets()
             self.descendantcount = self.entity.descendantcount
 
@@ -52,16 +53,25 @@ class DonorData:
         """
 
         if self.metadata is None:
-            metadata = {}
-        else:
-            metadata = self.metadata
+            return []
 
-        # Donor metadata is a list of dicts.
+        # If the donor has metadata, the metadata object is a dict in form:
+        # {<key>:[list of dicts]}
+        # in which <key> is either 'living_donor_data' or 'organ_donor_data'.
+        # Get the list of metadata elements.
+        source_name = 'living_donor_data'
+        if source_name not in self.metadata.keys():
+            source_name = 'organ_donor_data'
+        if source_name not in self.metadata.keys():
+            abort(500,'unknown donor metadata key')
+
+        listmetadata = self.metadata.get(source_name)
+
         # Extract the relevant metadata dicts from the list, and then the relevant value from each dict.
         listret = []
 
         if list_concept is not None:
-            for m in metadata:
+            for m in listmetadata:
                 m_concept = m.get('concept_id').strip()
                 if m_concept in list_concept:
                     group = m.get('grouping_concept').strip()
@@ -70,7 +80,7 @@ class DonorData:
                         if val is not None:
                             listret.append(val)
         elif grouping_concept is not None:
-            for m in metadata:
+            for m in listmetadata:
                 group = m.get('grouping_concept').strip()
                 if group == grouping_concept:
                     val = m.get(key)

@@ -66,6 +66,7 @@ class Entity:
         url = f'{self.urlbase}.{self.consortium}.org/entities/{self.donorid}'
         response = requests.get(url=url, headers=self.headers)
 
+        donor = {}
         if response.status_code == 200:
             rjson = response.json()
             entity_type = rjson.get('entity_type')
@@ -121,6 +122,10 @@ class Entity:
         response = requests.put(url, json=data, headers=self.headers)
 
         if response.status_code not in [200, 201]:
+            msg = f'Error after calling /entities PUT endpoint in entity-api for donor {self.donorid}. '
+            if response.status_code == 403:
+                msg = msg + (f"This donor is locked--most likely because it is associated with a published dataset. "
+                             f"To update metadata, export to TSV for manual update.")
             abort(response.status_code, f'Error after calling /entities PUT endpoint '
                                         f'in entity-api for donor {self.donorid} ')
 
