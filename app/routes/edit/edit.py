@@ -513,13 +513,13 @@ def setdefaults(form):
         flash(msg)
         has_error = True
 
-    if form.currentdonordata.descendantcount > 10:
-        msg = (f'Donor {form.currentdonordata.donorid} is associated with {form.currentdonordata.descendantcount} descendants.')
-        flash(msg)
+    #if form.currentdonordata.descendantcount > 10:
+        #msg = (f'Donor {form.currentdonordata.donorid} is associated with {form.currentdonordata.descendantcount} descendants.')
+        #flash(msg)
         # has_error = True
-    elif form.currentdonordata.has_published_datasets:
-        msg = (f'Donor {form.currentdonordata.donorid} is associated with one or more published datasets.')
-        flash(msg)
+    #elif form.currentdonordata.has_published_datasets:
+        #msg = (f'Donor {form.currentdonordata.donorid} is associated with one or more published datasets.')
+        #flash(msg)
         # has_error = True
 
     if len(heightunitlist) > 0:

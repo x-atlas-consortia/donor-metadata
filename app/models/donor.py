@@ -36,10 +36,9 @@ class DonorData:
         else:
             # This instance will contain existing metadata.
             #dictmetadata = self.entity.getdonormetadata()
-            #self.metadata = getmetadatabytype(dictmetadata=dictmetadata)
             self.metadata = self.entity.getdonormetadata()
-            self.has_published_datasets = self.entity.has_published_datasets()
-            self.descendantcount = self.entity.descendantcount
+            #self.has_published_datasets = self.entity.has_published_datasets()
+            #self.descendantcount = self.entity.descendantcount
 
     def getmetadatavalues(self, key: str, grouping_concept=None, list_concept=None) -> list:
         """

@@ -3,7 +3,7 @@ Routes for the metadata export workflow.
 
 """
 
-from flask import Blueprint, request, redirect, render_template, session, make_response, flash, abort
+from flask import Blueprint, request, redirect, render_template, session, make_response, flash, abort, send_file
 import pickle
 import base64
 
@@ -84,10 +84,9 @@ def export_review():
     return render_template('export_review.html', table=table)
 
 
-export_tsv_blueprint = Blueprint('export_tsv', __name__, url_prefix='/export/tsv')
+export_tsv_blueprint = Blueprint('export_tsv_review_new', __name__, url_prefix='/export/tsv')
 
-
-@export_tsv_blueprint.route('', methods=['POST'])
+@export_tsv_blueprint.route('', methods=['POST','GET'])
 def export_tsv():
 
     # Obtain and decode the base64-encoded dictionary of new donor metadata,
@@ -103,14 +102,18 @@ def export_tsv():
 
     # Flatten for donor id.
     donorid = session['donorid']
+    consortium = session['consortium']
+
     dfexportmetadata = MetadataFrame(metadata=dfnewdonortype, donorid=donorid).dfexport
 
-    # Export form content to tsv.
+    # Export new donor metadata to tsv.
     tsv_string = dfexportmetadata.to_csv(index=False,sep='\t')
+
     # Create a response with the TSV data
     response = make_response(tsv_string)
     # Get the donor ID
     response.headers["Content-Disposition"] = f"attachment; filename={donorid}_metadata.tsv"
     response.headers["Content-Type"] = "text/tsv"
     flash(f'Metadata for {donorid} exported to TSV.')
+
     return response
