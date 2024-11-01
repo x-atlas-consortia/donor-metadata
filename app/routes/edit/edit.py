@@ -176,11 +176,14 @@ def setdefaults(form):
     # or 'organ_donor_data'.
     if form.currentdonordata.metadata is not None:
         source = 'living_donor_data'
-        if source not in form.currentdonordata.metadata.keys():
+        if source in form.currentdonordata.metadata.keys():
+            form.source.data = '0'
+        else:
             source = 'organ_donor_data'
-        if source not in form.currentdonordata.metadata.keys():
-            abort(500,'Unknown donor metadata key')
-        form.source.data = source
+            if source in form.currentdonordata.metadata.keys():
+                form.source.data = '1'
+            else:
+                abort(500,'Unknown donor metadata key')
     else:
         # No existing metadata.
         form.source.data = 'PROMPT'
