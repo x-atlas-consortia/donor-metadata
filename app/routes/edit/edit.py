@@ -146,7 +146,9 @@ def setdefaults(form):
     # Race
     # The Race valueset has its own tab. The default value is Unknown.
     race_grouping_concept = form.valuesetmanager.getcolumnvalues(tab='Race', col='grouping_concept')[0]
+    print(race_grouping_concept)
     racelist = form.currentdonordata.getmetadatavalues(grouping_concept=race_grouping_concept, key='concept_id')
+    print(racelist)
     if len(racelist) > 0:
         form.race.data = racelist[0]
     else:

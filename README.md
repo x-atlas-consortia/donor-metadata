@@ -98,8 +98,8 @@ The application works with three databases:
 
 There are three workflows in the application:
 1. A **curation workflow** that allows for editing of the metadata for a single donor in a consortium.
-2. An **export workflow** that exports metadata for all donors in a consortium to a CSV file.
-3. An **export workflow** that exports metadata for a single donor to TSV.
+2. An **export workflow** that exports metadata for all donors in a consortium to a file in spreadsheet format (CSV or TSV).
+3. An **export workflow** that exports metadata for a single donor to a file in spreadsheet format.
 
 # Curation workflow
 
@@ -142,19 +142,29 @@ The application:
    * the comparison of the current and new metadata JSONs
 2. The Blueprint route */review*:
    * works with the **donor** helper class to update the donor metadata in provenance
+   * redirects to the **export_review.html** for export
    * redirects to **index.html**
 
    
 ***
-# Export workflow
+# Export workflows
 
-## Export select page
+## All donors for consortium - Export select page
 The page allows the user to select a consortium for which donor metadata should be exported.
 
-## Export review page
-The page displays in spreadsheet format the metadata for human donors in the consortium provenance.
+## Single donor - Export button on Review page
+This button allows the user to export for a single donor.
 
-The **Export** button downloads a file named *consortium*_metadata.csv.
+## Export review page
+The page displays in spreadsheet format the metadata for a set of human donors in the consortium provenance.
+
+The **CSV** and **TSV** buttons download a file with name in format
+*scope*_metadata.*format*
+
+in which 
+- *scope* is either the name of the consortium or the donor id
+- *format* is either **csv** or **tsv**.
+
 
 # base.html
 All HTML files in the application inherit from **base.html**, which includes:
@@ -180,7 +190,6 @@ This file contains a custom Jinja script used to populate content from WTForms f
 
 # Business rules
 1. The application can only update metadata for an existing donor; it does not create donor entities in provenance.
-2. The application will not update metadata for a donor that is associated with published datasets. 
 2. The application can document a maximum of 10 medical conditions. The application cannot update metadata for a donor if the current metadata includes more than 10 conditions.
 3. The application will only update metadata if there was a change.
 4. In SenNet, the application will only update donors that are human sources.
@@ -194,6 +203,11 @@ An authentication token for a consortium's entity-api is set via the consortium'
 The application will raise a HTTP 401 exception when:
 1. The authentication token expires at the consortium level.
 2. The authentication token is for the incorrect consortium--e.g., if the user provides a HuBMAP token for an update to a donor in SenNet.
+
+## 403 (Prohibited) errors
+If a donor is associated with published datasets (also known as "locked"), updating metadata requires administrative privileges, such as membership in a Globus admin group.
+Attepts to update metadata for restri without the appropriate privileges will result in a 403 error.
+
 ***
 # Potential issues
 ## Non-compliant current data

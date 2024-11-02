@@ -30,7 +30,7 @@ class SearchAPI:
         # The url base depends on both the consortium and the enviroment (i.e., development vs production).
         self.urlbase = f'https://search.api.{self.consortium}/'
         if self.consortium == 'hubmapconsortium.org':
-            self.urlbase = f'{self.urlbase}/v3/'
+            self.urlbase = f'{self.urlbase}v3/'
 
         self.headers = {'Authorization': f'Bearer {self.token}'}
         if self.consortium == 'sennetconsortium.org':
@@ -68,7 +68,6 @@ class SearchAPI:
                 else:
                     getdonor = True
                     donorid = donorjson.get('hubmap_id')
-
                 if getdonor:
                     dictmetadata = donorjson.get('metadata')
                     if dictmetadata is not None and dictmetadata!={}:
