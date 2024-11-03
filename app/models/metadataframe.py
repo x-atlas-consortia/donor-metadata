@@ -19,7 +19,6 @@ class MetadataFrame:
                 # source name. Order columns.
                 mnew = {'id': donorid}
                 for key in m:
-                    print(key)
                     mnew[key] = m[key]
 
                 # Create the metadata element into a DataFrame, wrapping the dict in a list.
