@@ -128,7 +128,7 @@ def setdefaults(form):
 
     # Age
     # The Age valueset has its own tab.
-    age_concept = form.valuesetmanager.getcolumnvalues(tab='Age', col='concept_id')[0]
+    age_concept = form.valuesetmanager.getcolumnvalues(tab='Age', col='concept_id')
     age_grouping_concept = 'C0001779'
     agelist = form.currentdonordata.getmetadatavalues(list_concept=age_concept,
                                                       grouping_concept=age_grouping_concept, key='data_value')
@@ -137,18 +137,19 @@ def setdefaults(form):
 
     # Age Units
     # The default age unit is years.
-    ageunitlist = form.currentdonordata.getmetadatavalues(grouping_concept=age_grouping_concept, key='units')
+    # Age is different in that there are two separate values for "age in years" and "age in months". The units field
+    # for age is thus duplicative.
+    print(form.ageunit.choices)
+    ageunitlist = form.currentdonordata.getmetadatavalues(list_concept=age_concept,grouping_concept=age_grouping_concept, key='concept_id')
     if len(ageunitlist) > 0:
         form.ageunit.data = ageunitlist[0]
     else:
-        form.ageunit.data = 'C0001779'  # years
+        form.ageunit.data = 'years'  # years
 
     # Race
     # The Race valueset has its own tab. The default value is Unknown.
     race_grouping_concept = form.valuesetmanager.getcolumnvalues(tab='Race', col='grouping_concept')[0]
-    print(race_grouping_concept)
     racelist = form.currentdonordata.getmetadatavalues(grouping_concept=race_grouping_concept, key='concept_id')
-    print(racelist)
     if len(racelist) > 0:
         form.race.data = racelist[0]
     else:
@@ -269,7 +270,6 @@ def setdefaults(form):
         # Translate the metadata value into its corresponding selection in the list. Convert known variances in
         # unit.
         dictchoices = dict(form.weightunit.choices)
-        print(dictchoices)
         if weightunitlist[0] == 'pounds':
             weightunitlist[0] = 'lb'
         if weightunitlist[0] not in ['lb', 'kg']:
