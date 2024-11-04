@@ -153,7 +153,7 @@ def setdefaults(form):
     if len(racelist) > 0:
         form.race.data = racelist[0]
     else:
-        form.race.data = 'C0439673'  # Unknown
+        form.race.data = 'C1532697'  # Unknown
 
     # Ethnicity
     # The Ethnicity valueset has its own tab. There is no default value.

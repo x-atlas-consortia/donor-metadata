@@ -62,8 +62,8 @@ class DonorUI:
 
         # The consortium authentication token is stored in a session cookie.
         # Set cookie expiration:
-        # 1. Set the session lifetime to 5 minutes (in seconds).
-        self.app.config['PERMANENT_SESSION_LIFETIME'] = 300
+        # 1. Set the session lifetime to 10 minutes (in seconds).
+        self.app.config['PERMANENT_SESSION_LIFETIME'] = 600
 
         # Custom 400 error handler.
         @self.app.errorhandler(400)
