@@ -29,7 +29,8 @@ def validate_age(form, field):
     if age <= 0:
         raise ValidationError('The minimum age is 1 month.')
     if age > 89 and ageunit == 'C0001779':  # UMLS CUI for age in years
-        raise ValidationError('All ages over 89 years must be set to 90 years.')
+        if age != 90:
+            raise ValidationError('All ages over 89 years must be set to 90 years.')
 
 
 def validate_selectfield_default(form, field):
