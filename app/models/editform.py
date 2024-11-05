@@ -183,7 +183,7 @@ class EditForm(Form):
     tobacco = SelectField('Tobacco history', choices=tobaccos,
                           validators=[validate_selectfield_default, validators.Optional()])
 
-    list_alcohol_concepts = ['C0001948', 'C0457801']
+    list_alcohol_concepts = ['C0001948', 'C0457801', 'C0001969']
     alcohols = valuesetmanager.getvaluesettuple(tab='Social History', list_concepts=list_alcohol_concepts,
                                                 addprompt=True)
     alcohol = SelectField('Alcohol history', choices=alcohols,

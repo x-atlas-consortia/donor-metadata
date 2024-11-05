@@ -139,7 +139,6 @@ def setdefaults(form):
     # The default age unit is years.
     # Age is different in that there are two separate values for "age in years" and "age in months". The units field
     # for age is thus duplicative.
-    print(form.ageunit.choices)
     ageunitlist = form.currentdonordata.getmetadatavalues(list_concept=age_concept,grouping_concept=age_grouping_concept, key='concept_id')
     if len(ageunitlist) > 0:
         form.ageunit.data = ageunitlist[0]
@@ -463,7 +462,7 @@ def setdefaults(form):
     # Alcohol
     # Alcohol is categorical. Its valueset is a subset of rows on the "Social History" tab. The
     # valueset concepts do not share a grouping concept.
-    alcohol_concepts = ['C0001948', 'C0457801']
+    alcohol_concepts = ['C0001948', 'C0457801', 'C0001969']
     grouping_concept = 'C0424945'
     alcohollist = form.currentdonordata.getmetadatavalues(list_concept=alcohol_concepts,
                                                           grouping_concept=grouping_concept, key='concept_id')
