@@ -151,6 +151,9 @@ def setdefaults(form):
     racelist = form.currentdonordata.getmetadatavalues(grouping_concept=race_grouping_concept, key='concept_id')
     if len(racelist) > 0:
         form.race.data = racelist[0]
+    elif racelist[0] == 'C0439673':
+        # The concept for "unknown race" replaced "unknown".
+        form.race.data = 'C1532697'  # Unknown
     else:
         form.race.data = 'C1532697'  # Unknown
 
