@@ -756,13 +756,13 @@ def buildnewdonordata(form, token: str, donorid: str) -> DonorData:
         donor.metadata[donor_data_key].append(lipase)
 
     # eGFR
-    egfr = translate_field_value_to_metadata(form, formfield=form.lipase, tab='Measurements',
+    egfr = translate_field_value_to_metadata(form, formfield=form.egfr, tab='Measurements',
                                              concept_id='C3274401')
     if egfr != {}:
         donor.metadata[donor_data_key].append(egfr)
 
     # Creatinine
-    secr = translate_field_value_to_metadata(form, formfield=form.lipase, tab='Measurements',
+    secr = translate_field_value_to_metadata(form, formfield=form.secr, tab='Measurements',
                                              concept_id='C0600061')
     if secr != {}:
         donor.metadata[donor_data_key].append(secr)
