@@ -26,8 +26,10 @@ def validate_age(form, field):
     ageunit = form.ageunit.data
     age = field.data
 
-    if age <= 0:
-        raise ValidationError('The minimum age is 1 month.')
+    #if age <= 0:
+        #raise ValidationError('The minimum age is 1 month.')
+    if age is None:
+        age = 0
     if age > 89 and ageunit == 'C0001779':  # UMLS CUI for age in years
         if age != 90:
             raise ValidationError('All ages over 89 years must be set to 90 years.')
@@ -95,7 +97,7 @@ class EditForm(Form):
     ageunits = valuesetmanager.getvaluesettuple(tab='Age', group_term='Age', col='units')
     ageunit = SelectField('units', choices=ageunits)
     agevalue = DecimalField('Age (value)',
-                            places=1, validators=[validators.DataRequired(), validators.NumberRange(min=0), validate_age])
+                            places=1, validators=[validate_age])
 
     # Race
     races = valuesetmanager.getvaluesettuple(tab='Race', group_term='Race')
