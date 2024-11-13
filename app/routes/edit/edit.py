@@ -149,11 +149,15 @@ def setdefaults(form):
     # The Race valueset has its own tab. The default value is Unknown.
     race_grouping_concept = form.valuesetmanager.getcolumnvalues(tab='Race', col='grouping_concept')[0]
     racelist = form.currentdonordata.getmetadatavalues(grouping_concept=race_grouping_concept, key='concept_id')
-    if len(racelist) > 0:
-        form.race.data = racelist[0]
-    elif racelist[0] == 'C0439673':
-        # The concept for "unknown race" replaced "unknown".
+    print(racelist)
+    if racelist is None:
         form.race.data = 'C1532697'  # Unknown
+    elif len(racelist) > 0:
+        if racelist[0] == 'C0439673':
+            # The concept for "unknown race" replaced "unknown".
+            form.race.data = 'C1532697'  # Unknown
+        else:
+            form.race.data = racelist[0]
     else:
         form.race.data = 'C1532697'  # Unknown
 
