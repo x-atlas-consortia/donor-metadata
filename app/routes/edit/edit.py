@@ -481,15 +481,15 @@ def setdefaults(form):
     # Drug
     # Drug is categorical. Its valueset is a subset of rows on the "Social History" tab. The
     # valueset concepts do not share a grouping concept.
+
+    # There can be multiple forms of "other drug". Allow up to 3, based on current data experience.
     drug_concepts = ['C4518790', 'C0524662', 'C0242566', 'C1456624', 'C3266350',
                      'C0281875', 'C0013146', 'C0239076']
     grouping_concept = 'C0424945'
     druglist = form.currentdonordata.getmetadatavalues(list_concept=drug_concepts,
                                                        grouping_concept=grouping_concept, key='concept_id')
-    if len(druglist) > 0:
-        form.drug.data = druglist[0]
-    else:
-        form.drug.data = 'PROMPT'
+    formdrugdata = [form.drug_0, form.drug_1, form.drug_2]
+    setmultipledefaults(listfields=formdrugdata, listvalues=druglist)
 
     # Medical History
     # The Medical History valueset has its own tab. There is no default value.
@@ -506,14 +506,7 @@ def setdefaults(form):
     medhxlist = form.currentdonordata.getmetadatavalues(list_concept=medhx_concepts,
                                                         grouping_concept=grouping_concept, key='concept_id')
 
-    for medhx in medhxlist:
-        idx = medhxlist.index(medhx)
-        if idx < 10:
-            formmedhxdata[idx].data = medhx
-
-    # Set defaults for any medhx list that was not set by donor data.
-    for m in range(len(medhxlist), 10):
-        formmedhxdata[m].data = 'PROMPT'
+    setmultipledefaults(listfields = formmedhxdata, listvalues=medhxlist)
 
     # Error conditions that result in disabling of the form.
     has_error = False
@@ -523,15 +516,6 @@ def setdefaults(form):
                f'Edit manually.')
         flash(msg)
         has_error = True
-
-    #if form.currentdonordata.descendantcount > 10:
-        #msg = (f'Donor {form.currentdonordata.donorid} is associated with {form.currentdonordata.descendantcount} descendants.')
-        #flash(msg)
-        # has_error = True
-    #elif form.currentdonordata.has_published_datasets:
-        #msg = (f'Donor {form.currentdonordata.donorid} is associated with one or more published datasets.')
-        #flash(msg)
-        # has_error = True
 
     if len(heightunitlist) > 0:
         if heightunitlist[0] not in ['in', 'cm']:
@@ -557,6 +541,22 @@ def setdefaults(form):
     if has_error:
         for field in form:
             setinputdisabled(field, disabled=True)
+
+def setmultipledefaults(listfields: list, listvalues: list):
+    """
+    Sets default values for an metadata type with multiple options--e.g., Medical History
+    :param listfields: a list of fields in a form
+    :param listvalues: a list of metadata values
+    """
+
+    for val in listvalues:
+        idx = listvalues.index(val)
+        if idx < len(listfields):
+            listfields[idx].data = val
+
+    # Set defaults for any field in the list that was not set by donor data.
+    for i in range(len(listvalues), len(listfields)):
+        listfields[i].data = 'PROMPT'
 
 
 def translate_age_to_metadata(form) -> dict:
@@ -845,10 +845,12 @@ def buildnewdonordata(form, token: str, donorid: str) -> DonorData:
     if alcohol != {}:
         donor.metadata[donor_data_key].append(alcohol)
 
-    # Drug use
-    drug = translate_selectfield_to_metadata(form, formfield=form.drug, tab='Social History')
-    if drug != {}:
-        donor.metadata[donor_data_key].append(drug)
+    # Drug use - up to 3 types.
+    for field in form:
+        if 'drug' in field.name:
+            drug = translate_selectfield_to_metadata(form, formfield=field, tab='Social History')
+            if drug != {}:
+                donor.metadata[donor_data_key].append(drug)
 
     # Medical History - up to 10 conditions.
     for field in form:

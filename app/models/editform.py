@@ -196,8 +196,14 @@ class EditForm(Form):
                           'C0013146', 'C0239076']
     drugs = valuesetmanager.getvaluesettuple(tab='Social History', list_concepts=list_drug_concepts,
                                              addprompt=True)
-    drug = SelectField('Other drug history', choices=drugs,
+
+    # Allow for multiple "other drug" use.
+    drug_0 = SelectField('Other drug history', choices=drugs,
                        validators=[validate_selectfield_default, validators.Optional()])
+    drug_1 = SelectField('Other drug history', choices=drugs,
+                         validators=[validate_selectfield_default, validators.Optional()])
+    drug_2 = SelectField('Other drug history', choices=drugs,
+                         validators=[validate_selectfield_default, validators.Optional()])
 
     # Medical History
     # A fixed set of medical history fields will be instantiated. Assume a maximum of 10 conditions.
