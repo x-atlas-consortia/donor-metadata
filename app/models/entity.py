@@ -169,7 +169,7 @@ class Entity:
         Checks whether a donor is associated with published datasets in provenance.
         :return: boolean
         """
-        url = f'{self.urlbase}.{self.consortium}.org/descendants/{self.donorid}?property=uuid'
+        url = f'{self.urlbase}.{self.consortium}.org/descendants/{self.donorid}'
         response = requests.get(url=url, headers=self.headers)
 
         if response.status_code == 200:

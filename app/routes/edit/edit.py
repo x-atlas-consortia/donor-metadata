@@ -149,7 +149,6 @@ def setdefaults(form):
     # The Race valueset has its own tab. The default value is Unknown.
     race_grouping_concept = form.valuesetmanager.getcolumnvalues(tab='Race', col='grouping_concept')[0]
     racelist = form.currentdonordata.getmetadatavalues(grouping_concept=race_grouping_concept, key='concept_id')
-    print(racelist)
     if racelist is None:
         form.race.data = 'C1532697'  # Unknown
     elif len(racelist) > 0:
@@ -493,12 +492,18 @@ def setdefaults(form):
 
     # Medical History
     # The Medical History valueset has its own tab. There is no default value.
-    # Display information for up to 10 conditions.
+    # Display information for up to 20 conditions.
     formmedhxdata = [form.medhx_0, form.medhx_1,
                      form.medhx_2, form.medhx_3,
                      form.medhx_4, form.medhx_5,
                      form.medhx_6, form.medhx_7,
-                     form.medhx_8, form.medhx_9]
+                     form.medhx_8, form.medhx_9,
+                     form.medhx_10, form.medhx_11,
+                     form.medhx_12, form.medhx_13,
+                     form.medhx_14, form.medhx_15,
+                     form.medhx_16, form.medhx_17,
+                     form.medhx_18, form.medhx_19
+                     ]
     # Future development note: Some existing records incorrectly use concept_id for grouping_concept_id. After
     # these donors are corrected, change medhxlist to use group_concept.
     medhx_concepts = form.valuesetmanager.getcolumnvalues(tab='Medical History', col='concept_id')
@@ -511,8 +516,8 @@ def setdefaults(form):
     # Error conditions that result in disabling of the form.
     has_error = False
 
-    if len(medhxlist) > 10:
-        msg = (f'Donor {form.currentdonordata.donorid} currently has more than 10 Medical History Conditions. '
+    if len(medhxlist) > 20:
+        msg = (f'Donor {form.currentdonordata.donorid} currently has more than 20 Medical History Conditions. '
                f'Edit manually.')
         flash(msg)
         has_error = True

@@ -210,25 +210,44 @@ class EditForm(Form):
     # Because of the requirement to set the choices using the valuesetmanager, the FieldList methodology cannot
     # be used.
     medhx = valuesetmanager.getvaluesettuple(tab='Medical History', group_term='Medical History', addprompt=True)
-    medhx_0 = SelectField('Condition', choices=medhx,
+    medhx_0 = SelectField('Condition 1', choices=medhx,
                           validators=[validate_selectfield_default, validators.Optional()])
-    medhx_1 = SelectField('Condition', choices=medhx,
+    medhx_1 = SelectField('Condition 2', choices=medhx,
                           validators=[validate_selectfield_default, validators.Optional()])
-    medhx_2 = SelectField('Condition', choices=medhx,
+    medhx_2 = SelectField('Condition 3', choices=medhx,
                           validators=[validate_selectfield_default, validators.Optional()])
-    medhx_3 = SelectField('Condition', choices=medhx,
+    medhx_3 = SelectField('Condition 4', choices=medhx,
                           validators=[validate_selectfield_default, validators.Optional()])
-    medhx_4 = SelectField('Condition', choices=medhx,
+    medhx_4 = SelectField('Condition 5', choices=medhx,
                           validators=[validate_selectfield_default, validators.Optional()])
-    medhx_5 = SelectField('Condition', choices=medhx,
+    medhx_5 = SelectField('Condition 6', choices=medhx,
                           validators=[validate_selectfield_default, validators.Optional()])
-    medhx_6 = SelectField('Condition', choices=medhx,
+    medhx_6 = SelectField('Condition 7', choices=medhx,
                           validators=[validate_selectfield_default, validators.Optional()])
-    medhx_7 = SelectField('Condition', choices=medhx,
+    medhx_7 = SelectField('Condition 8', choices=medhx,
                           validators=[validate_selectfield_default, validators.Optional()])
-    medhx_8 = SelectField('Condition', choices=medhx,
+    medhx_8 = SelectField('Condition 9', choices=medhx,
                           validators=[validate_selectfield_default, validators.Optional()])
-    medhx_9 = SelectField('Condition', choices=medhx,
+    medhx_9 = SelectField('Condition 10', choices=medhx,
                           validators=[validate_selectfield_default, validators.Optional()])
-
+    medhx_10 = SelectField('Condition 11', choices=medhx,
+                          validators=[validate_selectfield_default, validators.Optional()])
+    medhx_11 = SelectField('Condition 12', choices=medhx,
+                           validators=[validate_selectfield_default, validators.Optional()])
+    medhx_12 = SelectField('Condition 13', choices=medhx,
+                           validators=[validate_selectfield_default, validators.Optional()])
+    medhx_13 = SelectField('Condition 14', choices=medhx,
+                           validators=[validate_selectfield_default, validators.Optional()])
+    medhx_14 = SelectField('Condition 15', choices=medhx,
+                           validators=[validate_selectfield_default, validators.Optional()])
+    medhx_15 = SelectField('Condition 16', choices=medhx,
+                           validators=[validate_selectfield_default, validators.Optional()])
+    medhx_16 = SelectField('Condition 17', choices=medhx,
+                           validators=[validate_selectfield_default, validators.Optional()])
+    medhx_17 = SelectField('Condition 18', choices=medhx,
+                           validators=[validate_selectfield_default, validators.Optional()])
+    medhx_18 = SelectField('Condition 19', choices=medhx,
+                           validators=[validate_selectfield_default, validators.Optional()])
+    medhx_19 = SelectField('Condition 20', choices=medhx,
+                           validators=[validate_selectfield_default, validators.Optional()])
     review = SubmitField()
