@@ -7,7 +7,7 @@ venv/
 **~
 
 # Ignore config file
-src/app/instance/app.cfg
+/src/app/instance/app.cfg
 
 # Ignore the generated BUILD file
 BUILD
