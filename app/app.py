@@ -72,7 +72,6 @@ class DonorUI:
 
             # Custom 400 error handler.
 
-
         # Custom 401 error handler.
         @self.app.errorhandler(401)
         def unauthorized(error):
@@ -104,7 +103,7 @@ if __name__ == "__main__":
 
     try:
         donor_app = DonorUI(cfg.file, Path(__file__).absolute().parent.parent.parent).app
-        donor_app.run(host='0.0.0.0', port='5000')
+        donor_app.run(host='0.0.0.0', port='5100')
     except Exception as e:
         print(str(e))
         logger.error(e, exc_info=True)
