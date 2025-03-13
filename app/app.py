@@ -103,7 +103,7 @@ if __name__ == "__main__":
 
     try:
         donor_app = DonorUI(cfg.file, Path(__file__).absolute().parent.parent.parent).app
-        donor_app.run(host='0.0.0.0', port='5100')
+        donor_app.run(host='0.0.0.0', port='5000')
     except Exception as e:
         print(str(e))
         logger.error(e, exc_info=True)
