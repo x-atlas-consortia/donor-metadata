@@ -129,7 +129,7 @@ class EditForm(Form):
     event = SelectField('Death Event', choices=events, validators=[validate_selectfield_default])
 
     # Measurements
-    # Create SelectFields for each measurment group.
+    # Create SelectFields for each measurement group.
     heightvalue = DecimalField('Height (value)', validators=[validators.Optional()])
     heightunit = SelectField('units', choices=[('0', 'cm'), ('1', 'in')], validators=[validators.Optional()])
     weightvalue = DecimalField('Weight (value)', validators=[validators.Optional()])
@@ -250,4 +250,11 @@ class EditForm(Form):
                            validators=[validate_selectfield_default, validators.Optional()])
     medhx_19 = SelectField('Condition 20', choices=medhx,
                            validators=[validate_selectfield_default, validators.Optional()])
+
+    # March 2025
+    # Pregnancy
+    gravida = DecimalField('Gravida', validators=[validators.Optional()])
+    parity = DecimalField('Parity', validators=[validators.Optional()])
+    abortus = DecimalField('Abortus', validators=[validators.Optional()])
+
     review = SubmitField()

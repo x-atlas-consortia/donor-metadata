@@ -356,6 +356,31 @@ def setdefaults(form):
     if len(gestationalagelist) > 0:
         form.gestationalage.data = float(gestationalagelist[0])
 
+    # March 2025
+    # Gravida
+    # Gravida has no default value.
+    gravida_concept = 'C0600457'
+    gravidalist = form.currentdonordata.getmetadatavalues(grouping_concept=gravida_concept,
+                                                          key='data_value')
+    if len(gravidalist) > 0:
+        form.gravida.data = float(gravidalist[0])
+
+    # Parity
+    # Parity has no default value.
+    parity_concept = 'C0030563'
+    paritylist = form.currentdonordata.getmetadatavalues(grouping_concept=parity_concept,
+                                                         key='data_value')
+    if len(paritylist) > 0:
+        form.parity.data = float(paritylist[0])
+
+    # Abortus
+    # Abortus has no default value.
+    abortus_concept = 'C0429912'
+    abortuslist = form.currentdonordata.getmetadatavalues(grouping_concept=abortus_concept,
+                                                          key='data_value')
+    if len(abortuslist) > 0:
+        form.parity.data = float(abortuslist[0])
+
     # KDPI
     # The KDPI has no default value.
     kdpi_concept = 'C4330523'
