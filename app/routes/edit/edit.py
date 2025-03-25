@@ -379,7 +379,7 @@ def setdefaults(form):
     abortuslist = form.currentdonordata.getmetadatavalues(grouping_concept=abortus_concept,
                                                           key='data_value')
     if len(abortuslist) > 0:
-        form.parity.data = float(abortuslist[0])
+        form.abortus.data = float(abortuslist[0])
 
     # KDPI
     # The KDPI has no default value.
@@ -821,6 +821,25 @@ def buildnewdonordata(form, token: str, donorid: str) -> DonorData:
                                                        concept_id='C0017504')
     if gestationalage != {}:
         donor.metadata[donor_data_key].append(gestationalage)
+
+    # March 2025 - measures of pregnancy
+    # gravida
+    gravida = translate_field_value_to_metadata(form, formfield=form.gravida, tab='Measurements',
+                                                concept_id='C0600457')
+    if gravida != {}:
+        donor.metadata[donor_data_key].append(gravida)
+
+    # parity
+    parity = translate_field_value_to_metadata(form, formfield=form.parity, tab='Measurements',
+                                               concept_id='C0030563')
+    if parity != {}:
+        donor.metadata[donor_data_key].append(parity)
+
+    # abortus
+    abortus = translate_field_value_to_metadata(form, formfield=form.abortus, tab='Measurements',
+                                                concept_id='C0429912')
+    if abortus != {}:
+        donor.metadata[donor_data_key].append(abortus)
 
     # cancer risk
     cancerrisk = translate_field_value_to_metadata(form, formfield=form.cancerrisk, tab='Measurements',
