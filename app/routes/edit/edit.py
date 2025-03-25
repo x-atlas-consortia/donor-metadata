@@ -356,6 +356,31 @@ def setdefaults(form):
     if len(gestationalagelist) > 0:
         form.gestationalage.data = float(gestationalagelist[0])
 
+    # March 2025
+    # Gravida
+    # Gravida has no default value.
+    gravida_concept = 'C0600457'
+    gravidalist = form.currentdonordata.getmetadatavalues(grouping_concept=gravida_concept,
+                                                          key='data_value')
+    if len(gravidalist) > 0:
+        form.gravida.data = float(gravidalist[0])
+
+    # Parity
+    # Parity has no default value.
+    parity_concept = 'C0030563'
+    paritylist = form.currentdonordata.getmetadatavalues(grouping_concept=parity_concept,
+                                                         key='data_value')
+    if len(paritylist) > 0:
+        form.parity.data = float(paritylist[0])
+
+    # Abortus
+    # Abortus has no default value.
+    abortus_concept = 'C0429912'
+    abortuslist = form.currentdonordata.getmetadatavalues(grouping_concept=abortus_concept,
+                                                          key='data_value')
+    if len(abortuslist) > 0:
+        form.abortus.data = float(abortuslist[0])
+
     # KDPI
     # The KDPI has no default value.
     kdpi_concept = 'C4330523'
@@ -796,6 +821,25 @@ def buildnewdonordata(form, token: str, donorid: str) -> DonorData:
                                                        concept_id='C0017504')
     if gestationalage != {}:
         donor.metadata[donor_data_key].append(gestationalage)
+
+    # March 2025 - measures of pregnancy
+    # gravida
+    gravida = translate_field_value_to_metadata(form, formfield=form.gravida, tab='Measurements',
+                                                concept_id='C0600457')
+    if gravida != {}:
+        donor.metadata[donor_data_key].append(gravida)
+
+    # parity
+    parity = translate_field_value_to_metadata(form, formfield=form.parity, tab='Measurements',
+                                               concept_id='C0030563')
+    if parity != {}:
+        donor.metadata[donor_data_key].append(parity)
+
+    # abortus
+    abortus = translate_field_value_to_metadata(form, formfield=form.abortus, tab='Measurements',
+                                                concept_id='C0429912')
+    if abortus != {}:
+        donor.metadata[donor_data_key].append(abortus)
 
     # cancer risk
     cancerrisk = translate_field_value_to_metadata(form, formfield=form.cancerrisk, tab='Measurements',
