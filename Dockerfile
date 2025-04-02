@@ -19,7 +19,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app .
 
 # Expose the port your application will run on
-EXPOSE 5000
+EXPOSE 7000
 
 # Specify the command to run on container start
 CMD ["python", "/usr/src/app/app.py"]

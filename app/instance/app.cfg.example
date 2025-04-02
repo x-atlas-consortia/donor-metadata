@@ -1,3 +1,5 @@
+# Application port
+PORT=7000
 # Application contexts (consortia)
 CONTEXT_HUBMAP='hubmapconsortium'
 CONTEXT_SENNET='sennetconsortium'

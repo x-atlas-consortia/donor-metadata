@@ -103,7 +103,9 @@ if __name__ == "__main__":
 
     try:
         donor_app = DonorUI(cfg.file, Path(__file__).absolute().parent.parent.parent).app
-        donor_app.run(host='0.0.0.0', port='5000')
+        # Mar 2025 - configurable application port.
+        port = cfg.getfield(key='PORT')
+        donor_app.run(host='0.0.0.0', port=port)
     except Exception as e:
         print(str(e))
         logger.error(e, exc_info=True)

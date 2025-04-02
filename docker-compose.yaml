@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5000:5000"
+      - "7000:7000"
     volumes:
       # Mount the app config to container in order to keep it outside the image
       - "./src/app/instance:/usr/src/app/src/app/instance"
