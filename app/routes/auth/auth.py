@@ -19,7 +19,7 @@ def get_user_info(token):
 def load_app_client(consortium: str) -> ConfidentialAppAuthClient:
 
     """
-    Initiates a Globus aopp client, based on the consortium.
+    Initiates a Globus app client, based on the consortium.
     :param consortium: identifies a Globus environment
     """
     cfg = AppConfig()
