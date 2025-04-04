@@ -16,6 +16,8 @@ from routes.globus.globus import globus_blueprint
 from routes.export.export import export_select_blueprint
 from routes.export.export import export_review_blueprint
 from routes.export.export import export_donor_blueprint
+from routes.doi.doi import doi_select_blueprint
+from routes.doi.doi import doi_review_blueprint
 
 
 # Configure consistent logging. This is done at the beginning of each module instead of with a superclass of
@@ -56,6 +58,8 @@ class DonorUI:
         self.app.register_blueprint(export_select_blueprint)
         self.app.register_blueprint(export_review_blueprint)
         self.app.register_blueprint(export_donor_blueprint)
+        self.app.register_blueprint(doi_select_blueprint)
+        self.app.register_blueprint(doi_review_blueprint)
 
         # Register the custom JSON pretty print filter.
         self.app.jinja_env.filters['tojson_pretty'] = to_pretty_json

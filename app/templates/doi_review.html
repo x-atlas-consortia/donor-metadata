@@ -1,0 +1,22 @@
+<!-- Compare donor clinical metadata with DOI titles from published datasts-->
+{% extends 'base.html' %}
+
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+<title>Consortium Donor Metadata and DOIs </title>
+
+<form method=post action="/doi/review">
+
+    <button  type="submit" class="btn btn-primary btn-lg" name="export" value="csv">Export to CSV</button>
+    <button  type="submit" class="btn btn-primary btn-lg" name="export" value="tsv">Export to TSV</button>
+    <a href="/" class="btn btn-primary btn-lg">Cancel</a>
+
+    <div class="overflow-scroll mt-1 pb-5"
+                 style="max-width: 1800px; max-height: 800px;">
+        {{ table|safe }}
+    </div>
+
+</form>
+<br>
+<button class="btn btn-primary btn-lg" onclick="history.back()" value="return">Go Back</button>
+{% endblock %}

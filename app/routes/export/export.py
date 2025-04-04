@@ -75,14 +75,6 @@ def export_review():
         dfexportmetadata = MetadataFrame(metadata=dfnewdonortype, donorid=donorid).dfexport
 
     if request.method == 'GET':
-        # Remove irrelevant columns for display purposes.
-        #dfmetadatadisplay = dfexportmetadata[['id', 'source_name',
-                                                    #'code', 'concept_id',
-                                                    #'data_type', 'data_value',
-                                                    #'grouping_code', 'grouping_concept',
-                                                    #'grouping_concept_preferred_term',
-                                                    #'grouping_sab', 'numeric_operator',
-                                                    #'preferred_term', 'sab', 'units']]
         # Convert to HTML table.
         table = dfexportmetadata.to_html(classes='table table-hover .table-condensed { font-size: 8px !important; } '
                                                   'table-bordered table-responsive-sm')

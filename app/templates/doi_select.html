@@ -1,0 +1,32 @@
+<!-- Compare donor clinical metadata with DOI titles-->
+{% extends 'base.html' %}
+
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+<title>Compare donor metadata with dataset DOIs</title>
+<div class="container-fluid bg-secondary text-white">
+    <br>
+    <img src="/static/datacite.png" alt="Export" data-height="234" style="max-height: 40px;">
+    <br>
+    <h4>Compare Donor Metadata in Provenance with Dataset DOIs in DataCite</h4>
+</div>
+<form method=post>
+    <div class="container-fluid">
+        <br>
+        <div>
+            {{ render_field(form.consortium) }}
+        </div>
+        <br>
+        <div>
+            <button type="submit"  class="btn btn-primary btn-lg"
+                    value="Search" onclick="spinner4()">Select</button>
+        </div>
+        <br>
+        <!-- Spinner that displays while searching -->
+        <div id="spinner" class="loading">
+        </div>
+        <br>
+    </div>
+</form>
+
+{% endblock %}
