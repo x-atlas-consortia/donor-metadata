@@ -1,5 +1,5 @@
-# Class representing a set of metadata for a single donor, optimized for DataFrame opertaions such as
-# export
+# Class representing a set of metadata for a single donor, optimized for DataFrame operations
+# such as export
 import pandas as pd
 
 class MetadataFrame:

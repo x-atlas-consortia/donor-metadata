@@ -55,7 +55,7 @@ def export_review():
         token = session['groups_token']
 
         # Get DataFrame of metadata rows.
-        dfexportmetadata = SearchAPI(consortium=consortium, token=token).dfalldonormetata
+        dfexportmetadata = SearchAPI(consortium=consortium, token=token).dfalldonormetadata
     else:
         # Obtain and decode the base64-encoded dictionary of new donor metadata,
         # which is stored in the session cookie.
@@ -80,7 +80,7 @@ def export_review():
                                                   'table-bordered table-responsive-sm')
 
     if request.method == 'POST':
-        # Export the export review form content, incdiated by the value of the clicked button in the form.
+        # Export the export review form content, indicated by the value of the clicked button in the form.
         format = request.form.getlist('export')[0]
         if format == 'csv':
             sep = ','
