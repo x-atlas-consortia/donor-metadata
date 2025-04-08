@@ -5,6 +5,11 @@
 from flask import abort
 import requests
 import pandas as pd
+from tqdm import tqdm
+
+# For retry loop
+from requests.adapters import HTTPAdapter
+from urllib3.util import Retry
 
 # Helper classes
 # Optimizes donor metadata for display in a DataFrame
@@ -98,10 +103,13 @@ class SearchAPI:
         DOIs for published datasets.
     """
         listdonor = []
-        sdonorid = self.dfalldonormetadata['id'].drop_duplicates().to_list()
+        listdonorid = self.dfalldonormetadata['id'].drop_duplicates().to_list()
 
-        for id in sdonorid:
-
+        iid = 1
+        for id in tqdm(listdonorid, desc="Donors"):
+            iid = iid + 1
+            if iid == 3:
+                break
             # Get the donor.
             donor = self.dfalldonormetadata[self.dfalldonormetadata['id'] == id]
             # Get relevant metadata values.
@@ -110,11 +118,10 @@ class SearchAPI:
             race = donor.loc[donor['grouping_concept'] == 'C0034510']['data_value'].values
             if len(race) == 1:
                 race = race[0]
-
+            # Get DOI titles for any published datasets associated with the donor.
             listdatasets = self._getdatasetdoisfordonor(donorid=id)
             for ds in listdatasets:
                 listdonor.append({"id": id, "age": age, "sex": sex, "race": race, "doi_url": ds.get('doi_url'), "doi_title": ds.get('doi_title')})
-            # Get the IDs for datasets for donor.
 
         return pd.DataFrame(listdonor)
 
@@ -135,24 +142,29 @@ class SearchAPI:
         # Get descendants of the donor entity.
         descendants = dictdonor.get('hits').get('hits')[0].get('_source').get('descendants')
         if descendants is not None:
-            for desc in descendants:
+            for desc in tqdm(descendants, desc="datasets"):
+                # Look for DOIs only for dataset descendants.
                 dataset_type = desc.get("dataset_type")
                 uuid = desc.get("uuid")
                 if dataset_type is not None:
-                    donordataset = self._searchmatch(id_field="uuid", id_value=uuid)
+                    source = ["uuid", "doi_url", "registered_doi"]
+                    # Get DOI URL
+                    donordataset = self._searchmatch(id_field="uuid", id_value=uuid, source=source)
                     if donordataset is not None:
                         doi_url = donordataset.get('hits').get('hits')[0].get('_source').get('doi_url')
                         if doi_url is not None:
+                            # Get current DOI title from DataCite.
                             doi_title = self._getdatacitetitle(doi_url=doi_url)
                             listdois.append({"doi_url": doi_url, "doi_title": doi_title})
 
         return listdois
 
-    def _searchmatch(self, id_field: str, id_value: str) -> dict:
+    def _searchmatch(self, id_field: str, id_value: str, source=None) -> dict:
         """
         Obtain information for an id, using keyword match.
         :param id_field: the field name to match
         :param id_value: the field value to match
+        :param source: optional list of specific fields
         :return: dict for results of the search API.
 
         """
@@ -172,11 +184,14 @@ class SearchAPI:
             }
         }
 
-        url = f'{self.urlbase}/search'
-        response = requests.post(url=url, headers=self.headers, json=data)
+        if source is not None:
+            # Limit search results to specified fields.
+            data['_source'] = source
 
-        if response.status_code == 200:
-            return response.json()
+        url = f'{self.urlbase}/search'
+        #response = (requests.post(url=url, headers=self.headers, json=data))
+        return self._getresponsejson(url=url, method='POST', headers=self.headers, json=data)
+
 
     def _getdatacitetitle(self, doi_url: str) -> str:
         """
@@ -185,7 +200,48 @@ class SearchAPI:
 
         doi = doi_url.split('https://doi.org/')[1]
         url = f'https://api.datacite.org/dois/{doi}'
-        response = requests.get(url=url)
-        if response.status_code == 200:
-            respjson = response.json()
-            return respjson.get("data").get("attributes").get("titles")[0].get("title")
+        response = self._getresponsejson(url=url, method='GET')
+        if response is not None:
+            return response.get("data").get("attributes").get("titles")[0].get("title")
+
+    def _getresponsejson(self, url: str, method: str, headers=None, json=None) -> str:
+        """
+        Obtains a response from a REST API.
+        Employs a retry loop in case of timeout or other failures.
+
+        :param url: the URL to the REST API
+        :param method: GET or POST
+        :param headers: optional headers
+        :param json: optional response body for POST
+        :return:
+        """
+
+        # Use the HTTPAdapter's retry strategy, as described here:
+        # https://oxylabs.io/blog/python-requests-retry
+
+        # Five retries max.
+        # A backoff factor of 2, which results in exponential increases in delays before each attempt.
+        # Retry for scenarios such as Service Unavailable or Too Many Requests that often are returned in case
+        # of an overloaded server.
+        try:
+            retry = Retry(
+                total=5,
+                backoff_factor=2,
+                status_forcelist=[429, 500, 502, 503, 504]
+            )
+
+            adapter = HTTPAdapter(max_retries=retry)
+
+            session = requests.Session()
+            session.mount('https://', adapter)
+            # r = session.get('https://httpbin.org/status/502', timeout=180)
+            if method == 'GET':
+                r = session.get(url=url, timeout=180)
+            else:
+                r = session.post(url=url, timeout=180, headers=headers, json=json)
+
+            return r.json()
+
+        except Exception as e:
+            print('Error with URL', url)
+            session.raise_for_status()
