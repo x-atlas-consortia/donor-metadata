@@ -105,11 +105,7 @@ class SearchAPI:
         listdonor = []
         listdonorid = self.dfalldonormetadata['id'].drop_duplicates().to_list()
 
-        iid = 1
         for id in tqdm(listdonorid, desc="Donors"):
-            iid = iid + 1
-            if iid == 3:
-                break
             # Get the donor.
             donor = self.dfalldonormetadata[self.dfalldonormetadata['id'] == id]
             # Get relevant metadata values.
