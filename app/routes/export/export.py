@@ -75,6 +75,7 @@ def export_review():
         dfexportmetadata = MetadataFrame(metadata=dfnewdonortype, donorid=donorid).dfexport
 
     if request.method == 'GET':
+        # Redirected from the Globus authorization (the /login route in the auth path).
         # Convert to HTML table.
         table = dfexportmetadata.to_html(classes='table table-hover .table-condensed { font-size: 8px !important; } '
                                                   'table-bordered table-responsive-sm')

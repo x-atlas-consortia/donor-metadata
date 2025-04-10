@@ -2,6 +2,8 @@
 # Converts a call to the search-api into a DataFrame flattened to the level of individual metadata element, with
 # each row including columns for common elements, including donor id.
 
+import time
+
 from flask import abort
 import requests
 import pandas as pd
@@ -14,9 +16,7 @@ from urllib3.util import Retry
 # Helper classes
 # Optimizes donor metadata for display in a DataFrame
 from .metadataframe import MetadataFrame
-
 from .getmetadatabytype import getmetadatabytype
-
 
 class SearchAPI:
 
@@ -97,15 +97,24 @@ class SearchAPI:
         else:
             abort(500, 'Error when calling the param-search endpoint in search-api')
 
-    def getalldonordoimetadata(self) -> pd.DataFrame:
+    def getalldonordoimetadata(self, start: int, end: int) -> pd.DataFrame:
         """
+        April 2025
         Extracts from the dfalldonormetadata DataFrame metadata relevant to
         DOIs for published datasets.
+        :param start: ordinal number of first donor in a batch to process.
+        :param end: ordinal number of the last donor in a batch to process.
     """
         listdonor = []
+        # Get a sorted list of donor ids.
         listdonorid = self.dfalldonormetadata['id'].drop_duplicates().to_list()
+        listdonorid.sort()
+        if start > len(listdonorid):
+            start = len(listdonorid) - 1
+            end = start
 
-        for id in tqdm(listdonorid, desc="Donors"):
+        for id in tqdm(listdonorid[start:end], desc="Donors"):
+            time.sleep(10)
             # Get the donor.
             donor = self.dfalldonormetadata[self.dfalldonormetadata['id'] == id]
             # Get relevant metadata values.
@@ -116,8 +125,14 @@ class SearchAPI:
                 race = race[0]
             # Get DOI titles for any published datasets associated with the donor.
             listdatasets = self._getdatasetdoisfordonor(donorid=id)
-            for ds in listdatasets:
-                listdonor.append({"id": id, "age": age, "sex": sex, "race": race, "doi_url": ds.get('doi_url'), "doi_title": ds.get('doi_title')})
+            if len(listdatasets) == 0:
+                listdonor.append({"id": id, "age": age, "sex": sex, "race": race, "doi_url": "no published datasets",
+                                  "doi_title": "no published datasets"})
+            else:
+                for ds in listdatasets:
+                    listdonor.append({"id": id, "age": age, "sex": sex, "race": race, "doi_url": ds.get('doi_url'),
+                                      "doi_title": ds.get('doi_title')})
+
 
         return pd.DataFrame(listdonor)
 
@@ -221,7 +236,7 @@ class SearchAPI:
         # of an overloaded server.
         try:
             retry = Retry(
-                total=5,
+                total=10,
                 backoff_factor=2,
                 status_forcelist=[429, 500, 502, 503, 504]
             )
@@ -239,5 +254,5 @@ class SearchAPI:
             return r.json()
 
         except Exception as e:
-            print('Error with URL', url)
-            session.raise_for_status()
+            print(f'Error with URL {url}, json={json}')
+            abort(500)

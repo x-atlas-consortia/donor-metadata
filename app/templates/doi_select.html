@@ -16,16 +16,20 @@
         <div>
             {{ render_field(form.consortium) }}
         </div>
+        <div>
+            {{ render_field(form.start) }}
+        </div>
+        <div>
+            {{ render_field(form.batch) }}
+        </div>
+        <div>
+            &#8679; Values for <i>start</i> and <i>batch</i> must be set in app.cfg.
+        </div>
         <br>
         <div>
             <button type="submit"  class="btn btn-primary btn-lg"
-                    value="Search" onclick="spinner4()">Select</button>
+                    value="Search">Select</button>
         </div>
-        <br>
-        <!-- Spinner that displays while searching -->
-        <div id="spinner" class="loading">
-        </div>
-        <br>
     </div>
 </form>
 

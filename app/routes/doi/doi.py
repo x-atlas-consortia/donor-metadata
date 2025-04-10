@@ -7,24 +7,28 @@ April 2025
 """
 
 from flask import Blueprint, request, redirect, render_template, session, make_response, flash
-import pickle
-import base64
-import pandas as pd
+
 
 # Helper classes
 from models.doiform import DOIForm
 from models.searchapi import SearchAPI
+from models.getdoistartandend import getdoistartandend
+from models.setinputdisabled import setinputdisabled
 
 doi_select_blueprint = Blueprint('doi_select', __name__, url_prefix='/doi/select')
 
-
-@doi_select_blueprint.route('', methods=['GET', 'POST'])
+@doi_select_blueprint.route('', methods=['GET','POST'])
 def doi_select():
 
     # Load form that allows for specification of the consortium for which a complete set of donor metadata will be
     # exported.
 
     form = DOIForm(request.form)
+    tstartandend = getdoistartandend()
+    form.start.data = tstartandend[0]
+    form.batch.data = tstartandend[1]
+    setinputdisabled(form.start, disabled=True)
+    setinputdisabled(form.batch, disabled=True)
 
     # Clear messages.
     if 'flashes' in session:
@@ -37,7 +41,7 @@ def doi_select():
         session['donorid'] = 'DOI'
 
         # Authenticate to Globus via the login route.
-        # If login is successful, Globus will redirect to the DOI review page.
+        # If login is successful, Globus will redirect to the hidden DOI review page.
         return redirect(f'/login')
 
     # Render the export selection form.
@@ -46,55 +50,39 @@ def doi_select():
 
 doi_review_blueprint = Blueprint('doi_review', __name__, url_prefix='/doi/review')
 
-
-@doi_review_blueprint.route('', methods=['GET','POST'])
+@doi_review_blueprint.route('', methods=['GET'])
 def doi_review():
 
+    # Redirected from the Globus authorization (the /login route in the auth path), which
+    # was invoked by the doi_select function.
+
+    # The DOI review page builds an export dataset for a batch of donors and
+    # exports to a CSV file. The page does not display.
+
     # Obtain all donor metadata for a consortium.
-    # Populate review form with consortium donor metadata.
     consortium = session['consortium']
     token = session['groups_token']
 
-    if request.method == 'GET':
-        # Get DataFrame of metadata rows.
-        dfexportmetadata = SearchAPI(consortium=consortium, token=token).getalldonordoimetadata()
-        print('CONVERTING TO HTML TABLE')
-        # Convert to HTML table.
-        table = dfexportmetadata.to_html(classes='table table-hover .table-condensed { font-size: 8px !important; } '
-                                                 'table-bordered table-responsive-sm')
+    # Because of the risk of timeout, process only a batch of donors at a time.
+    tstartend = getdoistartandend()
+    start = tstartend[0]
+    end = tstartend[1]
 
-        # Store the metadata to a session variable for use by the POST method.
-        # Convert from a DataFrame to a dictionary, then serialize the dictionary string.
-        pickled = base64.b64encode(pickle.dumps(dfexportmetadata.to_dict())).decode()
-        session['doiexport'] = pickled
+    # Get DataFrame of metadata rows.
+    s = SearchAPI(consortium=consortium, token=token)
+    # Use the base metadata dataframe to build a dataframe of DOI-related metadata.
+    # It would be possible to build the DOI metadata dataset more directly; however, the
+    # detailed parsing would be similar to just pulling it from the standard dataset of
+    # donor metadata developed for the original purpose of the application,
+    # which runs quickly.
+    dfexportmetadata = s.getalldonordoimetadata(start=start, end=end)
+    sep = ','
+    export_string = dfexportmetadata.to_csv(index=False, sep=sep)
 
-    if request.method == 'POST':
-        # Export the export review form content, indicated by the value of the clicked button in the form.
-        format = request.form.getlist('export')[0]
-        if format == 'csv':
-            sep = ','
-        else:
-            sep = '\t'
+    # Create a response with the exported data.
+    response = make_response(export_string)
+    response.headers["Content-Disposition"] = f"attachment; filename={consortium.split('_')[1]}_doi_metadata_{start}_{end}.csv"
+    response.headers["Content-Type"] = f"text/{format}"
 
-        # Obtain and decode the base64-encoded DOI metadata,
-        # which was stored in the session cookie by the GET method.
-        # Convert to a DataFrame.
-        # Write to file.
-        doiexport = session['doiexport']
-        if len(doiexport) > 0:
-            unpickled = pickle.loads(base64.b64decode(doiexport))
-            dfexportmetadata = pd.DataFrame(unpickled)
-        else:
-            abort(400, 'No doi metadata')
+    return response
 
-        export_string = dfexportmetadata.to_csv(index=False, sep=sep)
-
-        # Create a response with the exported data
-        response = make_response(export_string)
-        fname = consortium.split('_')[1].lower()
-        response.headers["Content-Disposition"] = f"attachment; filename={fname}_metadata.{format}"
-        response.headers["Content-Type"] = f"text/{format}"
-        flash(f'Metadata for {fname} exported.')
-        return response
-
-    return render_template('doi_review.html', table=table)

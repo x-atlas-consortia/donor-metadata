@@ -22,24 +22,9 @@ import json
 from models.donor import DonorData
 # The form used to build request bodies for PUT and POST endpoints of the entity-api
 from models.editform import EditForm
+from models.setinputdisabled import setinputdisabled
 
 edit_blueprint = Blueprint('edit', __name__, url_prefix='/edit')
-
-
-def setinputdisabled(inputfield, disabled: bool = True):
-    """
-    Disables the given field.
-    :param inputfield: the WTForms input to disable
-    :param disabled: if true set the disabled attribute of the input
-    :return: nothing
-    """
-
-    if inputfield.render_kw is None:
-        inputfield.render_kw = {}
-    if disabled:
-        inputfield.render_kw['disabled'] = 'disabled'
-    else:
-        inputfield.render_kw.pop('disabled')
 
 
 @edit_blueprint.route('', methods=['POST', 'GET'])
@@ -139,7 +124,8 @@ def setdefaults(form):
     # The default age unit is years.
     # Age is different in that there are two separate values for "age in years" and "age in months". The units field
     # for age is thus duplicative.
-    ageunitlist = form.currentdonordata.getmetadatavalues(list_concept=age_concept,grouping_concept=age_grouping_concept, key='concept_id')
+    ageunitlist = form.currentdonordata.getmetadatavalues(list_concept=age_concept,
+                                                          grouping_concept=age_grouping_concept, key='concept_id')
     if len(ageunitlist) > 0:
         form.ageunit.data = ageunitlist[0]
     else:
@@ -191,7 +177,7 @@ def setdefaults(form):
             if source in form.currentdonordata.metadata.keys():
                 form.source.data = '1'
             else:
-                abort(500,'Unknown donor metadata key')
+                abort(500, 'Unknown donor metadata key')
     else:
         # No existing metadata.
         form.source.data = 'PROMPT'
@@ -536,7 +522,7 @@ def setdefaults(form):
     medhxlist = form.currentdonordata.getmetadatavalues(list_concept=medhx_concepts,
                                                         grouping_concept=grouping_concept, key='concept_id')
 
-    setmultipledefaults(listfields = formmedhxdata, listvalues=medhxlist)
+    setmultipledefaults(listfields=formmedhxdata, listvalues=medhxlist)
 
     # Error conditions that result in disabling of the form.
     has_error = False
@@ -571,6 +557,7 @@ def setdefaults(form):
     if has_error:
         for field in form:
             setinputdisabled(field, disabled=True)
+
 
 def setmultipledefaults(listfields: list, listvalues: list):
     """
@@ -659,11 +646,11 @@ def translate_field_value_to_metadata(form, formfield: Field, tab: str, concept_
     # Unit is not encoded.
     if unitfield is None:
         # Look for a default unit.
-        dictdefaultunit = form.valuesetmanager.getvaluesetrow(tab='Measurements',concept_id=concept_id)
+        dictdefaultunit = form.valuesetmanager.getvaluesetrow(tab='Measurements', concept_id=concept_id)
         if dictdefaultunit == {}:
-            abort(500,f'Valueset manager does not have default units for field {form.formfield.name}')
+            abort(500, f'Valueset manager does not have default units for field {form.formfield.name}')
         else:
-            unit_value=dictdefaultunit['units']
+            unit_value = dictdefaultunit['units']
     else:
         unit_value = dict(unitfield.choices).get(unitfield.data)
 
@@ -674,13 +661,12 @@ def translate_field_value_to_metadata(form, formfield: Field, tab: str, concept_
     if concept_id in ['C0005890', 'C0455829']:
         if unitfield.data == '1':  # in
             unit_value = 'cm'
-            value = round(float(value) * 2.54,2)
+            value = round(float(value) * 2.54, 2)
 
     if concept_id == 'C0005910':
         if unitfield.data == '1':  # lb
             unit_value = 'kg'
-            value = round(float(value) / 2.2,2)
-
+            value = round(float(value) / 2.2, 2)
 
     # Some legacy metadata incorrectly coded:
     # 1. Race
@@ -688,7 +674,6 @@ def translate_field_value_to_metadata(form, formfield: Field, tab: str, concept_
     # 3. Medical History
     if formfield.name in ['race', 'sex', 'medhx']:
         dictvalueset['data_value'] = dictvalueset['preferred_term']
-
 
     dictvalueset['data_value'] = str(value)
     dictvalueset['units'] = unit_value
@@ -762,7 +747,6 @@ def buildnewdonordata(form, token: str, donorid: str) -> DonorData:
     bmi = translate_field_value_to_metadata(form, formfield=form.bmi, tab='Measurements', concept_id='C1305855')
     if bmi != {}:
         donor.metadata[donor_data_key].append(bmi)
-
 
     # waist circumference
     waist = translate_field_value_to_metadata(form, formfield=form.waistvalue, unitfield=form.waistunit,
