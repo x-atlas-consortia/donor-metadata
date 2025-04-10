@@ -32,8 +32,10 @@
         color: red;
       }
     </style>
+    <!-- Each page that features a spinner uses custom logic to determine when to display it.-->
+    <!-- Hone page -->
     <script type="text/javascript">
-        function spinner() {
+        function spinner_index() {
             const donorid = document.getElementById('donorid');
             if (donorid.value ==="") {
                 document.getElementById("spinner").hide();
@@ -42,23 +44,20 @@
             }
         }
     </script>
+    <!-- export select form -->
     <script type="text/javascript">
-        function spinner2() {
+        function spinner_exportselect() {
             const donorid = document.getElementById('consortium');
             document.getElementById("spinner").style.display = "block";
         }
     </script>
+    <!-- review form -->
     <script type="text/javascript">
-        function spinner3() {
+        function spinner_review() {
             document.getElementById("spinner").style.display = "block";
         }
     </script>
-      <script type="text/javascript">
-        function spinner4() {
-            document.getElementById("spinner").style.display = "block";
-        }
-    </script>
-      <script type="text/javascript">
+    <script type="text/javascript">
         function spinneroff() {
           document.getElementByID("spinner").hide();
         }
