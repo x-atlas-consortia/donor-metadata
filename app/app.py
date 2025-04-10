@@ -16,6 +16,8 @@ from routes.globus.globus import globus_blueprint
 from routes.export.export import export_select_blueprint
 from routes.export.export import export_review_blueprint
 from routes.export.export import export_donor_blueprint
+from routes.doi.doi import doi_select_blueprint
+from routes.doi.doi import doi_review_blueprint
 
 
 # Configure consistent logging. This is done at the beginning of each module instead of with a superclass of
@@ -56,14 +58,17 @@ class DonorUI:
         self.app.register_blueprint(export_select_blueprint)
         self.app.register_blueprint(export_review_blueprint)
         self.app.register_blueprint(export_donor_blueprint)
+        self.app.register_blueprint(doi_select_blueprint)
+        self.app.register_blueprint(doi_review_blueprint)
 
         # Register the custom JSON pretty print filter.
         self.app.jinja_env.filters['tojson_pretty'] = to_pretty_json
 
         # The consortium authentication token is stored in a session cookie.
         # Set cookie expiration:
-        # 1. Set the session lifetime to 10 minutes (in seconds).
-        self.app.config['PERMANENT_SESSION_LIFETIME'] = 600
+        # 1. Set the session lifetime to 30 minutes (in seconds).
+        # (April 2025 increased to 300 minutes for DOI export.)
+        self.app.config['PERMANENT_SESSION_LIFETIME'] = 300 * 60
 
         # Custom 400 error handler.
         @self.app.errorhandler(400)

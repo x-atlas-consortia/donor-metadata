@@ -55,7 +55,7 @@ def export_review():
         token = session['groups_token']
 
         # Get DataFrame of metadata rows.
-        dfexportmetadata = SearchAPI(consortium=consortium, token=token).dfalldonormetata
+        dfexportmetadata = SearchAPI(consortium=consortium, token=token).dfalldonormetadata
     else:
         # Obtain and decode the base64-encoded dictionary of new donor metadata,
         # which is stored in the session cookie.
@@ -75,20 +75,13 @@ def export_review():
         dfexportmetadata = MetadataFrame(metadata=dfnewdonortype, donorid=donorid).dfexport
 
     if request.method == 'GET':
-        # Remove irrelevant columns for display purposes.
-        #dfmetadatadisplay = dfexportmetadata[['id', 'source_name',
-                                                    #'code', 'concept_id',
-                                                    #'data_type', 'data_value',
-                                                    #'grouping_code', 'grouping_concept',
-                                                    #'grouping_concept_preferred_term',
-                                                    #'grouping_sab', 'numeric_operator',
-                                                    #'preferred_term', 'sab', 'units']]
+        # Redirected from the Globus authorization (the /login route in the auth path).
         # Convert to HTML table.
         table = dfexportmetadata.to_html(classes='table table-hover .table-condensed { font-size: 8px !important; } '
                                                   'table-bordered table-responsive-sm')
 
     if request.method == 'POST':
-        # Export the export review form content, incdiated by the value of the clicked button in the form.
+        # Export the export review form content, indicated by the value of the clicked button in the form.
         format = request.form.getlist('export')[0]
         if format == 'csv':
             sep = ','

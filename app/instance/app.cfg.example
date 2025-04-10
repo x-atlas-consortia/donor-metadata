@@ -15,3 +15,6 @@ GLOBUS_HUBMAP_CLIENT='globus-hubmap-client'
 GLOBUS_HUBMAP_SECRET='globus-hubmap-secret'
 GLOBUS_SENNET_CLIENT='globus-sennet-client'
 GLOBUS_SENNET_SECRET='globus-sennet-secret'
+# DOI batch
+DOI_START = 0
+DOI_BATCH = 5

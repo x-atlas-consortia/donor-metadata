@@ -1,0 +1,11 @@
+<!-- Compare donor clinical metadata with DOI titles from published datasts-->
+{% extends 'base.html' %}
+
+{% block content %}
+{% from "_formhelpers.html" import render_field %}
+<title>Consortium Donor Metadata and DOIs </title>
+<div class="overflow-scroll mt-1 pb-5" style="max-width: 1800px; max-height: 800px;">
+    {{ table|safe }}
+</div>
+
+{% endblock %}

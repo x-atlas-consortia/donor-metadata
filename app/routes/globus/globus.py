@@ -26,6 +26,8 @@ def globus():
         session['consortium'] = form.consortium.data
         # Pass the donor id.
         session['donorid'] = form.donorid.data
+        # Apr 2025 - Indicate the workflow (edit, export, doi) to the Globus auth.
+        session['workflow'] = 'edit'
         # Authenticate to Globus via the login route.
         # If login is successful, Globus will redirect to the edit page.
         return redirect(f'/login')

@@ -109,8 +109,11 @@ def login():
         session['donorid'] = donorid
         session['userid'] = user_info.get('preferred_username')
 
-        # Redirect to the appropriate page, based  on the workflow.
+        # Redirect to the appropriate page, based on the workflow.
+        # April 2025 added DOI workflow.
         if donorid == 'ALL':
             return redirect(f'/export/review')
+        elif donorid == 'DOI':
+            return redirect(f'/doi/review')
         else:
             return redirect(f'/edit')
