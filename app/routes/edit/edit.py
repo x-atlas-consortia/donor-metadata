@@ -16,6 +16,7 @@ import base64
 import pickle
 import deepdiff
 import json
+import pandas as pd
 
 # Helper classes
 # Represents the metadata for a donor in a consortium database
@@ -23,6 +24,7 @@ from models.donor import DonorData
 # The form used to build request bodies for PUT and POST endpoints of the entity-api
 from models.editform import EditForm
 from models.setinputdisabled import setinputdisabled
+from models.searchapi import SearchAPI
 
 edit_blueprint = Blueprint('edit', __name__, url_prefix='/edit')
 
@@ -50,7 +52,6 @@ def edit():
 
     if request.method == 'POST' and form.validate():
         # Translate revised donor metadata fields into the encoded donor metadata schema.
-
         form.newdonordata = buildnewdonordata(form, token=token, donorid=donorid)
 
         # Prepare a base64-encoded string version of the new metadata dictionary that will be decoded
@@ -73,6 +74,16 @@ def edit():
                 form.deepdiff = None
             else:
                 form.deepdiff = json.loads(diff.to_json())
+
+        # April 2025
+        # Obtain DOI titles for any published datasets associated with the donor.
+        consortium = session['consortium']
+        search = SearchAPI(consortium=consortium, token=token)
+        listdoi = search.getdatasetdoisfordonor(donorid=donorid)
+        if len(listdoi)>0:
+            dfdonordoi = pd.DataFrame(listdoi)
+            form.donordoitable = dfdonordoi.to_html(classes='table table-hover .table-condensed { font-size: 8px !important; } '
+                                                 'table-bordered table-responsive-sm')
 
         # Pass existing and changed metadata to the review/update form.
         return render_template('review.html', donorid=donorid,

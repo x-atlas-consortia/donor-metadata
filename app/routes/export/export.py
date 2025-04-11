@@ -55,7 +55,7 @@ def export_review():
         token = session['groups_token']
 
         # Get DataFrame of metadata rows.
-        dfexportmetadata = SearchAPI(consortium=consortium, token=token).dfalldonormetadata
+        dfexportmetadata = SearchAPI(consortium=consortium, token=token).getalldonormetadata()
     else:
         # Obtain and decode the base64-encoded dictionary of new donor metadata,
         # which is stored in the session cookie.
@@ -76,7 +76,8 @@ def export_review():
 
     if request.method == 'GET':
         # Redirected from the Globus authorization (the /login route in the auth path).
-        # Convert to HTML table.
+        # Convert the export metadata dataset to an HTML table that will be displayed
+        # in the associated web page.
         table = dfexportmetadata.to_html(classes='table table-hover .table-condensed { font-size: 8px !important; } '
                                                   'table-bordered table-responsive-sm')
 

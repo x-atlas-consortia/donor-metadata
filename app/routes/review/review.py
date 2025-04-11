@@ -7,6 +7,7 @@ Final page in the curation workflow.
 from flask import Blueprint, request, redirect, abort, flash, session
 import pickle
 import base64
+import pandas as pd
 
 # Helper classes
 from models.donor import DonorData
