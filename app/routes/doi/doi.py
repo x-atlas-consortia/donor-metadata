@@ -8,7 +8,6 @@ April 2025
 
 from flask import Blueprint, request, redirect, render_template, session, make_response, flash
 
-
 # Helper classes
 from models.doiform import DOIForm
 from models.searchapi import SearchAPI
@@ -24,6 +23,7 @@ def doi_select():
     # exported.
 
     form = DOIForm(request.form)
+
     tstartandend = getdoistartandend()
     form.start.data = tstartandend[0]
     form.batch.data = tstartandend[1]
@@ -53,20 +53,21 @@ doi_review_blueprint = Blueprint('doi_review', __name__, url_prefix='/doi/review
 @doi_review_blueprint.route('', methods=['GET'])
 def doi_review():
 
-    # Redirected from the Globus authorization (the /login route in the auth path), which
-    # was invoked by the doi_select function.
-
-    # The DOI review page builds an export dataset for a batch of donors and
-    # exports to a CSV file. The page does not display.
-
-    # Obtain all donor metadata for a consortium.
-    consortium = session['consortium']
-    token = session['groups_token']
-
     # Because of the risk of timeout, process only a batch of donors at a time.
     tstartend = getdoistartandend()
     start = tstartend[0]
     end = tstartend[1]
+
+    consortium = session['consortium']
+    token = session['groups_token']
+
+    # Redirected from the Globus authorization (the /login route in the auth path), which
+    # was invoked by the doi_select function.
+    # The DOI review page builds an export dataset for a batch of donors and populates
+    # a table.
+
+    consortium = session['consortium']
+    token = session['groups_token']
 
     # Get DataFrame of metadata rows.
     s = SearchAPI(consortium=consortium, token=token)
@@ -83,7 +84,10 @@ def doi_review():
     # Create a response with the exported data.
     response = make_response(export_string)
     response.headers["Content-Disposition"] = f"attachment; filename={consortium.split('_')[1]}_doi_metadata_{start}_{end}.csv"
-    response.headers["Content-Type"] = f"text/{format}"
-
+    response.headers["Content-Type"] = f"text/csv"
     return response
+
+
+
+
 
