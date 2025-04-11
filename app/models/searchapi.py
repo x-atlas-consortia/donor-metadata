@@ -18,6 +18,7 @@ from urllib3.util import Retry
 from .metadataframe import MetadataFrame
 from .getmetadatabytype import getmetadatabytype
 
+
 class SearchAPI:
 
     def __init__(self, token: str, consortium: str):
@@ -42,9 +43,10 @@ class SearchAPI:
         if self.consortium == 'sennetconsortium.org':
             self.headers['X-SenNet-Application'] = 'portal-ui'
 
-        self.dfalldonormetadata = self._getalldonormetadata()
+        # April 2025 - Remove default search of data for all donors data.
+        #self.dfalldonormetadata = self.getalldonormetadata()
 
-    def _getalldonormetadata(self) -> pd.DataFrame:
+    def getalldonormetadata(self) -> pd.DataFrame:
         """
         Searches for metadata for donor in a consortium, using the search-api.
         :return: if there is a donor entity with id=donorid, a DataFrame with flattened donor metadata.
@@ -113,10 +115,10 @@ class SearchAPI:
             start = len(listdonorid) - 1
             end = start
 
-        for id in tqdm(listdonorid[start:end], desc="Donors"):
-            time.sleep(10)
+        for donorid in tqdm(listdonorid[start:end], desc="Donors"):
+
             # Get the donor.
-            donor = self.dfalldonormetadata[self.dfalldonormetadata['id'] == id]
+            donor = self.dfalldonormetadata[self.dfalldonormetadata['id'] == donorid]
             # Get relevant metadata values.
             age = donor.loc[donor['grouping_concept'] == 'C0001779']['data_value'].values[0]
             sex = donor.loc[donor['grouping_concept'] == 'C1522384']['data_value'].values[0]
@@ -124,34 +126,45 @@ class SearchAPI:
             if len(race) == 1:
                 race = race[0]
             # Get DOI titles for any published datasets associated with the donor.
-            listdatasets = self._getdatasetdoisfordonor(donorid=id)
+            listdatasets = self.getdatasetdoisfordonor(donorid=donorid)
             if len(listdatasets) == 0:
-                listdonor.append({"id": id, "age": age, "sex": sex, "race": race, "doi_url": "no published datasets",
+                listdonor.append({"id": donorid, "age": age, "sex": sex, "race": race, "doi_url": "no published datasets",
                                   "doi_title": "no published datasets"})
             else:
                 for ds in listdatasets:
-                    listdonor.append({"id": id, "age": age, "sex": sex, "race": race, "doi_url": ds.get('doi_url'),
+                    listdonor.append({"id": donorid, "age": age, "sex": sex, "race": race, "doi_url": ds.get('doi_url'),
                                       "doi_title": ds.get('doi_title')})
 
+            time.sleep(10)
 
         return pd.DataFrame(listdonor)
 
-    def _getdatasetdoisfordonor(self, donorid: str) -> list:
+    def getdatasetdoisfordonor(self, donorid: str) -> list:
         """
         Obtains DOI information on published datasets of a donor.
         :param donorid: HuBMAP or SenNet ID of the donor.
 
         """
+
+        # Get set of published datasets of the donor entity.
+        if self.consortium == 'hubmapconsortium.org':
+            return self._gethubmapdoisfordonor(donorid=donorid)
+        else:
+            return self._getsennetdoisfordonor(donorid=donorid)
+
+    def _gethubmapdoisfordonor(self, donorid: str) -> list:
+        """
+            Obtains DOI information on published datasets of a HuBMAP donor.
+            :param donorid: HuBMAP ID of the donor.
+        """
+
         listdois = []
 
-        if self.consortium == 'hubmapconsortium.org':
-            id_field = 'hubmap_id'
-        else:
-            id_field = 'sennet_id'
+        # In HuBMAP, datasets are in the descendants array of the donor entity.
+        id_field = 'hubmap_id'
         dictdonor = self._searchmatch(id_field=id_field, id_value=donorid)
-
-        # Get descendants of the donor entity.
         descendants = dictdonor.get('hits').get('hits')[0].get('_source').get('descendants')
+
         if descendants is not None:
             for desc in tqdm(descendants, desc="datasets"):
                 # Look for DOIs only for dataset descendants.
@@ -170,6 +183,32 @@ class SearchAPI:
 
         return listdois
 
+    def _getsennetdoisfordonor(self, donorid: str) -> list:
+        """
+            Obtains DOI information on published datasets of a SenNet donor.
+            :param donorid: SenNet ID of the donor.
+        """
+        listdois = []
+
+        # In SenNet, donor entities do not have links to datasets; instead, datasets
+        # have links to a source.
+        id_field = 'source.sennet_id'
+        source = ["uuid", "doi_url", "registered_doi"]
+        dictdonor = self._searchmatch(id_field=id_field, id_value=donorid, source=source)
+
+        descendants = dictdonor.get('hits').get('hits')
+        #for desc in tqdm(descendants, desc="datasets"):
+        for desc in descendants:
+            # Look for DOIs for published datasets.
+            source = desc.get("_source")
+            doi_url = source.get("doi_url")
+            if doi_url is not None:
+                # Get current DOI title from DataCite.
+                doi_title = self._getdatacitetitle(doi_url=doi_url)
+                listdois.append({"doi_url": doi_url, "doi_title": doi_title})
+
+        return listdois
+
     def _searchmatch(self, id_field: str, id_value: str, source=None) -> dict:
         """
         Obtain information for an id, using keyword match.
@@ -179,7 +218,6 @@ class SearchAPI:
         :return: dict for results of the search API.
 
         """
-        listret = []
 
         data = {
             "query": {
@@ -200,9 +238,8 @@ class SearchAPI:
             data['_source'] = source
 
         url = f'{self.urlbase}/search'
-        #response = (requests.post(url=url, headers=self.headers, json=data))
+        # response = (requests.post(url=url, headers=self.headers, json=data))
         return self._getresponsejson(url=url, method='POST', headers=self.headers, json=data)
-
 
     def _getdatacitetitle(self, doi_url: str) -> str:
         """
@@ -215,7 +252,7 @@ class SearchAPI:
         if response is not None:
             return response.get("data").get("attributes").get("titles")[0].get("title")
 
-    def _getresponsejson(self, url: str, method: str, headers=None, json=None) -> str:
+    def _getresponsejson(self, url: str, method: str, headers=None, json=None) -> dict:
         """
         Obtains a response from a REST API.
         Employs a retry loop in case of timeout or other failures.
@@ -254,5 +291,5 @@ class SearchAPI:
             return r.json()
 
         except Exception as e:
-            print(f'Error with URL {url}, json={json}')
+            print(f'Error with URL {url}, json={json}: {e}')
             abort(500)

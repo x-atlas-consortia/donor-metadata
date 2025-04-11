@@ -206,7 +206,7 @@
                     {{ render_field(form.medhx_9) }}
                 </div>
         </div>
-
+        <!-- Additional medical history fields -->
         <div class="row align-items_start">
             <h3>Medical History, continued</h3>
             <div class="col">
@@ -240,8 +240,12 @@
                 {{ render_field(form.medhx_19) }}
             </div>
         </div>
+        <!-- The "Review" button triggers a spinner display.-->
         <div class="d-grid gap-2 col-6 mx-auto">
-            {{ form.review(class="btn btn-primary btn-lg") }}
+            {{ form.review(class="btn btn-primary btn-lg", onclick="spinner_review()") }}
+        </div>
+        <!--spinner container-->
+        <div id="spinner" class="loading">
         </div>
     </div>
     <br>

@@ -75,6 +75,7 @@ def doi_review():
     # detailed parsing would be similar to just pulling it from the standard dataset of
     # donor metadata developed for the original purpose of the application,
     # which runs quickly.
+    s.dfalldonormetadata = s.getalldonormetadata()
     dfexportmetadata = s.getalldonordoimetadata(start=start, end=end)
     sep = ','
     export_string = dfexportmetadata.to_csv(index=False, sep=sep)

@@ -11,7 +11,9 @@ from flask import abort
 # Helper classes
 # Entity-api functions
 from models.entity import Entity
-from models.getmetadatabytype import getmetadatabytype
+# April 2025
+# To obtain DOI information
+from models.searchapi import SearchAPI
 
 class DonorData:
 
@@ -35,10 +37,7 @@ class DonorData:
             self.metadata = {}
         else:
             # This instance will contain existing metadata.
-            #dictmetadata = self.entity.getdonormetadata()
             self.metadata = self.entity.getdonormetadata()
-            #self.has_published_datasets = self.entity.has_published_datasets()
-            #self.descendantcount = self.entity.descendantcount
 
     def getmetadatavalues(self, key: str, grouping_concept=None, list_concept=None) -> list:
         """

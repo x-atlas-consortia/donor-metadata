@@ -16,6 +16,7 @@ import base64
 import pickle
 import deepdiff
 import json
+import pandas as pd
 
 # Helper classes
 # Represents the metadata for a donor in a consortium database
@@ -23,6 +24,7 @@ from models.donor import DonorData
 # The form used to build request bodies for PUT and POST endpoints of the entity-api
 from models.editform import EditForm
 from models.setinputdisabled import setinputdisabled
+from models.searchapi import SearchAPI
 
 edit_blueprint = Blueprint('edit', __name__, url_prefix='/edit')
 
@@ -50,7 +52,6 @@ def edit():
 
     if request.method == 'POST' and form.validate():
         # Translate revised donor metadata fields into the encoded donor metadata schema.
-
         form.newdonordata = buildnewdonordata(form, token=token, donorid=donorid)
 
         # Prepare a base64-encoded string version of the new metadata dictionary that will be decoded
@@ -74,6 +75,16 @@ def edit():
             else:
                 form.deepdiff = json.loads(diff.to_json())
 
+        # April 2025
+        # Obtain DOI titles for any published datasets associated with the donor.
+        consortium = session['consortium']
+        search = SearchAPI(consortium=consortium, token=token)
+        listdoi = search.getdatasetdoisfordonor(donorid=donorid)
+        if len(listdoi)>0:
+            dfdonordoi = pd.DataFrame(listdoi)
+            form.donordoitable = dfdonordoi.to_html(classes='table table-hover .table-condensed { font-size: 8px !important; } '
+                                                 'table-bordered table-responsive-sm')
+
         # Pass existing and changed metadata to the review/update form.
         return render_template('review.html', donorid=donorid,
                                form=form)
@@ -88,6 +99,32 @@ def edit():
 
     return render_template('edit.html', donorid=donorid, form=form)
 
+def stringisnumber(s:str) -> bool:
+    """
+    Checks whether a string represents a number.
+    :param s: the string to check
+    :return: true if the string can represent a number; false otherwise.
+    """
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+def stringisintegerorfloat(s:str) ->str:
+    """
+    Returns whether a string is an integer or float.
+    :param: str: number to check
+    :return: "float","integer", or "not a number"
+    """
+
+    if stringisnumber(s):
+        if s.isdigit():
+            return "integer"
+        else:
+            return "float"
+
+    return "not a number"
 
 def setdefaults(form):
     """
@@ -118,7 +155,16 @@ def setdefaults(form):
     agelist = form.currentdonordata.getmetadatavalues(list_concept=age_concept,
                                                       grouping_concept=age_grouping_concept, key='data_value')
     if len(agelist) > 0:
-        form.agevalue.data = float(agelist[0])
+        #form.agevalue.data = float(agelist[0])
+        # April 2025
+        # Ages can be either integers or floats, but are stored as strings.
+        # Maintain the original data type.
+        if len(agelist) > 0:
+            agetype = stringisintegerorfloat(agelist[0])
+            if agetype == "integer":
+                form.agevalue.data = int(agelist[0])
+            elif agetype == "float":
+                form.agevalue.data = float(agelist[0])
 
     # Age Units
     # The default age unit is years.

@@ -5,7 +5,9 @@
 {% from "_formhelpers.html" import render_field %}
 <title>Donor ID: {{ donorid }} </title>
 
-<!-- Submitting the form posts back to this page.-->
+<!-- Submitting from the Edit form posts back to this page.-->
+<!-- The Edit form passes dictionaries as properties of the form.-->
+<!-- The |tojson_pretty|safe commands below render the dictionaries as formatted JSONs.-->
 <!-- Hyphens at the beginning of a Jinja code block trims leading blank spaces, including newlines.
      Two hyphens are needed to trim all newlines in the JSONs.-->
 <form method=post action="/review">
@@ -24,20 +26,16 @@
                     </pre>
                 </div>
             </div>
+            <!--The Edit form's donordoitable is a HTML table of DOI information for published datasets for the donor.-->
             <div class = "col text-bg-warning">
-                <p> New metadata consists of the original metadata modified by any changes from the Edit form.</p>
-                <p> Metadata will be standardized--e.g., </p>
-                <ul>
-                    <li>converted to decimal</li>
-                    <li>converted to metric units (in to cm; lb to kg)</li>
-                </ul>
-                <p> In addition, previously curated metadata will be corrected and updated for consistency--e.g.,</p>
-                <ul>
-                    <li>grouping concepts</li>
-                    <li>race and ethnicity for donors with race of "Hispanic"</li>
-                </ul>
+                <p>DOIs for published datasets that may require updating in DataCite:</p>
+                <div class="overflow-scroll mt-1 pb-5"
+                 style="max-width: 800px; max-height: 100 px;">
+                    {{ form.donordoitable|safe }}
+                </div>
             </div>
         </div>
+        <!--Side-by-side comparisons of the current and new metadata dictionaries-->
         <div class="row align-items-start">
             <div class="col">
                 <h3>Current Metadata</h3>
@@ -67,16 +65,18 @@
             </div>
         </div>
         <br>
+        <!--Base64-encoded versions of data used by the POST to update donor metadata.-->
         <div>
             <input name="newdonor" type="hidden" value={{ form.newdonor }} >
             <input name="donorid" type="hidden" value="{{ donorid }}">
         </div>
+        <!--Only allow updates if there was a change in metadata.-->
         <div class="row justify-content-md-center">
             <div class="col col-lg-2">
                 {% if form.deepdiff is none %}
                     <button  type="submit" class="btn btn-primary btn-lg disabled" value="Update" aria-disabled="true">Update</button>
                 {% else %}
-                    <button  type="submit" class="btn btn-primary btn-lg" value="Update" onclick="spinner3()">Update</button>
+                    <button  type="submit" class="btn btn-primary btn-lg" value="Update" onclick="spinner_review()">Update</button>
                 {% endif %}
             </div>
             <div class="col col-lg-2">
@@ -85,9 +85,11 @@
         </div>
     </div>
     <br>
+    <!--Spinner container -->
     <div id="spinner" class="loading">
     </div>
 </form>
+<!--Form of new metadata optimized for export to CSV/TSV -->
 <form method=post action="/export/donor">
     <input name="newdonortsv" type="hidden" value={{ form.newdonortsv }} >
     <div class="container text-left">

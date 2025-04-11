@@ -83,9 +83,9 @@ The application uses **app.cfg** to obtain:
 - Globus client keys and secrets for HuBMAP and SenNet
 
 The configuration file must be kept separate from the application in either of its possible deployments:
-1. In a "bare-metal" deployment, in which the application is run from within a clone of the GitHub repository, the configuration file must not be in the repo. the application looks for the app.cfg file in a subfolder of the user root
+1. In a "bare-metal" deployment, in which the application is run from within a clone of the GitHub repository, the configuration file must not be in the repo. The application looks for the app.cfg file in a subfolder of the user root
 named **donor-metadata**.
-2. In a "containerized" deployment, in which the application is executed from within a Docker container, the configuration file must not be in the container. the application looks for the app.cfg file in the /usr/src/app/instance
+2. In a "containerized" deployment, in which the application is executed from within a Docker container, the configuration file must not be in the container. The application looks for the app.cfg file in the /usr/src/app/instance
 folder, which is bound to a volume on the host machine.
 
 # Databases
@@ -96,10 +96,11 @@ The application works with three databases:
 ***
 # Workflows
 
-There are three workflows in the application:
+There are **four** workflows in the application:
 1. A **curation workflow** that allows for editing of the metadata for a single donor in a consortium.
 2. An **export workflow** that exports metadata for all donors in a consortium to a file in spreadsheet format (CSV or TSV).
 3. An **export workflow** that exports metadata for a single donor to a file in spreadsheet format.
+4. A **DOI review workflow** that compares donor metadata with the titles of DOIs created for published datasets associated with the donor.
 
 # Curation workflow
 
@@ -165,6 +166,25 @@ in which
 - *scope* is either the name of the consortium or the donor id
 - *format* is either **csv** or **tsv**.
 
+***
+# DOI Workflow
+
+When a dataset is published, a Digital Object Identifier (DOI) is created for the dataset in the [DataCite Commons](https://datacite.org/create-dois/).
+The DOI's description is derived from the following donor clinical metadata:
+- age
+- race
+- sex
+
+The description for the DOI for a published dataset may lose currency if the donor's clinical metadata changes. 
+The DOI workflow allows for comparison between a donor's current or proposed clinical metadata and the descriptions of
+DOIs for published datasets associated with the donor.
+
+## Review page
+The Review page (in the edit workflow) displays a table of DOI information for published datasets associated with the donor.
+
+## DOI Compare page
+The DOI Compare page allows the display of information on a set of donors in a consortium. 
+The page downloads results to a CSV file, similar to those downloaded from the Export page.
 
 # base.html
 All HTML files in the application inherit from **base.html**, which includes:
@@ -195,9 +215,12 @@ This file contains a custom Jinja script used to populate content from WTForms f
 4. In SenNet, the application will only update donors that are human sources.
 5. The application attempts to standardize on units (e.g., *in* and *cm* for height). If an existing unit is unexpected, the application will require manual intervention.
 
-# Authentication token
-The entity-api requires an authentication token, which is obtained from Globus.
-An authentication token for a consortium's entity-api is set via the consortium's Single Sign On.
+# Globus Authentication
+
+The entity-api and search-api require a Globus authentication token, which is obtained from Globus.
+An authentication token for a consortium's entity-api is set via the consortium's Single Sign On (SSO).
+
+The /login route of the application executes the Globus SSO.
 
 ## 401 (Access denied) errors
 The application will raise a HTTP 401 exception when:
@@ -206,7 +229,7 @@ The application will raise a HTTP 401 exception when:
 
 ## 403 (Prohibited) errors
 If a donor is associated with published datasets (also known as "locked"), updating metadata requires administrative privileges, such as membership in a Globus admin group.
-Attepts to update metadata for restri without the appropriate privileges will result in a 403 error.
+Attempts to update metadata for a protected file without the appropriate privileges will result in a 403 error.
 
 ***
 # Potential issues
