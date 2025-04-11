@@ -12,6 +12,7 @@ from wtforms import (Form, StringField, SelectField, DecimalField, validators, V
 from models.appconfig import AppConfig
 # Represents the Google Sheets of donor clinical metadata valuesets
 from models.valuesetmanager import ValueSetManager
+from models.stringnumber import stringisintegerorfloat
 
 
 def validate_age(form, field):
@@ -25,7 +26,9 @@ def validate_age(form, field):
 
     ageunit = form.ageunit.data
     age = field.data
-    if not age.isnumeric():
+    print(age)
+    # if not age.isnumeric():
+    if not stringisintegerorfloat(age):
         raise ValidationError('Age must be a number.')
     agenum = float(age)
 
