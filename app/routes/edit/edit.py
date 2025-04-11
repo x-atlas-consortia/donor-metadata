@@ -99,6 +99,32 @@ def edit():
 
     return render_template('edit.html', donorid=donorid, form=form)
 
+def stringisnumber(s:str) -> bool:
+    """
+    Checks whether a string represents a number.
+    :param s: the string to check
+    :return: true if the string can represent a number; false otherwise.
+    """
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+def stringisintegerorfloat(s:str) ->str:
+    """
+    Returns whether a string is an integer or float.
+    :param: str: number to check
+    :return: "float","integer", or "not a number"
+    """
+
+    if stringisnumber(s):
+        if s.isdigit():
+            return "integer"
+        else:
+            return "float"
+
+    return "not a number"
 
 def setdefaults(form):
     """
@@ -129,7 +155,16 @@ def setdefaults(form):
     agelist = form.currentdonordata.getmetadatavalues(list_concept=age_concept,
                                                       grouping_concept=age_grouping_concept, key='data_value')
     if len(agelist) > 0:
-        form.agevalue.data = float(agelist[0])
+        #form.agevalue.data = float(agelist[0])
+        # April 2025
+        # Ages can be either integers or floats, but are stored as strings.
+        # Maintain the original data type.
+        if len(agelist) > 0:
+            agetype = stringisintegerorfloat(agelist[0])
+            if agetype == "integer":
+                form.agevalue.data = int(agelist[0])
+            elif agetype == "float":
+                form.agevalue.data = float(agelist[0])
 
     # Age Units
     # The default age unit is years.

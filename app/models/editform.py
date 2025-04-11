@@ -25,14 +25,17 @@ def validate_age(form, field):
 
     ageunit = form.ageunit.data
     age = field.data
+    if not age.isnumeric():
+        raise ValidationError('Age must be a number.')
+    agenum = float(age)
 
     # Apr 2025 - Set minimum age to be 1 month.
-    if age <= 0:
+    if agenum <= 0:
         raise ValidationError('The minimum age is 1 month.')
     # if age is None:
         # age = 0
-    if age > 89 and ageunit == 'C0001779':  # UMLS CUI for age in years
-        if age != 90:
+    if agenum > 89 and ageunit == 'C0001779':  # UMLS CUI for age in years
+        if agenum != 90:
             raise ValidationError('All ages over 89 years must be set to 90 years.')
 
 
@@ -100,8 +103,8 @@ class EditForm(Form):
 
     # Apr 2025 remove rounding (places=1).
     # agevalue = DecimalField('Age (value)',places=1, validators=[validate_age])
-    agevalue = DecimalField('Age (value)', validators=[validate_age])
-
+    #agevalue = DecimalField('Age (value)', validators=[validate_age])
+    agevalue = StringField('Age (value)', validators=[validate_age])
     # Race
     races = valuesetmanager.getvaluesettuple(tab='Race', group_term='Race')
     race = SelectField('Race', choices=races)
