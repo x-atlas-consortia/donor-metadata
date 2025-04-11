@@ -30,6 +30,11 @@ class Entity:
         if self.consortium == 'sennetconsortium':
             self.headers['X-SenNet-Application'] = 'portal-ui'
 
+        # April 2025 - Override key for updates to donors associated with published datasets.
+        self.override_key = self.cfg.getfield(key='GLOBUS_HUBMAP_UPDATE_OVERRIDE_HEADER_NAME')
+        self.override_value = self.cfg.getfield(key='GLOBUS_HUBMAP_UPDATE_OVERRIDE_HEADER_VALUE')
+        self.headers[self.override_key] = self.override_value
+
         # The bearer token in the configuration file should be the globus_group key from the
         # info cookie set by the consortium application:
         # 1. HuBMAP - as a client cookie. (Use the Ingest UI.)
