@@ -163,9 +163,18 @@ class SearchAPI:
         # In HuBMAP, datasets are in the descendants array of the donor entity.
         id_field = 'hubmap_id'
         dictdonor = self._searchmatch(id_field=id_field, id_value=donorid)
-        descendants = dictdonor.get('hits').get('hits')[0].get('_source').get('descendants')
+        gotdescendants = False
+        hits = dictdonor.get('hits').get('hits')
+        if len(hits) > 0:
+            source = hits[0].get('_source')
+            if source is not None:
+                desc = source.get('descendants')
+                gotdescendants = desc is not None
 
-        if descendants is not None:
+        #descendants = dictdonor.get('hits').get('hits')[0].get('_source').get('descendants')
+
+        #if descendants is not None:
+        if gotdescendants:
             for desc in tqdm(descendants, desc="datasets"):
                 # Look for DOIs only for dataset descendants.
                 dataset_type = desc.get("dataset_type")
