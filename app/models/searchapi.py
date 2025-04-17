@@ -163,18 +163,15 @@ class SearchAPI:
         # In HuBMAP, datasets are in the descendants array of the donor entity.
         id_field = 'hubmap_id'
         dictdonor = self._searchmatch(id_field=id_field, id_value=donorid)
-        gotdescendants = False
         hits = dictdonor.get('hits').get('hits')
         if len(hits) > 0:
             source = hits[0].get('_source')
             if source is not None:
-                desc = source.get('descendants')
-                gotdescendants = desc is not None
+                descendants = source.get('descendants')
 
         #descendants = dictdonor.get('hits').get('hits')[0].get('_source').get('descendants')
 
-        #if descendants is not None:
-        if gotdescendants:
+        if descendants is not None:
             for desc in tqdm(descendants, desc="datasets"):
                 # Look for DOIs only for dataset descendants.
                 dataset_type = desc.get("dataset_type")
@@ -184,11 +181,13 @@ class SearchAPI:
                     # Get DOI URL
                     donordataset = self._searchmatch(id_field="uuid", id_value=uuid, source=source)
                     if donordataset is not None:
-                        doi_url = donordataset.get('hits').get('hits')[0].get('_source').get('doi_url')
-                        if doi_url is not None:
-                            # Get current DOI title from DataCite.
-                            doi_title = self._getdatacitetitle(doi_url=doi_url)
-                            listdois.append({"doi_url": doi_url, "doi_title": doi_title})
+                        hits = donordataset.get('hits').get('hits')
+                        if len(hits) > 0:
+                            doi_url = donordataset.get('hits').get('hits')[0].get('_source').get('doi_url')
+                            if doi_url is not None:
+                                # Get current DOI title from DataCite.
+                                doi_title = self._getdatacitetitle(doi_url=doi_url)
+                                listdois.append({"doi_url": doi_url, "doi_title": doi_title})
 
         return listdois
 
