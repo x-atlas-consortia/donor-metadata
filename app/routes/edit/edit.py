@@ -456,7 +456,7 @@ def setdefaults(form):
     # concepts manually. If these donors are re-ingested with the corrected valuesets, the logic
     # can revert to using a common grouping_concept.
     fitz_concepts = ['C2700185', 'C2700186', 'C2700187', 'C2700188', 'C2700189', 'C2700190']
-    fitzlist = form.currentdonordata.getmetadatavalues(list_concept=fitz_concepts, key='concept_id')
+    fitzlist = form.currentdonordata.getmetadatavalues(list_concept=fitz_concepts, key='concept_id', grouping_concept='C2700191')
     if len(fitzlist) > 0:
         form.fitzpatrick.data = fitzlist[0]
     else:
