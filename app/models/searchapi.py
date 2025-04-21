@@ -169,8 +169,6 @@ class SearchAPI:
             if source is not None:
                 descendants = source.get('descendants')
 
-        #descendants = dictdonor.get('hits').get('hits')[0].get('_source').get('descendants')
-
         if descendants is not None:
             for desc in tqdm(descendants, desc="datasets"):
                 # Look for DOIs only for dataset descendants.
@@ -200,12 +198,12 @@ class SearchAPI:
 
         # In SenNet, donor entities do not have links to datasets; instead, datasets
         # have links to a source.
-        id_field = 'source.sennet_id'
+        id_field = 'sources.sennet_id'
         source = ["uuid", "doi_url", "registered_doi"]
         dictdonor = self._searchmatch(id_field=id_field, id_value=donorid, source=source)
 
         descendants = dictdonor.get('hits').get('hits')
-        #for desc in tqdm(descendants, desc="datasets"):
+
         for desc in descendants:
             # Look for DOIs for published datasets.
             source = desc.get("_source")
