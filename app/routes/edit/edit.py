@@ -25,6 +25,7 @@ from models.donor import DonorData
 from models.editform import EditForm
 from models.setinputdisabled import setinputdisabled
 from models.searchapi import SearchAPI
+from models.stringnumber import stringisintegerorfloat
 
 edit_blueprint = Blueprint('edit', __name__, url_prefix='/edit')
 
@@ -98,33 +99,6 @@ def edit():
         setinputdisabled(form.consortium, disabled=True)
 
     return render_template('edit.html', donorid=donorid, form=form)
-
-def stringisnumber(s:str) -> bool:
-    """
-    Checks whether a string represents a number.
-    :param s: the string to check
-    :return: true if the string can represent a number; false otherwise.
-    """
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-
-def stringisintegerorfloat(s:str) ->str:
-    """
-    Returns whether a string is an integer or float.
-    :param: str: number to check
-    :return: "float","integer", or "not a number"
-    """
-
-    if stringisnumber(s):
-        if s.isdigit():
-            return "integer"
-        else:
-            return "float"
-
-    return "not a number"
 
 def setdefaults(form):
     """
@@ -482,7 +456,7 @@ def setdefaults(form):
     # concepts manually. If these donors are re-ingested with the corrected valuesets, the logic
     # can revert to using a common grouping_concept.
     fitz_concepts = ['C2700185', 'C2700186', 'C2700187', 'C2700188', 'C2700189', 'C2700190']
-    fitzlist = form.currentdonordata.getmetadatavalues(list_concept=fitz_concepts, key='concept_id')
+    fitzlist = form.currentdonordata.getmetadatavalues(list_concept=fitz_concepts, key='concept_id', grouping_concept='C2700191')
     if len(fitzlist) > 0:
         form.fitzpatrick.data = fitzlist[0]
     else:

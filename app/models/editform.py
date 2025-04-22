@@ -12,6 +12,7 @@ from wtforms import (Form, StringField, SelectField, DecimalField, validators, V
 from models.appconfig import AppConfig
 # Represents the Google Sheets of donor clinical metadata valuesets
 from models.valuesetmanager import ValueSetManager
+from models.stringnumber import stringisintegerorfloat
 
 
 def validate_age(form, field):
@@ -25,13 +26,12 @@ def validate_age(form, field):
 
     ageunit = form.ageunit.data
     age = field.data
-    if not age.isnumeric():
+    # if not age.isnumeric():
+    if not stringisintegerorfloat(age):
         raise ValidationError('Age must be a number.')
     agenum = float(age)
-
-    # Apr 2025 - Set minimum age to be 1 month.
-    if agenum <= 0:
-        raise ValidationError('The minimum age is 1 month.')
+    # if agenum <= 0:
+        # raise ValidationError('The minimum age is 1 month.')
     # if age is None:
         # age = 0
     if agenum > 89 and ageunit == 'C0001779':  # UMLS CUI for age in years
