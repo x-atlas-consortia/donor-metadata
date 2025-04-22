@@ -3,6 +3,8 @@
 # each row including columns for common elements, including donor id.
 
 import time
+import os
+import sys
 
 from flask import abort
 import requests
@@ -15,8 +17,13 @@ from urllib3.util import Retry
 
 # Helper classes
 # Optimizes donor metadata for display in a DataFrame
-from .metadataframe import MetadataFrame
-from .getmetadatabytype import getmetadatabytype
+# April 2025. Because this file is used by both the donor-metadata app and scripts in the
+# validate path, set relative paths to parent package.
+fpath = os.path.dirname(os.getcwd())
+fpath = os.path.join(fpath, 'app/models')
+sys.path.append(fpath)
+from metadataframe import MetadataFrame
+from getmetadatabytype import getmetadatabytype
 
 
 class SearchAPI:
@@ -34,7 +41,7 @@ class SearchAPI:
             self.consortium = 'sennetconsortium.org'
         self.token = token
 
-        # The url base depends on both the consortium and the enviroment (i.e., development vs production).
+        # The url base depends on both the consortium and the environment (i.e., development vs production).
         self.urlbase = f'https://search.api.{self.consortium}/'
         if self.consortium == 'hubmapconsortium.org':
             self.urlbase = f'{self.urlbase}v3/'
@@ -299,3 +306,49 @@ class SearchAPI:
         except Exception as e:
             print(f'Error with URL {url}, json={json}: {e}')
             abort(500)
+
+    def getdoisforconsortium(self, size: int) -> dict:
+        """
+        Obtain information for the DOIs of published datasets in a consortium.
+        :param size: query return size.
+        HuBMAP has < 5K published datasets as of April 2025, so use this instead of
+        a point in time pagination.
+
+        """
+
+        data = {
+            "size": size,
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "match_phrase": {
+                                "entity_type": "dataset"
+                            }
+                        },
+                        {
+                            "match_phrase": {
+                                "status": "Published"
+                            }
+                        }
+                    ],
+                    "must_not": [
+                        {
+                            "term": {
+                                "registered_doi": ""
+                            },
+                            "term": {
+                                "donor.metadata": ""
+                            }
+
+                        }
+                    ]
+                }
+            },
+            "_source": ["donor.hubmap_id","registered_doi"]
+        }
+        url = f'{self.urlbase}/search'
+        return self._getresponsejson(url=url, method='POST', headers=self.headers, json=data)
+
+
+
