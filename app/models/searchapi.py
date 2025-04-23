@@ -316,39 +316,133 @@ class SearchAPI:
 
         """
 
-        data = {
-            "size": size,
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "match_phrase": {
-                                "entity_type": "dataset"
-                            }
-                        },
-                        {
-                            "match_phrase": {
-                                "status": "Published"
-                            }
-                        }
-                    ],
-                    "must_not": [
-                        {
-                            "term": {
-                                "registered_doi": ""
-                            },
-                            "term": {
-                                "donor.metadata": ""
-                            }
+        # The SenNet schema differs from the HuBMAP schema in that SenNet has non-human
+        # sources, not just donors.
 
+        if self.consortium == 'hubmapconsortium.org':
+
+            data = {
+                "size": size,
+                "sort": [
+                    {
+                        "registered_doi.keyword": {
+                            "order":"asc"
                         }
-                    ]
-                }
-            },
-            "_source": ["donor.hubmap_id","registered_doi"]
-        }
+                    }
+                ],
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "match_phrase": {
+                                    "entity_type": "dataset"
+                                }
+                            },
+                            {
+                                "match_phrase": {
+                                    "status": "Published"
+                                }
+                            }
+                        ],
+                        "must_not": [
+                            {
+                                "term": {
+                                    "registered_doi": ""
+                                },
+                                "term": {
+                                    "donor.metadata": ""
+                                }
+                            }
+                        ]
+                    }
+                },
+                "_source": ["donor.hubmap_id", "registered_doi"]
+            }
+
+        else:
+
+            data = {
+                "size": size,
+                "sort": [
+                    {
+                        "registered_doi.keyword": {
+                            "order": "asc"
+                        }
+                    }
+                ],
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "match_phrase": {
+                                    "entity_type": "dataset"
+                                }
+                            },
+                            {
+                                "match_phrase": {
+                                    "status": "Published"
+                                }
+                            },
+                            {
+                                "match_phrase": {
+                                    "sources.source_type": "Human"
+                                }
+                            }
+                        ],
+                        "must_not": [
+                            {
+                                "term": {
+                                    "registered_doi": ""
+                                },
+                                "term": {
+                                    "donor.metadata": ""
+                                }
+                            }
+                        ]
+                    }
+                },
+                "_source": ["sources.sennet_id", "registered_doi"]
+            }
+
         url = f'{self.urlbase}/search'
         return self._getresponsejson(url=url, method='POST', headers=self.headers, json=data)
 
+    def getdonorraceandageterms(self, donorid: str) -> dict:
+        """
+        Returns a dict of case-insensitive terms for a donor's race and age
+        :param donorid: hubmap or sennet id
+        :return:
+        """
+
+        if self.consortium == 'hubmapconsortium.org':
+            id_field = 'hubmap_id'
+        else:
+            id_field = 'sennet_id'
+
+        # Search for donor
+        donor = self._searchmatch(id_field=id_field, id_value=donorid, source =["metadata"])
+
+        if donor is None:
+            print(f'Error: missing donor {donorid}')
+            exit(-1)
+        else:
+            metadata = donor.get('hits').get('hits')[0].get('_source').get('metadata')
+            if 'living_donor_data' in metadata.keys():
+                listkey = 'living_donor_data'
+            else:
+                listkey = 'organ_donor_data'
+            listmeta = metadata.get(listkey)
+            # Get terms for race and sex.
+            for m in listmeta:
+                grouping_concept = m.get('grouping_concept')
+                if grouping_concept == 'C1522384':
+                    # sex
+                    sex = m.get('preferred_term').lower()
+                elif grouping_concept == 'C0034510':
+                    # race
+                    race = m.get('preferred_term').lower()
+
+            dictret = {'race': race, 'sex': sex}
+            return dictret
 
 
