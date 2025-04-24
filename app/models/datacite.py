@@ -59,7 +59,7 @@ class DataCiteAPI:
             if len(titles) > 0:
                 title = titles[0].get('title')
             listtitle.append({
-                "doi": id,
+                "doi": id.upper(),
                 "title": title
             })
         return listtitle

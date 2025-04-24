@@ -110,24 +110,42 @@ search = SearchAPI(consortium=consortium, token=token)
 datacite = DataCiteAPI(consortium=consortium)
 
 # Obtain information on published datasets and their donors.
-dfdoidonor = getdoianddonorid(consortium=consortium, search=search)
+dfdonordoi = getdoianddonorid(consortium=consortium, search=search)
 
 # Obtain all DOI-related donor metadata for the consortium.
 print('Getting donor metadata for consortium...')
 search.dfalldonormetadata = search.getalldonormetadata()
+
+print('Filtering to DOI-specific metadata...')
 start = 0
 end = len(search.dfalldonormetadata)
 dfdonor = search.getalldonordoimetadata(start=start, end=end, geturls=False)
-dfout = dfdonor
+
+
 # Obtain all consortium DOIs from DataCite.
-#dfdoi = datacite.getdoititles()
+dfdoi = datacite.getdoititles()
 
 # Merge doi-donor map with donor metadata.
-#dfout = pd.merge(left=dfdoidonor, right=dfdonor,
-                 #how='left', left_on='donorid', right_on='id')
+dfdoidonor = pd.merge(left=dfdonordoi, right=dfdonor,
+                 how='left', left_on='donorid', right_on='id')
+# Drop one of the donor id key fields from the merge.
+dfdoidonor = dfdoidonor[['donorid','doi','age','sex','race']]
 
-# Start output file.
-outfile= 'doi_donor.csv'
+# Merge doi-donor with metadata with parsed doi title information.
+dfout = pd.merge(left=dfdoidonor, right=dfdoi,
+                 how='left', on='doi',
+                 suffixes=['_donor','_doi']).sort_values(by='donorid')
+
+# Compare terms for race and sex from donor metadata with corresponding
+# terms parsed from the DOI titles.
+dfout['race_match'] = np.where(dfout['race_doi'] == dfout['race_donor'],
+                               'yes', 'no')
+dfout['sex_match'] = np.where(dfout['sex_doi'] == dfout['sex_donor'],
+                              'yes', 'no')
+dfout['match'] = np.where((dfout['race_match'] == 'yes') & (dfout['sex_match'] == 'yes'),
+                          'yes', 'no')
+# Write to output.
+outfile = 'doi_donor.csv'
 dfout.to_csv(outfile, index=False)
 
 
