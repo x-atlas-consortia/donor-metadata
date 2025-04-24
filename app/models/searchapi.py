@@ -11,10 +11,6 @@ import requests
 import pandas as pd
 from tqdm import tqdm
 
-# For retry loop
-from requests.adapters import HTTPAdapter
-from urllib3.util import Retry
-
 # Helper classes
 # Optimizes donor metadata for display in a DataFrame
 # April 2025. Because this file is used by both the donor-metadata app and scripts in the
@@ -24,7 +20,9 @@ fpath = os.path.join(fpath, 'app/models')
 sys.path.append(fpath)
 from metadataframe import MetadataFrame
 from getmetadatabytype import getmetadatabytype
-
+from getresponsejson import getresponsejson
+# to obtain DOI information for published datasets
+from datacite import DataCiteAPI
 
 class SearchAPI:
 
@@ -50,8 +48,8 @@ class SearchAPI:
         if self.consortium == 'sennetconsortium.org':
             self.headers['X-SenNet-Application'] = 'portal-ui'
 
-        # April 2025 - Remove default search of data for all donors data.
-        #self.dfalldonormetadata = self.getalldonormetadata()
+        # April 2025 - class to integrate DOI information.
+        self.datacite = DataCiteAPI(consortium=self.consortium)
 
     def getalldonormetadata(self) -> pd.DataFrame:
         """
@@ -191,7 +189,7 @@ class SearchAPI:
                             doi_url = donordataset.get('hits').get('hits')[0].get('_source').get('doi_url')
                             if doi_url is not None:
                                 # Get current DOI title from DataCite.
-                                doi_title = self._getdatacitetitle(doi_url=doi_url)
+                                doi_title = self.datacite.getdatacitetitle(doi_url=doi_url)
                                 listdois.append({"doi_url": doi_url, "doi_title": doi_title})
 
         return listdois
@@ -217,7 +215,7 @@ class SearchAPI:
             doi_url = source.get("doi_url")
             if doi_url is not None:
                 # Get current DOI title from DataCite.
-                doi_title = self._getdatacitetitle(doi_url=doi_url)
+                doi_title = self.datacite.getdatacitetitle(doi_url=doi_url)
                 listdois.append({"doi_url": doi_url, "doi_title": doi_title})
 
         return listdois
@@ -252,116 +250,8 @@ class SearchAPI:
 
         url = f'{self.urlbase}/search'
         # response = (requests.post(url=url, headers=self.headers, json=data))
-        return self._getresponsejson(url=url, method='POST', headers=self.headers, json=data)
+        return getresponsejson(url=url, method='POST', headers=self.headers, json=data)
 
-    def _getdatacitetitle(self, doi_url: str) -> str:
-        """
-        Queries the DataCite REST API for the title of a DOI.
-        """
-
-        doi = doi_url.split('https://doi.org/')[1]
-        url = f'https://api.datacite.org/dois/{doi}'
-        response = self._getresponsejson(url=url, method='GET')
-        if response is not None:
-            return response.get("data").get("attributes").get("titles")[0].get("title")
-
-    def _gettitleinfo(self, data:list) -> list:
-        """
-        Parses information from the data list of a DataCite response.
-        :param data: data list
-        :return: list of dicts of flattened information
-        """
-
-        listtitle = []
-        for doi in data:
-            id = doi.get('id')
-            titles = doi.get('attributes').get('titles')
-            if len(titles) > 0:
-                title = titles[0].get('title')
-            listtitle.append({
-                "doi": id,
-                "title": title
-            })
-        return listtitle
-
-    def getalldatacitetitles(self) -> list:
-        """
-        Obtains titles for all DOIs for a consortium.
-        Uses pagination.
-        :return: list of dicts of flattened information.
-        """
-        listret = []
-
-        if self.consortium == 'hubmapconsortium.org':
-            #prefix = '10.35079'
-            clientid = 'psc.hubmap'
-        else:
-            clientid = 'psc.sennet'
-
-
-        print('Getting initial page of 1000 titles...')
-        # Obtain the first 1000 records and pagination parameters.
-        url_init = f'https://api.datacite.org/dois/?client-id={clientid}&fields[dois]=titles&page[size]=1000'
-        response_init = self._getresponsejson(url=url_init, method='GET')
-
-        if response_init is not None:
-            data = response_init.get('data')
-            listret = listret + self._gettitleinfo(data=data)
-
-        pages = response_init.get('meta').get('totalPages')
-
-        for page in range(2,pages+1):
-            print(f'Getting page {str(page)} of 1000 titles...')
-            url_next = f'{url_init}&page[number]={page}'
-            response_next = self._getresponsejson(url=url_next, method='GET')
-
-            if response_next is not None:
-                data_next = response_next.get('data')
-                listret = listret + self._gettitleinfo(data=data_next)
-
-        return listret
-
-    def _getresponsejson(self, url: str, method: str, headers=None, json=None) -> dict:
-        """
-        Obtains a response from a REST API.
-        Employs a retry loop in case of timeout or other failures.
-
-        :param url: the URL to the REST API
-        :param method: GET or POST
-        :param headers: optional headers
-        :param json: optional response body for POST
-        :return:
-        """
-
-        # Use the HTTPAdapter's retry strategy, as described here:
-        # https://oxylabs.io/blog/python-requests-retry
-
-        # Five retries max.
-        # A backoff factor of 2, which results in exponential increases in delays before each attempt.
-        # Retry for scenarios such as Service Unavailable or Too Many Requests that often are returned in case
-        # of an overloaded server.
-        try:
-            retry = Retry(
-                total=10,
-                backoff_factor=2,
-                status_forcelist=[429, 500, 502, 503, 504]
-            )
-
-            adapter = HTTPAdapter(max_retries=retry)
-
-            session = requests.Session()
-            session.mount('https://', adapter)
-            # r = session.get('https://httpbin.org/status/502', timeout=180)
-            if method == 'GET':
-                r = session.get(url=url, timeout=180)
-            else:
-                r = session.post(url=url, timeout=180, headers=headers, json=json)
-
-            return r.json()
-
-        except Exception as e:
-            print(f'Error with URL {url}, json={json}: {e}')
-            abort(500)
 
     def getdoisforconsortium(self, size: int) -> dict:
         """
@@ -461,7 +351,7 @@ class SearchAPI:
             }
 
         url = f'{self.urlbase}/search'
-        return self._getresponsejson(url=url, method='POST', headers=self.headers, json=data)
+        return getresponsejson(url=url, method='POST', headers=self.headers, json=data)
 
     def getdonorraceandageterms(self, donorid: str) -> dict:
         """

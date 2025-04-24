@@ -30,6 +30,8 @@ fpath = os.path.dirname(os.getcwd())
 fpath = os.path.join(fpath, 'app/models')
 sys.path.append(fpath)
 from searchapi import SearchAPI
+# to obtain DOI information for published datasets
+from datacite import DataCiteAPI
 
 
 def getdoianddonorid(consortium: str, search: SearchAPI) -> pd.DataFrame:
@@ -77,9 +79,11 @@ def getdoititles(consortium: str, search: SearchAPI) -> pd.DataFrame:
     :param search: SearchAPI instance
     """
 
+    datacite = DataCiteAPI(consortium=consortium)
+
     listret = []
     print('Obtaining all DOI titles for consortium...')
-    listtitles = search.getalldatacitetitles()
+    listtitles = datacite.getalldatacitetitles()
     if listtitles is None:
         print('Error from DataCite')
         exit(-1)
