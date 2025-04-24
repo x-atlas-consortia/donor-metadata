@@ -32,11 +32,12 @@ sys.path.append(fpath)
 from searchapi import SearchAPI
 
 
-def getdoianddonorid(consortium: str) -> list:
+def getdoianddonorid(consortium: str, search: SearchAPI) -> pd.DataFrame:
 
     """
-    Returns flattened dict of dataset information for validation.
+    Returns DataFrame of dataset information for validation.
     :param consortium: name of consortium
+    :param search: SearchAPI instance
     :return: a list of dictionaries with;
              registered DOI
              donor id
@@ -46,7 +47,12 @@ def getdoianddonorid(consortium: str) -> list:
     print('Getting information on published datasets...')
 
     # Get all DOIs for published datasets.
-    datasets = search.getdoisforconsortium(size=3)
+    datasets = search.getdoisforconsortium(size=5000)
+    if 'error' in datasets.keys():
+        print(datasets)
+        exit(-1)
+
+    # Flatten response.
     if datasets is not None:
         hits = datasets.get('hits').get('hits')
         for hit in hits:
@@ -59,8 +65,39 @@ def getdoianddonorid(consortium: str) -> list:
 
             listret.append({'donorid': donorid, 'doi': registered_doi})
 
-        return listret
+        # Convert to DataFrame, dropping cases of published datasets without DOIs.
+        return pd.DataFrame(listret).dropna(subset=['doi'])
 
+def getdoititles(consortium: str, search: SearchAPI) -> pd.DataFrame:
+    """
+
+    Returns DataFrame with titles of all published DOIs for a consortium.
+    Includes parsed race and sex terms.
+    :param consortium: name of consortium
+    :param search: SearchAPI instance
+    """
+
+    listret = []
+    print('Obtaining all DOI titles for consortium...')
+    listtitles = search.getalldatacitetitles()
+    if listtitles is None:
+        print('Error from DataCite')
+        exit(-1)
+
+    for doi in listtitles:
+        title = doi.get('title')
+        if title is not None:
+            dictparse = parsedtitle(title=title)
+        listret.append(
+            {
+                "doi": doi.get('doi'),
+                "title": title,
+                "race": dictparse.get('race'),
+                "sex": dictparse.get('sex')
+            }
+        )
+
+    return pd.DataFrame(listret).drop_duplicates()
 
 def parsedtitle(title: str) -> dict:
     """
@@ -74,17 +111,22 @@ def parsedtitle(title: str) -> dict:
     # The race can have multiple words--e.g., "black or african american".
 
     dictret = {}
-    # Extrct the combined race and sex phrase.
-    print(title)
-    doiracesex = title.split('old ')[1]
-    # The term for sex is the last word in the combined phrase.
-    racesexsplit = doiracesex.split(' ')
-    doisex = racesexsplit[len(racesexsplit)-1]
-    # The term for race is everything up to the sex term.
-    doirace = doiracesex[0:(doiracesex.find(doisex)-1)]
+    title = title.lower().replace(' donor','')
+    if 'old' in title:
+        # Extract the combined race and sex phrase.
+        doiracesex = title.split('old ')[1]
+        # The term for sex is the last word in the combined phrase.
+        racesexsplit = doiracesex.split(' ')
+        doisex = racesexsplit[len(racesexsplit)-1]
+        # The term for race is everything up to the sex term.
+        doirace = doiracesex[0:(doiracesex.find(doisex)-1)]
 
-    dictret['race'] = doirace
-    dictret['sex'] = doisex
+        dictret['race'] = doirace
+        dictret['sex'] = doisex
+
+    else:
+        dictret['race'] = 'race cannot be parsed'
+        dictret['sex'] = 'sex cannot be parsed'
 
     return dictret
 
@@ -127,7 +169,12 @@ token = readglobustoken()
 search = SearchAPI(consortium=consortium, token=token)
 
 # Obtain information on published datasets.
-listdsinfo = getdoianddonorid(consortium=consortium)
+dfdoi = getdoianddonorid(consortium=consortium, search=search)
+
+# Obtain all HuBMAP DOIs from DataCite.
+dftitles = getdoititles(consortium=consortium, search=search)
+print(dftitles)
+exit(-1)
 
 # List of unique donor metadata.
 listdonor = []
@@ -136,57 +183,6 @@ listdonor = []
 outfile= 'doi_data.csv'
 writetocsv(filename=outfile, line={})
 
-# For each published dataset,
-# 1. Get the DOI title from DataCite.
-# 2. Extract the race and sex terms from the title.
-# 3. Get the donor id.
-# 4. Write to output.
+# Get DOI titles from DataCite.
 
-print('Parsing DOI title terms for race and sex...')
-for ds in tqdm(listdsinfo):
-
-    doi = ds.get("doi")
-    doi_url = f'https://doi.org/{doi}'
-    title = search._getdatacitetitle(doi_url=doi_url)
-    ds['title'] = title
-
-    dictparsedtitle = parsedtitle(title=title)
-    ds['race'] = dictparsedtitle.get('race')
-    ds['sex'] = dictparsedtitle.get('sex')
-
-    # Get donor id
-    listdonor.append(ds.get('donorid'))
-
-    # Write to CSV as we go to minimize memory.
-    writetocsv(filename=outfile, line=ds)
-
-# Make list of donors unique.
-listdonor = list(set(listdonor))
-
-print('Parsing terms for sex and race from associated donors...')
-listdonormeta = []
-
-for donorid in listdonor:
-    metadata = search.getdonorraceandageterms(donorid=donorid)
-    donormeta ={'donorid': donorid,
-                'race': metadata['race'],
-                'sex': metadata['sex']}
-    listdonormeta.append(donormeta)
-
-# Merge and compare DOI and unique donor metadata via Pandas.
-
-# Get doi metadata from CSV.
-dfdoi = pd.read_csv(outfile)
-# Convert unique donor metadata to DataFrame.
-dfdonor = pd.DataFrame(listdonormeta)
-# Merge on the donorid.
-dfout = pd.merge(left=dfdoi, right=dfdonor, how='left', on='donorid',
-                 suffixes=['_doi','_donor']).sort_values(by='donorid')
-# Compare terms.
-dfout['race_match'] = np.where(dfout['race_doi'] == dfout['race_donor'],
-                               'yes', 'no')
-dfout['sex_match'] = np.where(dfout['sex_doi'] == dfout['sex_donor'],
-                              'yes', 'no')
-# Write to CSV.
-dfout.to_csv(outfile, index=False)
 

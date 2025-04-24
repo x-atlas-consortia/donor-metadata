@@ -265,6 +265,62 @@ class SearchAPI:
         if response is not None:
             return response.get("data").get("attributes").get("titles")[0].get("title")
 
+    def _gettitleinfo(self, data:list) -> list:
+        """
+        Parses information from the data list of a DataCite response.
+        :param data: data list
+        :return: list of dicts of flattened information
+        """
+
+        listtitle = []
+        for doi in data:
+            id = doi.get('id')
+            titles = doi.get('attributes').get('titles')
+            if len(titles) > 0:
+                title = titles[0].get('title')
+            listtitle.append({
+                "doi": id,
+                "title": title
+            })
+        return listtitle
+
+    def getalldatacitetitles(self) -> list:
+        """
+        Obtains titles for all DOIs for a consortium.
+        Uses pagination.
+        :return: list of dicts of flattened information.
+        """
+        listret = []
+
+        if self.consortium == 'hubmapconsortium.org':
+            #prefix = '10.35079'
+            clientid = 'psc.hubmap'
+        else:
+            clientid = 'psc.sennet'
+
+
+        print('Getting initial page of 1000 titles...')
+        # Obtain the first 1000 records and pagination parameters.
+        url_init = f'https://api.datacite.org/dois/?client-id={clientid}&fields[dois]=titles&page[size]=1000'
+        response_init = self._getresponsejson(url=url_init, method='GET')
+
+        if response_init is not None:
+            data = response_init.get('data')
+            listret = listret + self._gettitleinfo(data=data)
+
+        pages = response_init.get('meta').get('totalPages')
+
+        for page in range(2,pages+1):
+            print(f'Getting page {str(page)} of 1000 titles...')
+            url_next = f'{url_init}&page[number]={page}'
+            response_next = self._getresponsejson(url=url_next, method='GET')
+
+            if response_next is not None:
+                data_next = response_next.get('data')
+                listret = listret + self._gettitleinfo(data=data_next)
+
+        return listret
+
     def _getresponsejson(self, url: str, method: str, headers=None, json=None) -> dict:
         """
         Obtains a response from a REST API.
