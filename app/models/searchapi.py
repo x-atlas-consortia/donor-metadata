@@ -51,41 +51,94 @@ class SearchAPI:
         # April 2025 - class to integrate DOI information.
         self.datacite = DataCiteAPI(consortium=self.consortium)
 
+
     def getalldonormetadata(self) -> pd.DataFrame:
         """
         Searches for metadata for donor in a consortium, using the search-api.
-        :return: if there is a donor entity with id=donorid, a DataFrame with flattened donor metadata.
+        :return: a DataFrame with flattened donor metadata.
         """
         listalldonordf = []
 
         # HuBMAP entity-api uses donors; SenNet entity-api uses sources.
-        if self.consortium == 'hubmapconsortium.org':
-            entities = 'donors'
-        else:
-            entities = 'sources'
-        url = f'{self.urlbase}param-search/{entities}'
+        # Get only those donors/human sources with metadata.
 
-        response = requests.get(url=url, headers=self.headers)
+        if self.consortium == 'hubmapconsortium.org':
+            idfield = 'hubmap_id'
+
+            data = {
+                "size": 1000,
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "match_phrase": {
+                                    "entity_type": "donor"
+                                }
+                            }
+                        ],
+                        "must_not": [
+                            {
+                                "term": {
+                                    "metadata": ""
+                                }
+                            }
+                        ]
+                    }
+                },
+                "_source": ["hubmap_id", "metadata"]
+            }
+
+        else:
+            idfield = 'sennet_id'
+
+            data = data = {
+                "size": 1000,
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "match_phrase": {
+                                    "entity_type": "Source"
+                                }
+                            },
+                            {
+                                "match_phrase": {
+                                    "source_type": "Human"
+                                }
+                            }
+                        ],
+                        "must_not": [
+                            {
+                                "term": {
+                                    "source.metadata": ""
+                                }
+                            }
+                        ]
+                    }
+                },
+                "_source": ["sennet_id", "metadata"]
+            }
+
+        url = f'{self.urlbase}/search'
+        response = requests.post(url=url, headers=self.headers, json=data)
 
         if response.status_code == 200:
 
             respjson = response.json()
+            # Navigate through the ElasticSearch response.
 
-            for donorjson in respjson:
-
-                # Only return metadata for human sources in SenNet.
-                if self.consortium == 'sennetconsortium.org':
-                    source_type = donorjson.get('source_type')
-                    donorid = donorjson.get('sennet_id')
-                    getdonor = source_type == 'Human'
-                else:
-                    getdonor = True
-                    donorid = donorjson.get('hubmap_id')
-                if getdonor:
-                    dictmetadata = donorjson.get('metadata')
+            donors = respjson.get('hits').get('hits')
+            if len(donors) > 0:
+                for donor in donors:
+                    source = donor.get('_source')
+                    donorid = source.get(idfield)
+                    dictmetadata = source.get('metadata')
                     if dictmetadata is not None and dictmetadata != {}:
+                        # Normalize living_donor_data and organ_donor_data objects.
                         metadata = getmetadatabytype(dictmetadata=dictmetadata)
+                        # Flatten metadata to level of donor.
                         donorexport = MetadataFrame(metadata=metadata, donorid=donorid)
+                        # Add to list.
                         listalldonordf.append(donorexport.dfexport)
 
             if len(listalldonordf) == 0:
@@ -104,13 +157,14 @@ class SearchAPI:
         else:
             abort(500, 'Error when calling the param-search endpoint in search-api')
 
-    def getalldonordoimetadata(self, start: int, end: int) -> pd.DataFrame:
+    def getalldonordoimetadata(self, start: int, end: int, geturls: bool=False) -> pd.DataFrame:
         """
         April 2025
         Extracts from the dfalldonormetadata DataFrame metadata relevant to
         DOIs for published datasets.
         :param start: ordinal number of first donor in a batch to process.
         :param end: ordinal number of the last donor in a batch to process.
+        :param geturls: if true, obtain DOI urls for published datasets.
     """
         listdonor = []
         # Get a sorted list of donor ids.
@@ -124,23 +178,26 @@ class SearchAPI:
 
             # Get the donor.
             donor = self.dfalldonormetadata[self.dfalldonormetadata['id'] == donorid]
-            # Get relevant metadata values.
+            # Get relevant metadata values in lowercase.
             age = donor.loc[donor['grouping_concept'] == 'C0001779']['data_value'].values[0]
-            sex = donor.loc[donor['grouping_concept'] == 'C1522384']['data_value'].values[0]
+            sex = donor.loc[donor['grouping_concept'] == 'C1522384']['data_value'].values[0].lower()
             race = donor.loc[donor['grouping_concept'] == 'C0034510']['data_value'].values
             if len(race) == 1:
-                race = race[0]
-            # Get DOI titles for any published datasets associated with the donor.
-            listdatasets = self.getdatasetdoisfordonor(donorid=donorid)
-            if len(listdatasets) == 0:
-                listdonor.append({"id": donorid, "age": age, "sex": sex, "race": race, "doi_url": "no published datasets",
+                race = race[0].lower()
+            if geturls:
+                # Get DOI titles for any published datasets associated with the donor.
+                listdatasets = self.getdatasetdoisfordonor(donorid=donorid)
+                if len(listdatasets) == 0:
+                    listdonor.append({"id": donorid, "age": age, "sex": sex, "race": race, "doi_url": "no published datasets",
                                   "doi_title": "no published datasets"})
-            else:
-                for ds in listdatasets:
-                    listdonor.append({"id": donorid, "age": age, "sex": sex, "race": race, "doi_url": ds.get('doi_url'),
+                else:
+                    for ds in listdatasets:
+                        listdonor.append({"id": donorid, "age": age, "sex": sex, "race": race, "doi_url": ds.get('doi_url'),
                                       "doi_title": ds.get('doi_title')})
 
-            time.sleep(10)
+                time.sleep(10)
+            else:
+                listdonor.append({"id": donorid, "age": age, "sex": sex, "race": race})
 
         return pd.DataFrame(listdonor)
 

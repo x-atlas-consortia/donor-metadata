@@ -3,6 +3,8 @@ Class representing interactions with the DataCite API for DOIs.
 """
 import os
 import sys
+import pandas as pd
+from tqdm import tqdm
 
 # Helper classes
 # Optimizes donor metadata for display in a DataFrame
@@ -70,8 +72,6 @@ class DataCiteAPI:
         """
         listret = []
 
-
-
         print('Getting initial page of 1000 titles...')
         # Obtain the first 1000 records and pagination parameters.
         url_init = f'https://api.datacite.org/dois/?client-id={self.clientid}&fields[dois]=titles&page[size]=1000'
@@ -83,8 +83,8 @@ class DataCiteAPI:
 
         pages = response_init.get('meta').get('totalPages')
 
-        for page in range(2,pages+1):
-            print(f'Getting page {str(page)} of 1000 titles...')
+        print(f'Getting remaining {str(pages-1)} pages...')
+        for page in tqdm(range(2,pages+1)):
             url_next = f'{url_init}&page[number]={page}'
             response_next = getresponsejson(url=url_next, method='GET')
 
@@ -93,3 +93,64 @@ class DataCiteAPI:
                 listret = listret + self._gettitleinfo(data=data_next)
 
         return listret
+
+    def getdoititles(self) -> pd.DataFrame:
+        """
+
+        Returns DataFrame with titles of all published DOIs for a consortium.
+        Includes parsed race and sex terms.
+
+        """
+
+        listret = []
+        print('Obtaining all DOI titles for consortium...')
+        listtitles = self.getalldatacitetitles()
+        if listtitles is None:
+            print('Error from DataCite')
+            exit(-1)
+
+        for doi in listtitles:
+            title = doi.get('title')
+            if title is not None:
+                dictparse = self._parsedtitle(title=title)
+            listret.append(
+                {
+                    "doi": doi.get('doi'),
+                    "title": title,
+                    "race": dictparse.get('race'),
+                    "sex": dictparse.get('sex')
+                }
+            )
+
+        return pd.DataFrame(listret).drop_duplicates()
+
+    def _parsedtitle(self, title: str) -> dict:
+        """
+        Parses the sex and race terms from a DOI title string.
+        :param title: DOI title string
+        :return: dict
+        """
+
+        # The DOI title is in format
+        # <type of data> from the <organ> of a <age>-<age unit>-old <race> <sex>.
+        # The race can have multiple words--e.g., "black or african american".
+
+        dictret = {}
+        title = title.lower().replace(' donor', '')
+        if 'old' in title:
+            # Extract the combined race and sex phrase.
+            doiracesex = title.split('old ')[1]
+            # The term for sex is the last word in the combined phrase.
+            racesexsplit = doiracesex.split(' ')
+            doisex = racesexsplit[len(racesexsplit) - 1]
+            # The term for race is everything up to the sex term.
+            doirace = doiracesex[0:(doiracesex.find(doisex) - 1)]
+
+            dictret['race'] = doirace
+            dictret['sex'] = doisex
+
+        else:
+            dictret['race'] = 'race cannot be parsed'
+            dictret['sex'] = 'sex cannot be parsed'
+
+        return dictret

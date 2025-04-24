@@ -2,6 +2,8 @@
 Routines to support calls to REST APIs subject to throttling or timeout.
 Employs a retry loop.
 Can be invoked from within either a Flask app or in a script.
+If this will ever be called from a script, the import of flask does not apply.
+
 """
 import requests
 
