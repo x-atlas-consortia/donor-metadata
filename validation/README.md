@@ -11,6 +11,13 @@ issues related to formatting of donor metadata, including:
 The **donor-metadata** Flask application is intended primarily as a means to edit the metadata of 
 one donor at a time, and is not suitable for bulk validation.
 
+The validation scripts use classes that were originally developed for the
+**donor-metadata** application, including:
+- searchapi.py
+- datacite.py
+
+The classes have been enhanced to allow use by either the Flask app or the validation scripts.
+
 ## doi_donor.py
 ### Prerequisites
 Unlike the **donor-metadata** application, this script does not use Globus SSO.
