@@ -137,11 +137,10 @@ dfdonor = search.getalldonordoimetadata(start=start, end=end, geturls=False)
 # Obtain all consortium DOIs from DataCite.
 dfdoi = datacite.getdoititles()
 
+print('Comparing donor metadata with DOI metadata...')
 # Merge doi-donor map with donor metadata.
 dfdoidonor = pd.merge(left=dfdonordoi, right=dfdonor,
                  how='left', left_on='donorid', right_on='id')
-# Drop one of the donor id key fields from the merge.
-#dfdoidonor = dfdoidonor[['donorid','doi','age','ageunits','sex','race']]
 
 # Merge doi-donor with metadata with parsed doi title information.
 dfout = pd.merge(left=dfdoidonor, right=dfdoi,
@@ -174,9 +173,18 @@ dfout['age_donor_type'] = np.where(dfout['age_donor'].str.contains('.', regex=Fa
 dfout['age_doi_type'] = np.where(dfout['age_doi'].str.contains('.', regex=False), 'decimal', 'integer')
 # Drop extra id column.
 dfout = dfout.drop('id', axis=1).sort_values(by='donorid')
+
 # Write to output.
-outfile = 'doi_donor.csv'
+print('Writing output files...')
+cout = consortium.split('_')[1]
+outfile = f'{cout}_doi_donor_analysis.csv'
 dfout.to_csv(outfile, index=False)
+
+# Export only donorids with datasets that need DOI updates.
+dfid = dfout[dfout['match'] == 'no']['donorid'].drop_duplicates()
+idfile = outfile = f'{cout}_donors_to_update.csv'
+dfid.to_csv(idfile, index=False)
+
 
 
 
