@@ -97,6 +97,18 @@ def writetocsv(filename: str, line: dict):
                         quotechar='|', quoting=csv.QUOTE_MINIMAL)
         cw.writerow(lineout)
 
+def checkageunit(row) -> str:
+    """
+    Compares the singular age unit from the DOI (e.g., year) with the
+    plural age unit from donor metadata (e.g., years).
+
+    :return: yes or no
+    """
+    doiunitplural = f'{row["ageunits_doi"]}s'
+    if doiunitplural == row["ageunits_donor"]:
+        return 'yes'
+    else:
+        return 'no'
 
 # --- MAIN
 # Get the consortium.
@@ -129,12 +141,12 @@ dfdoi = datacite.getdoititles()
 dfdoidonor = pd.merge(left=dfdonordoi, right=dfdonor,
                  how='left', left_on='donorid', right_on='id')
 # Drop one of the donor id key fields from the merge.
-dfdoidonor = dfdoidonor[['donorid','doi','age','sex','race']]
+#dfdoidonor = dfdoidonor[['donorid','doi','age','ageunits','sex','race']]
 
 # Merge doi-donor with metadata with parsed doi title information.
 dfout = pd.merge(left=dfdoidonor, right=dfdoi,
                  how='left', on='doi',
-                 suffixes=['_donor','_doi']).sort_values(by='donorid')
+                 suffixes=['_donor','_doi'])
 
 # Compare terms for race and sex from donor metadata with corresponding
 # terms parsed from the DOI titles.
@@ -142,8 +154,20 @@ dfout['race_match'] = np.where(dfout['race_doi'] == dfout['race_donor'],
                                'yes', 'no')
 dfout['sex_match'] = np.where(dfout['sex_doi'] == dfout['sex_donor'],
                               'yes', 'no')
-dfout['match'] = np.where((dfout['race_match'] == 'yes') & (dfout['sex_match'] == 'yes'),
-                          'yes', 'no')
+dfout['age_match'] = np.where(dfout['age_doi'] == dfout['age_donor'],
+                              'yes', 'no')
+# Age unit is singular in DOI title and plural in donor metadata.
+dfout['ageunits_match'] = dfout.apply(checkageunit, axis=1)
+
+dfout['match'] = np.where(
+    (dfout['race_match'] == 'yes')
+    & (dfout['sex_match'] == 'yes')
+    & (dfout['age_match'] == 'yes')
+    & (dfout['ageunits_match'] == 'yes'),
+    'yes', 'no')
+
+# Drop extra id column.
+dfout = dfout.drop('id', axis=1).sort_values(by='donorid')
 # Write to output.
 outfile = 'doi_donor.csv'
 dfout.to_csv(outfile, index=False)

@@ -118,7 +118,9 @@ class DataCiteAPI:
                     "doi": doi.get('doi'),
                     "title": title,
                     "race": dictparse.get('race'),
-                    "sex": dictparse.get('sex')
+                    "sex": dictparse.get('sex'),
+                    "age": dictparse.get('age'),
+                    "ageunits": dictparse.get('ageunits')
                 }
             )
 
@@ -126,31 +128,58 @@ class DataCiteAPI:
 
     def _parsedtitle(self, title: str) -> dict:
         """
-        Parses the sex and race terms from a DOI title string.
+        Parses the age, age unit, sex, and race terms from a DOI title string.
         :param title: DOI title string
         :return: dict
         """
 
-        # The DOI title is in format
+        # The DOI title is expected to be in format
         # <type of data> from the <organ> of a <age>-<age unit>-old <race> <sex>.
         # The race can have multiple words--e.g., "black or african american".
 
         dictret = {}
         title = title.lower().replace(' donor', '')
-        if 'old' in title:
+        if '-old' in title:
             # Extract the combined race and sex phrase.
-            doiracesex = title.split('old ')[1]
+            doiracesex = title.split('-old ')[1]
+            # format of doiracesex:
+            #   <race> <sex>
             # The term for sex is the last word in the combined phrase.
             racesexsplit = doiracesex.split(' ')
             doisex = racesexsplit[len(racesexsplit) - 1]
             # The term for race is everything up to the sex term.
             doirace = doiracesex[0:(doiracesex.find(doisex) - 1)]
-
             dictret['race'] = doirace
             dictret['sex'] = doisex
+
+            # Extract the age unit.
+            doiage = title.split('-old')[0]
+            # format of doiage:
+            #   <type of data> from the <organ> of a <age>-<age unit>
+            dashsplit = doiage.split('-')
+            if len(dashsplit) > 1:
+                # format of doiagedashsplit:
+                #   <type of data> from the <organ> of a <age>
+                #   <age unit>
+                dictret['ageunits'] = dashsplit[len(dashsplit)-1]
+            else:
+                dictret['ageunits'] = 'age unit cannot be parsed'
+
+            # Extract the age.
+            doiage = title.split('of a')
+            # format of doiage:
+            #   <type of data> from the <organ>
+            #   <age>-<age unit>-old <race> <sex>
+            dashsplit = doiage[1].split('-')
+            if len(dashsplit) > 1:
+                dictret['age'] = dashsplit[0].strip()
+            else:
+                dictret['age'] = 'age cannot be parsed'
 
         else:
             dictret['race'] = 'race cannot be parsed'
             dictret['sex'] = 'sex cannot be parsed'
+            dictret['age'] = 'age cannot be parsed'
+            dictret['ageunits'] = 'ageunits cannot be parsed'
 
         return dictret

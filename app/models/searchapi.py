@@ -180,6 +180,7 @@ class SearchAPI:
             donor = self.dfalldonormetadata[self.dfalldonormetadata['id'] == donorid]
             # Get relevant metadata values in lowercase.
             age = donor.loc[donor['grouping_concept'] == 'C0001779']['data_value'].values[0]
+            ageunits = donor.loc[donor['grouping_concept'] == 'C0001779']['units'].values[0]
             sex = donor.loc[donor['grouping_concept'] == 'C1522384']['data_value'].values[0].lower()
             race = donor.loc[donor['grouping_concept'] == 'C0034510']['data_value'].values
             if len(race) == 1:
@@ -188,16 +189,21 @@ class SearchAPI:
                 # Get DOI titles for any published datasets associated with the donor.
                 listdatasets = self.getdatasetdoisfordonor(donorid=donorid)
                 if len(listdatasets) == 0:
-                    listdonor.append({"id": donorid, "age": age, "sex": sex, "race": race, "doi_url": "no published datasets",
-                                  "doi_title": "no published datasets"})
+                    listdonor.append({"id": donorid, "age": age, "ageunits": ageunits,
+                                      "sex": sex, "race": race,
+                                      "doi_url": "no published datasets",
+                                      "doi_title": "no published datasets"})
                 else:
                     for ds in listdatasets:
-                        listdonor.append({"id": donorid, "age": age, "sex": sex, "race": race, "doi_url": ds.get('doi_url'),
-                                      "doi_title": ds.get('doi_title')})
+                        listdonor.append({"id": donorid, "age": age, "ageunits": ageunits,
+                                          "sex": sex, "race": race,
+                                          "doi_url": ds.get('doi_url'),
+                                          "doi_title": ds.get('doi_title')})
 
                 time.sleep(10)
             else:
-                listdonor.append({"id": donorid, "age": age, "sex": sex, "race": race})
+                listdonor.append({"id": donorid, "age": age, "ageunits": ageunits,
+                                  "sex": sex, "race": race})
 
         return pd.DataFrame(listdonor)
 
