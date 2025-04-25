@@ -166,6 +166,12 @@ dfout['match'] = np.where(
     & (dfout['ageunits_match'] == 'yes'),
     'yes', 'no')
 
+# Explicitly compare number types of donor and doi age to identify synchronization
+# issues--e.g., an integer donor age (11) and a decimal DOI age (11.0).
+# (When Excel opens a CSV with a decimal in format x.0, it truncates the display, so
+# the numeric type mismatch is not apparent.)
+dfout['age_donor_type'] = np.where(dfout['age_donor'].str.contains('.', regex=False), 'decimal', 'integer')
+dfout['age_doi_type'] = np.where(dfout['age_doi'].str.contains('.', regex=False), 'decimal', 'integer')
 # Drop extra id column.
 dfout = dfout.drop('id', axis=1).sort_values(by='donorid')
 # Write to output.
