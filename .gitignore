@@ -27,3 +27,6 @@ BUILD
 
 /valueset/*.csv
 **/*.zip
+
+/validation/*/*.token
+/validation/*/*.csv
