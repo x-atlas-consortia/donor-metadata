@@ -24,3 +24,4 @@ def stringisintegerorfloat(s:str) ->str:
             return "float"
 
     return "not a number"
+

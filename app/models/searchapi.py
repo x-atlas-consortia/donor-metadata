@@ -232,6 +232,7 @@ class SearchAPI:
         id_field = 'hubmap_id'
         dictdonor = self._searchmatch(id_field=id_field, id_value=donorid)
         hits = dictdonor.get('hits').get('hits')
+        descendants = None
         if len(hits) > 0:
             source = hits[0].get('_source')
             if source is not None:

@@ -26,18 +26,42 @@ def validate_age(form, field):
 
     ageunit = form.ageunit.data
     age = field.data
-    # if not age.isnumeric():
-    if not stringisintegerorfloat(age):
+    if stringisintegerorfloat(age) == "not a number":
         raise ValidationError('Age must be a number.')
     agenum = float(age)
-    # if agenum <= 0:
-        # raise ValidationError('The minimum age is 1 month.')
-    # if age is None:
-        # age = 0
+    if age is None:
+        age = 0
     if agenum > 89 and ageunit == 'C0001779':  # UMLS CUI for age in years
         if agenum != 90:
             raise ValidationError('All ages over 89 years must be set to 90 years.')
 
+def validate_number(form, field):
+    """
+    Custom validator for StringFields that collect numeric data.
+    :param form: the Edit form
+    :param field: the field to check
+    :return: Nothing or raises ValidationError
+    """
+
+    valuetotest = field.data
+    test = stringisintegerorfloat(valuetotest)
+
+    if test == "not a number":
+        raise ValidationError(f'{field.name} must be a number.')
+
+def validate_integer(form, field):
+    """
+    Custom validator for StringFields that collect integer data.
+    :param form: the Edit form
+    :param field: the field to check
+    :return: Nothing or raises ValidationError
+    """
+
+    valuetotest = field.data
+    test = stringisintegerorfloat(valuetotest)
+
+    if test != "integer":
+        raise ValidationError(f'{field.name} must be an integer.')
 
 def validate_selectfield_default(form, field):
     """
@@ -101,10 +125,9 @@ class EditForm(Form):
     ageunits = valuesetmanager.getvaluesettuple(tab='Age', group_term='Age', col='units')
     ageunit = SelectField('units', choices=ageunits)
 
-    # Apr 2025 remove rounding (places=1).
-    # agevalue = DecimalField('Age (value)',places=1, validators=[validate_age])
-    #agevalue = DecimalField('Age (value)', validators=[validate_age])
+    # The age value can be either an integer or a decimal, so use a StringField.
     agevalue = StringField('Age (value)', validators=[validate_age])
+
     # Race
     races = valuesetmanager.getvaluesettuple(tab='Race', group_term='Race')
     race = SelectField('Race', choices=races)
@@ -135,25 +158,41 @@ class EditForm(Form):
     event = SelectField('Death Event', choices=events, validators=[validate_selectfield_default])
 
     # Measurements
-    # Create SelectFields for each measurement group.
-    heightvalue = DecimalField('Height (value)', validators=[validators.Optional()])
+    # April 2025 - Converted all DecimalFields to StringFields in order to observe numeric
+    # type of numeric measurements--i.e., integer or float.
+    heightvalue = StringField('Height (value)', validators=[validate_number, validators.Optional()])
     heightunit = SelectField('units', choices=[('0', 'cm'), ('1', 'in')], validators=[validators.Optional()])
-    weightvalue = DecimalField('Weight (value)', validators=[validators.Optional()])
+
+    weightvalue = StringField('Weight (value)', validators=[validate_number, validators.Optional()])
     weightunit = SelectField('units', choices=[('0', 'kg'), ('1', 'lb')], validators=[validators.Optional()])
-    bmi = DecimalField('Body Mass Index (kg/m2)', validators=[validators.Optional()])
-    waistvalue = DecimalField('Waist circumference', validators=[validators.Optional()])
+
+    bmi = StringField('Body Mass Index (kg/m2)', validators=[validate_number, validators.Optional()])
+
+    waistvalue = StringField('Waist circumference', validators=[validate_number, validators.Optional()])
     waistunit = SelectField('units', choices=[('0', 'cm'), ('1', 'in')], validators=[validators.Optional()])
-    kdpi = DecimalField('KDPI (%)', validators=[validators.Optional()])
-    hba1c = DecimalField('HbA1c (%)', validators=[validators.Optional()])
-    amylase = DecimalField('Amylase (U/L)', validators=[validators.Optional()])
-    lipase = DecimalField('Lipase (U/L)', validators=[validators.Optional()])
-    egfr = DecimalField('eGFR (mL/min/1.73m2)', validators=[validators.Optional()])
-    secr = DecimalField('Creatinine (mg/dL)', validators=[validators.Optional()])
-    agemenarche = DecimalField('Age at menarche (years)', validators=[validators.Optional()])
-    agefirstbirth = DecimalField('Age at first birth (years)', validators=[validators.Optional()])
-    gestationalage = DecimalField('Gestational age (weeks)', validators=[validators.Optional()])
-    cancerrisk = DecimalField('Cancer Risk (%)', validators=[validators.Optional()])
+
+    kdpi = StringField('KDPI (%)', validators=[validate_number, validators.Optional()])
+
+    hba1c = StringField('HbA1c (%)', validators=[validate_number, validators.Optional()])
+
+    amylase = StringField('Amylase (U/L)', validators=[validate_number, validators.Optional()])
+
+    lipase = StringField('Lipase (U/L)', validators=[validate_number, validators.Optional()])
+
+    egfr = StringField('eGFR (mL/min/1.73m2)', validators=[validate_number, validators.Optional()])
+
+    secr = StringField('Creatinine (mg/dL)', validators=[validate_number, validators.Optional()])
+
+    agemenarche = StringField('Age at menarche (years)', validators=[validate_number, validators.Optional()])
+
+    agefirstbirth = StringField('Age at first birth (years)', validators=[validate_number, validators.Optional()])
+
+    gestationalage = StringField('Gestational age (weeks)', validators=[validate_number, validators.Optional()])
+
+    cancerrisk = StringField('Cancer Risk (%)', validators=[validate_number, validators.Optional()])
+
     pathologynote = TextAreaField('Pathology Note', validators=[validators.Optional()])
+
     apoephenotype = TextAreaField('APOE phenotype', validators=[validators.Optional()])
 
     # The Fitzpatrick Skin Type, Other Anatomic, blood type, and blood Rh factor are categorical measurements.
@@ -258,9 +297,11 @@ class EditForm(Form):
                            validators=[validate_selectfield_default, validators.Optional()])
 
     # March 2025
-    # Pregnancy
-    gravida = DecimalField('Gravida', validators=[validators.Optional()])
-    parity = DecimalField('Parity', validators=[validators.Optional()])
-    abortus = DecimalField('Abortus', validators=[validators.Optional()])
+    # Measures of pregnancy must be integers.
+    gravida = StringField('Gravida', validators=[validate_integer,validators.Optional()])
+
+    parity = StringField('Parity', validators=[validate_integer, validators.Optional()])
+
+    abortus = StringField('Abortus', validators=[validate_integer, validators.Optional()])
 
     review = SubmitField()

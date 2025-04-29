@@ -89,9 +89,10 @@ named **donor-metadata**.
 folder, which is bound to a volume on the host machine.
 
 # Databases
-The application works with three databases:
+The application works with **four** databases:
 1. the Valueset Manager, a Google Sheets document
 2. the neo4j provenance databases for the two consortia, abstracted by consortium-specific instances of entity-api.
+3. DataCite, for DOIs of published datasets associated with donors.
 
 ***
 # Workflows
@@ -100,7 +101,6 @@ There are **four** workflows in the application:
 1. A **curation workflow** that allows for editing of the metadata for a single donor in a consortium.
 2. An **export workflow** that exports metadata for all donors in a consortium to a file in spreadsheet format (CSV or TSV).
 3. An **export workflow** that exports metadata for a single donor to a file in spreadsheet format.
-4. A **DOI review workflow** that compares donor metadata with the titles of DOIs created for published datasets associated with the donor.
 
 # Curation workflow
 
@@ -141,6 +141,7 @@ The application:
    * the current metadata JSON for the donor
    * the new metadata JSON for the donor
    * the comparison of the current and new metadata JSONs
+   * information on DOIs for published datasets associated with the donor, to identify cases in which the DOI titles will need to be updated.
 2. The Blueprint route */review*:
    * works with the **donor** helper class to update the donor metadata in provenance
    * redirects to the **export_review.html** for export
@@ -166,25 +167,6 @@ in which
 - *scope* is either the name of the consortium or the donor id
 - *format* is either **csv** or **tsv**.
 
-***
-# DOI Workflow
-
-When a dataset is published, a Digital Object Identifier (DOI) is created for the dataset in the [DataCite Commons](https://datacite.org/create-dois/).
-The DOI's description is derived from the following donor clinical metadata:
-- age
-- race
-- sex
-
-The description for the DOI for a published dataset may lose currency if the donor's clinical metadata changes. 
-The DOI workflow allows for comparison between a donor's current or proposed clinical metadata and the descriptions of
-DOIs for published datasets associated with the donor.
-
-## Review page
-The Review page (in the edit workflow) displays a table of DOI information for published datasets associated with the donor.
-
-## DOI Compare page
-The DOI Compare page allows the display of information on a set of donors in a consortium. 
-The page downloads results to a CSV file, similar to those downloaded from the Export page.
 
 # base.html
 All HTML files in the application inherit from **base.html**, which includes:

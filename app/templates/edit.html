@@ -25,15 +25,15 @@
                     </div>
                 </div>
                  <div class="row text-bg-warning">
-                    <div class="col">
+                    <div class="col" title="Source: required">
                         {{ render_field(form.source) }}
                     </div>
-                     <div class="col">
+                     <div class="col" title="Sex: required; default is Unknown">
                         {{ render_field(form.sex) }}
                     </div>
                 </div>
                 <div class="row text-bg-warning">
-                    <div class="col">
+                    <div class="col" title="Age: required; integer or decimal; can be 0">
                         {{ render_field(form.agevalue) }}
                     </div>
                     <div class="col">
@@ -41,14 +41,14 @@
                     </div>
                 </div>
                 <div class="row text-bg-warning">
-                    <div class="col">
+                    <div class="col" title="Race: required; default is Unknown">
                         {{ render_field(form.race) }}
                     </div>
-                    <div class="col">
+                    <div class="col" title="Ethnicity: optional">
                         {{ render_field(form.ethnicity) }}
                     </div>
                 </div>
-                <div class="row">
+                <div class="row" title="Optional">
                     <h3>Organ Donation</h3>
                     <dl>
                         {{ render_field(form.cause) }}
@@ -58,15 +58,15 @@
                 </div>
                 <div class = "row">
                     <h3> Vitals</h3>
-                    <div class="col">
+                    <div class="col" title="Height: integer or decimal; converts to cm">
                         {{ render_field(form.heightvalue) }}
                     </div>
-                    <div class="col">
+                    <div class="col"">
                         {{ render_field(form.heightunit) }}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col">
+                    <div class="col" title="Weight: integer or decimal; converts to kg">
                         {{ render_field(form.weightvalue) }}
                     </div>
                     <div class="col">
@@ -74,7 +74,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col">
+                    <div class="col" title="BMI: integer or decimal">
                          {{ render_field(form.bmi) }}
                     </div>
                 </div>
@@ -90,7 +90,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col">
+                    <div class="col" title="Waist circumference: converts to cm">
                         {{ render_field(form.waistvalue) }}
                     </div>
                     <div class="col">
@@ -98,63 +98,63 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col">
+                    <div class="col" title="Age at menarche: integer or decmial">
                         {{ render_field(form.agemenarche) }}
                     </div>
-                    <div class="col">
+                    <div class="col" title="Age at first birth: integer or decimal">
                         {{ render_field(form.agefirstbirth) }}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col">
+                    <div class="col" title="Gestational age: integer or decmial">
                         {{ render_field(form.gestationalage) }}
                     </div>
-                    <div class="col">
+                    <div class="col" title="Gravida: integer">
                         {{ render_field(form.gravida) }}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col">
+                    <div class="col" title="Parity: integer">
                         {{ render_field(form.parity) }}
                     </div>
-                    <div class="col">
+                    <div class="col" title="Abortus (lost pregnancies): integer">
                         {{ render_field(form.abortus) }}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col">
+                    <div class="col" title="KDPI: integer or decmial">
                         {{ render_field(form.kdpi) }}
                     </div>
-                    <div class="col">
+                    <div class="col" title="Cancer risk: integer or decimal">
                         {{ render_field(form.cancerrisk) }}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col">
+                    <div class="col" title="HbA1c: integer or decimal">
                         {{ render_field(form.hba1c) }}
                     </div>
-                    <div class="col">
+                    <div class="col" title="Amylase: integer or decimal">
                         {{ render_field(form.amylase) }}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col">
+                    <div class="col" title="Lipase: integer or decimal">
                         {{ render_field(form.lipase) }}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col">
+                    <div class="col" title="eGFR: integer or decimal">
                         {{ render_field(form.egfr) }}
                     </div>
-                    <div class="col">
+                    <div class="col" title="Creatinine: integer or decimal">
                         {{ render_field(form.secr) }}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col">
+                    <div class="col" title="Pathology note: free text">
                         {{ render_field(form.pathologynote) }}
                     </div>
-                    <div class="col">
+                    <div class="col" title="APOE phenotype: free text">
                         {{ render_field(form.apoephenotype) }}
                     </div>
                 </div>
