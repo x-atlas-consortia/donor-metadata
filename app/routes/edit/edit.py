@@ -129,16 +129,7 @@ def setdefaults(form):
     agelist = form.currentdonordata.getmetadatavalues(list_concept=age_concept,
                                                       grouping_concept=age_grouping_concept, key='data_value')
     if len(agelist) > 0:
-        #form.agevalue.data = float(agelist[0])
-        # April 2025
-        # Ages can be either integers or floats, but are stored as strings.
-        # Maintain the original data type.
-        if len(agelist) > 0:
-            agetype = stringisintegerorfloat(agelist[0])
-            if agetype == "integer":
-                form.agevalue.data = int(agelist[0])
-            elif agetype == "float":
-                form.agevalue.data = float(agelist[0])
+        form.agevalue.data = agelist[0]
 
     # Age Units
     # The default age unit is years.
@@ -248,7 +239,8 @@ def setdefaults(form):
     height_concept = 'C0005890'
     heightvaluelist = form.currentdonordata.getmetadatavalues(grouping_concept=height_concept, key='data_value')
     if len(heightvaluelist) > 0:
-        form.heightvalue.data = float(heightvaluelist[0])
+        #form.heightvalue.data = float(heightvaluelist[0])
+        form.heightvalue.data = heightvaluelist[0]
 
     # Height unit
     # The Height unit is currently linked to the Height valueset, and has a default of cm.
@@ -272,7 +264,7 @@ def setdefaults(form):
     weight_concept = 'C0005910'
     weightvaluelist = form.currentdonordata.getmetadatavalues(grouping_concept=weight_concept, key='data_value')
     if len(weightvaluelist) > 0:
-        form.weightvalue.data = float(weightvaluelist[0])
+        form.weightvalue.data = weightvaluelist[0]
 
     # Weight unit
     # The Weight unit is currently linked to the Height valueset, and has a default of kg.
@@ -295,7 +287,7 @@ def setdefaults(form):
     bmi_concept = 'C1305855'
     bmilist = form.currentdonordata.getmetadatavalues(grouping_concept=bmi_concept, key='data_value')
     if len(bmilist) > 0:
-        form.bmi.data = float(bmilist[0])
+        form.bmi.data = bmilist[0]
 
     # ABO Blood Type
     # The ABO Blood type is categorical. Its valueset is a subset of rows on the "Blood Type" tab.
@@ -321,7 +313,7 @@ def setdefaults(form):
     waist_concept = 'C0455829'
     waistvaluelist = form.currentdonordata.getmetadatavalues(grouping_concept=waist_concept, key='data_value')
     if len(waistvaluelist) > 0:
-        form.waistvalue.data = float(waistvaluelist[0])
+        form.waistvalue.data = waistvaluelist[0]
 
     # Waist Circumference unit
     # The Waist Circumference unit is currently linked to the Height valueset, and has a default of cm.
@@ -344,7 +336,7 @@ def setdefaults(form):
     agemenarche_concept = 'C1314691'
     agemenarchelist = form.currentdonordata.getmetadatavalues(grouping_concept=agemenarche_concept, key='data_value')
     if len(agemenarchelist) > 0:
-        form.agemenarche.data = float(agemenarchelist[0])
+        form.agemenarche.data = agemenarchelist[0]
 
     # Age at first birth
     # The age at first birth has no default value.
@@ -352,7 +344,7 @@ def setdefaults(form):
     agefirstbirthlist = form.currentdonordata.getmetadatavalues(grouping_concept=agefirstbirth_concept,
                                                                 key='data_value')
     if len(agefirstbirthlist) > 0:
-        form.agefirstbirth.data = float(agefirstbirthlist[0])
+        form.agefirstbirth.data = agefirstbirthlist[0]
 
     # Gestational age
     # The gestational age has no default value.
@@ -360,7 +352,7 @@ def setdefaults(form):
     gestationalagelist = form.currentdonordata.getmetadatavalues(grouping_concept=gestationalage_concept,
                                                                  key='data_value')
     if len(gestationalagelist) > 0:
-        form.gestationalage.data = float(gestationalagelist[0])
+        form.gestationalage.data = gestationalagelist[0]
 
     # March 2025
     # Gravida
@@ -369,7 +361,7 @@ def setdefaults(form):
     gravidalist = form.currentdonordata.getmetadatavalues(grouping_concept=gravida_concept,
                                                           key='data_value')
     if len(gravidalist) > 0:
-        form.gravida.data = float(gravidalist[0])
+        form.gravida.data = gravidalist[0]
 
     # Parity
     # Parity has no default value.
@@ -377,7 +369,7 @@ def setdefaults(form):
     paritylist = form.currentdonordata.getmetadatavalues(grouping_concept=parity_concept,
                                                          key='data_value')
     if len(paritylist) > 0:
-        form.parity.data = float(paritylist[0])
+        form.parity.data = paritylist[0]
 
     # Abortus
     # Abortus has no default value.
@@ -385,56 +377,56 @@ def setdefaults(form):
     abortuslist = form.currentdonordata.getmetadatavalues(grouping_concept=abortus_concept,
                                                           key='data_value')
     if len(abortuslist) > 0:
-        form.abortus.data = float(abortuslist[0])
+        form.abortus.data = abortuslist[0]
 
     # KDPI
     # The KDPI has no default value.
     kdpi_concept = 'C4330523'
     kdpilist = form.currentdonordata.getmetadatavalues(grouping_concept=kdpi_concept, key='data_value')
     if len(kdpilist) > 0:
-        form.kdpi.data = float(kdpilist[0])
+        form.kdpi.data = kdpilist[0]
 
     # Cancer risk
     # The Cancer risk has no default value.
     cancer_concept = 'C0596244'
     cancerlist = form.currentdonordata.getmetadatavalues(grouping_concept=cancer_concept, key='data_value')
     if len(cancerlist) > 0:
-        form.cancerrisk.data = float(cancerlist[0])
+        form.cancerrisk.data = cancerlist[0]
 
     # Hba1c
     # The Hba1c has no default value.
     hba1c_concept = 'C2707530'
     hba1clist = form.currentdonordata.getmetadatavalues(grouping_concept=hba1c_concept, key='data_value')
     if len(hba1clist) > 0:
-        form.hba1c.data = float(hba1clist[0])
+        form.hba1c.data = hba1clist[0]
 
     # Amylase
     # The Amylase has no default value.
     amylase_concept = 'C0201883'
     amlyaselist = form.currentdonordata.getmetadatavalues(grouping_concept=amylase_concept, key='data_value')
     if len(amlyaselist) > 0:
-        form.amylase.data = float(amlyaselist[0])
+        form.amylase.data = amlyaselist[0]
 
     # Lipase
     # The Lipase has no default value.
     lipase_concept = 'C0373670'
     lipaselist = form.currentdonordata.getmetadatavalues(grouping_concept=lipase_concept, key='data_value')
     if len(lipaselist) > 0:
-        form.lipase.data = float(lipaselist[0])
+        form.lipase.data = lipaselist[0]
 
     # eGFR
     # The eGFR has no default value.
     egfr_concept = 'C3274401'
     egfrlist = form.currentdonordata.getmetadatavalues(grouping_concept=egfr_concept, key='data_value')
     if len(egfrlist) > 0:
-        form.egfr.data = float(egfrlist[0])
+        form.egfr.data = egfrlist[0]
 
     # Serum creatinine
     # No default value.
     secr_concept = 'C0600061'
     secrlist = form.currentdonordata.getmetadatavalues(grouping_concept=secr_concept, key='data_value')
     if len(secrlist) > 0:
-        form.secr.data = float(secrlist[0])
+        form.secr.data = secrlist[0]
 
     # Pathology note
     # The Pathology note has no default value.

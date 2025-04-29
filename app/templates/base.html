@@ -120,7 +120,10 @@
           <img src="/static/sennet.png" alt="SenNet" title="SenNet" data-height="234" style="max-height: 40px;">
         </a>
       </nav>
-   <!-- Optional display of environment -->
+   <!-- Flag if in dev environment -->
+   {% if "dev" in config["ENDPOINT_BASE"]%}
+    <p class="bg-primary text-white fs-4">Environment: DEV</p>
+   {% endif %}
    <!--<p class="bg-secondary text-white fs-4">Environment: {% if "dev" in config["ENDPOINT_BASE"]%} development {% else %} production {% endif %}</p>-->
     {% block content %}
     {% endblock %}
