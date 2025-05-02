@@ -151,8 +151,6 @@ dfdoi = datacite.getdoititles()
 
 print('Comparing donor metadata with DOI metadata...')
 # Merge doi-donor map with donor metadata.
-print(dfdonordoitz.columns)
-print(dfdonor.columns)
 dfdoidonor = pd.merge(left=dfdonordoitz, right=dfdonor,
                  how='left', left_on='donorid', right_on='id')
 
