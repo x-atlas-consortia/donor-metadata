@@ -97,6 +97,7 @@ def writetocsv(filename: str, line: dict):
                         quotechar='|', quoting=csv.QUOTE_MINIMAL)
         cw.writerow(lineout)
 
+
 def checkageunit(row) -> str:
     """
     Compares the singular age unit from the DOI (e.g., year) with the
@@ -128,6 +129,17 @@ dfdonordoi = getdoianddonorid(consortium=consortium, search=search)
 print('Getting donor metadata for consortium...')
 search.dfalldonormetadata = search.getalldonormetadata()
 
+# Find any data_value with trailing zeroes.
+dftz = search.dfalldonormetadata
+dftz['last_digit'] = [str(x).strip()[-1] for x in dftz['data_value']]
+dftz['decimal'] = ['.' in str(x) for x in dftz['data_value']]
+dftz['trailing_zero'] = np.where((dftz['last_digit'] =='0') & (dftz['decimal']), 'yes', 'no')
+dftz = dftz[['id', 'trailing_zero']]
+
+dfdonordoitz = pd.merge(left=dfdonordoi, right=dftz,
+                        how='left', left_on='donorid', right_on='id')
+dfdonordoitz = dfdonordoitz.drop('id', axis=1)
+
 print('Filtering to DOI-specific metadata...')
 start = 0
 end = len(search.dfalldonormetadata)
@@ -139,7 +151,9 @@ dfdoi = datacite.getdoititles()
 
 print('Comparing donor metadata with DOI metadata...')
 # Merge doi-donor map with donor metadata.
-dfdoidonor = pd.merge(left=dfdonordoi, right=dfdonor,
+print(dfdonordoitz.columns)
+print(dfdonor.columns)
+dfdoidonor = pd.merge(left=dfdonordoitz, right=dfdonor,
                  how='left', left_on='donorid', right_on='id')
 
 # Merge doi-donor with metadata with parsed doi title information.
