@@ -69,6 +69,8 @@ The DOI of the published dataset
 Clinical metadata for the donor
 #### title
 DOI title from DataCite Commons
+#### trailing_zeroes
+Whether any decimal metadata field has a trailing zero.
 #### age_doi, ageunits_doi, race_doi, sex_doi
 Clinical metadata parsed from the DOI title
 #### age_match, ageunits_match, race_match, sex_match
