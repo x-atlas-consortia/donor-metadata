@@ -194,9 +194,12 @@ dfout.to_csv(outfile, index=False)
 
 # Export only donorids with datasets that need DOI updates.
 dfid = dfout[dfout['match'] == 'no']['donorid'].drop_duplicates()
-idfile = outfile = f'{cout}_donors_to_update.csv'
+idfile = f'{cout}_donors_to_update.csv'
 dfid.to_csv(idfile, index=False)
 
-
+# Export only donorids with metadata with trailing zeroes.
+dfzero = dfout[dfout['trailing_zero'] == 'yes']['donorid'].drop_duplicates()
+idfile = f'{cout}_donors_trailing_zeroes.csv'
+dfzero.to_csv(idfile, index=False)
 
 
