@@ -467,7 +467,7 @@ def setdefaults(form):
     # Smoking
     # Smoking is categorical. Its valueset is a subset of rows on the "Social History" tab. The
     # valueset concepts do not share a grouping concept.
-    smoking_concepts = ['C0337664', 'C0337672', 'C0337671']
+    smoking_concepts = ['C0337664', 'C0337672', 'C0337671','C5704610']
     grouping_concept = 'C0424945'
     smokinglist = form.currentdonordata.getmetadatavalues(list_concept=smoking_concepts,
                                                           grouping_concept=grouping_concept, key='concept_id')

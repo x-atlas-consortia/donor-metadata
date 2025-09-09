@@ -220,7 +220,7 @@ class EditForm(Form):
     # so grouping will need to be manual. The other option of adding distinct grouping concepts would require
     # that we regenerate all donor metadata currently in provenance.
 
-    list_smoking_concepts = ['C0337664', 'C0337672', 'C0337671']
+    list_smoking_concepts = ['C0337664', 'C0337672', 'C0337671', 'C5704610']
     smokings = valuesetmanager.getvaluesettuple(tab='Social History', list_concepts=list_smoking_concepts,
                                                 addprompt=True)
     smoking = SelectField('Smoking history', choices=smokings,
